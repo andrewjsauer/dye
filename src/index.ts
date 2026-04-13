@@ -17,6 +17,8 @@ export {default as Transform} from './components/Transform.js';
 export type {Props as NewlineProps} from './components/Newline.js';
 export {default as Newline} from './components/Newline.js';
 export {default as Spacer} from './components/Spacer.js';
+export {default as AlternateScreen} from './components/AlternateScreen.js';
+export type {AlternateScreenProps} from './components/AlternateScreen.js';
 export type {Key} from './hooks/use-input.js';
 export {default as useInput} from './hooks/use-input.js';
 export {default as usePaste} from './hooks/use-paste.js';
