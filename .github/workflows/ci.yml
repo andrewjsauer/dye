@@ -21,6 +21,7 @@ jobs:
       - name: Lint
         run: npm run lint
       - name: Test
-        run: FORCE_COLOR=true npx ava --serial
+        run: npx ava --serial
         env:
+          FORCE_COLOR: 'true'
           CI: false
