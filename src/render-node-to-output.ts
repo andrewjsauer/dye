@@ -8,6 +8,7 @@ import renderBorder from './render-border.js';
 import renderBackground from './render-background.js';
 import {type DOMElement} from './dom.js';
 import type Output from './output.js';
+import {recordNodeRect} from './node-cache.js';
 
 // If parent container is `<Box>`, text nodes will be treated as separate nodes in
 // the tree and will have their own coordinates in the layout.
@@ -128,6 +129,15 @@ const renderNodeToOutput = (
 		// Left and top positions in Yoga are relative to their parent node
 		const x = offsetX + yogaNode.getComputedLeft();
 		const y = offsetY + yogaNode.getComputedTop();
+
+		// Record screen-space bounding rect for hit-testing
+		recordNodeRect(
+			node,
+			x,
+			y,
+			yogaNode.getComputedWidth(),
+			yogaNode.getComputedHeight(),
+		);
 
 		// Transformers are functions that transform final text output of each component
 		// See Output class for logic that applies transformers

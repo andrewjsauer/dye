@@ -59,6 +59,9 @@ export {
 export type {Frame, Cursor, Viewport, Patch, Diff} from './frame.js';
 export {CharPool, StylePool, HyperlinkPool} from './pools.js';
 export type {StyleDescriptor} from './pools.js';
+// Node rect cache (hit-testing foundation)
+export type {CachedLayout} from './node-cache.js';
+export {getNodeRect, hitTest} from './node-cache.js';
 export {diffScreens} from './diff.js';
 export type {DiffOptions} from './diff.js';
 export {optimize, diffToString} from './optimizer.js';

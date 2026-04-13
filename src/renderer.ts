@@ -5,6 +5,7 @@ import Output from './output.js';
 import {type DOMElement} from './dom.js';
 import {type Screen} from './screen.js';
 import {type StylePool} from './pools.js';
+import {clearNodeCache} from './node-cache.js';
 
 type Result = {
 	output: string;
@@ -39,6 +40,9 @@ const renderer = (node: DOMElement, isScreenReaderEnabled: boolean): Result => {
 				staticOutput: staticOutput ? `${staticOutput}\n` : '',
 			};
 		}
+
+		// Clear node rect cache at the start of each render cycle
+		clearNodeCache();
 
 		const output = new Output({
 			width: node.yogaNode.getComputedWidth(),
