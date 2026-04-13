@@ -1,13 +1,12 @@
 {
-	"name": "ink",
-	"version": "7.0.0",
-	"description": "React for CLI",
+	"name": "@sauerapple/dye",
+	"version": "0.1.0",
+	"description": "React terminal UI framework with mouse support, text selection, and double-buffered rendering. Fork of Ink.",
 	"license": "MIT",
-	"repository": "vadimdemedes/ink",
+	"repository": "sauerapple/dye",
 	"author": {
-		"name": "Vadim Demedes",
-		"email": "vadimdemedes@hey.com",
-		"url": "https://github.com/vadimdemedes"
+		"name": "Andrew Sauer",
+		"url": "https://github.com/sauerapple"
 	},
 	"type": "module",
 	"exports": {
@@ -35,16 +34,15 @@
 	"keywords": [
 		"react",
 		"cli",
+		"terminal",
+		"tui",
 		"jsx",
-		"stdout",
 		"components",
 		"command-line",
-		"preact",
-		"redux",
-		"print",
+		"mouse",
+		"selection",
 		"render",
-		"colors",
-		"text"
+		"ink"
 	],
 	"dependencies": {
 		"@alcalzone/ansi-tokenize": "^0.3.0",

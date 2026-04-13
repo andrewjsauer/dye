@@ -1,4 +1,4 @@
-name: test
+name: CI
 on: [push, pull_request]
 jobs:
   test:
@@ -10,13 +10,17 @@ jobs:
           - 24
           - 22
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node_version }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node_version }}
       - run: npm install
-      - run: npm test -- --serial
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: FORCE_COLOR=true npx ava --serial
         env:
-          FORCE_COLOR: true
           CI: false
