@@ -37,5 +37,30 @@ export {default as useBoxMetrics} from './hooks/use-box-metrics.js';
 export type {CursorPosition} from './log-update.js';
 export {default as measureElement} from './measure-element.js';
 export type {DOMElement} from './dom.js';
+// Dye screen buffer types
+export type {Screen, Rectangle} from './screen.js';
+export {
+	CellWidth,
+	createScreen,
+	setCellAt,
+	getCellCharId,
+	getCellWord1,
+	getCell,
+	screenToString,
+	clearScreen,
+	clearRegion,
+	shiftRows,
+	blitRegion,
+	unpackStyleId,
+	unpackHyperlinkId,
+	unpackWidth,
+	packWord1,
+} from './screen.js';
+export type {Frame, Cursor, Viewport, Patch, Diff} from './frame.js';
+export {CharPool, StylePool, HyperlinkPool} from './pools.js';
+export type {StyleDescriptor} from './pools.js';
+export {diffScreens} from './diff.js';
+export type {DiffOptions} from './diff.js';
+export {optimize, diffToString} from './optimizer.js';
 export {kittyFlags, kittyModifiers} from './kitty-keyboard.js';
 export type {KittyKeyboardOptions, KittyFlagName} from './kitty-keyboard.js';

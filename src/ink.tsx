@@ -13,6 +13,7 @@ import wrapAnsi from 'wrap-ansi';
 import {getWindowSize} from './utils.js';
 import reconciler from './reconciler.js';
 import render from './renderer.js';
+import {type Screen} from './screen.js';
 import * as dom from './dom.js';
 import {hideCursorEscape, showCursorEscape} from './cursor-helpers.js';
 import logUpdate, {type LogUpdate, type CursorPosition} from './log-update.js';
@@ -300,6 +301,13 @@ export default class Ink {
 	private lastOutputToRender: string;
 	private lastOutputHeight: number;
 	private lastTerminalWidth: number;
+	/**
+	 * Current screen buffer from the last render.
+	 * Used by downstream features (hit-testing, mouse, selection) to map
+	 * screen coordinates to cell content. Populated when the renderer
+	 * returns a Screen (normal mode, not screen reader).
+	 */
+	private currentScreen: Screen | undefined;
 	private readonly container: FiberRoot;
 	private readonly rootNode: dom.DOMElement;
 	// This variable is used only in debug mode to store full static output
@@ -530,10 +538,15 @@ export default class Ink {
 		}
 
 		const startTime = performance.now();
-		const {output, outputHeight, staticOutput} = render(
+		const {output, outputHeight, staticOutput, screen} = render(
 			this.rootNode,
 			this.isScreenReaderEnabled,
 		);
+
+		// Track the current screen buffer for downstream features
+		if (screen) {
+			this.currentScreen = screen;
+		}
 
 		this.options.onRender?.({renderTime: performance.now() - startTime});
 
@@ -923,6 +936,14 @@ export default class Ink {
 		}
 
 		await yieldImmediate();
+	}
+
+	/**
+	 * Get the current screen buffer from the last render.
+	 * Used by downstream features (hit-testing, mouse, selection).
+	 */
+	getScreen(): Screen | undefined {
+		return this.currentScreen;
 	}
 
 	clear(): void {

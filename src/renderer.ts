@@ -3,11 +3,14 @@ import renderNodeToOutput, {
 } from './render-node-to-output.js';
 import Output from './output.js';
 import {type DOMElement} from './dom.js';
+import {type Screen} from './screen.js';
 
 type Result = {
 	output: string;
 	outputHeight: number;
 	staticOutput: string;
+	/** The Screen buffer for cell-level diffing (undefined for screen reader mode). */
+	screen?: Screen;
 };
 
 const renderer = (node: DOMElement, isScreenReaderEnabled: boolean): Result => {
@@ -64,6 +67,7 @@ const renderer = (node: DOMElement, isScreenReaderEnabled: boolean): Result => {
 			// Newline at the end is needed, because static output doesn't have one, so
 			// interactive output will override last line of static output
 			staticOutput: staticOutput ? `${staticOutput.get().output}\n` : '',
+			screen: output.getScreen(),
 		};
 	}
 
