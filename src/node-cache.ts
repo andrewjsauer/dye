@@ -25,18 +25,10 @@ export type CachedLayout = {
 const nodeCache = new WeakMap<DOMElement, CachedLayout>();
 
 /**
- * Record a node's screen-space bounding rect in the cache.
- * Called during renderNodeToOutput() after computing the node's position.
+ * Tracks which nodes have cached rects so we can clear
+ * the WeakMap between render cycles (WeakMap has no clear()).
  */
-export function cacheNodeRect(
-	node: DOMElement,
-	x: number,
-	y: number,
-	width: number,
-	height: number,
-): void {
-	nodeCache.set(node, {x, y, width, height});
-}
+const trackedNodes = new Set<DOMElement>();
 
 /**
  * Get a node's cached screen-space bounding rect.
@@ -51,14 +43,6 @@ export function getNodeRect(node: DOMElement): CachedLayout | undefined {
  * Clear the entire cache. Called at the start of each render cycle.
  */
 export function clearNodeCache(): void {
-	// WeakMap doesn't have a clear() method, but since it's keyed by
-	// DOMElement references, entries are automatically GC'd when nodes
-	// are removed from the tree. For explicit per-frame clearing, we
-	// use a generation counter approach: callers check the generation
-	// when reading from the cache.
-	//
-	// However, for simplicity and correctness, we track nodes in a
-	// separate Set and delete them explicitly.
 	for (const node of trackedNodes) {
 		nodeCache.delete(node);
 	}
@@ -67,14 +51,8 @@ export function clearNodeCache(): void {
 }
 
 /**
- * Set of nodes whose rects are currently cached.
- * Used to enable clearing the WeakMap between render cycles.
- */
-const trackedNodes = new Set<DOMElement>();
-
-/**
- * Record a node's rect and track it for cache clearing.
- * This is the primary entry point used during rendering.
+ * Record a node's screen-space bounding rect and track it for cache clearing.
+ * Called during renderNodeToOutput() after computing the node's position.
  */
 export function recordNodeRect(
 	node: DOMElement,
