@@ -59,6 +59,13 @@ export {
 export type {Frame, Cursor, Viewport, Patch, Diff} from './frame.js';
 export {CharPool, StylePool, HyperlinkPool} from './pools.js';
 export type {StyleDescriptor} from './pools.js';
+// Mouse protocol
+export {parseMouse, MOUSE_ENABLE, MOUSE_DISABLE} from './mouse.js';
+export type {ParsedMouse, MouseButton, MouseAction} from './mouse.js';
+// Events
+export {DyeEvent} from './events/event.js';
+export {ClickEvent} from './events/click-event.js';
+export {dispatchClick, dispatchHover, resetHoverState} from './events/dispatch.js';
 // Node rect cache (hit-testing foundation)
 export type {CachedLayout} from './node-cache.js';
 export {getNodeRect, hitTest} from './node-cache.js';

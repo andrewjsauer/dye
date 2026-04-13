@@ -70,6 +70,13 @@ export type DOMElement = {
 	onRender?: () => void;
 	onImmediateRender?: () => void;
 	internal_layoutListeners?: Set<LayoutListener>;
+
+	/**
+	 * Event handlers registered on this element (onClick, onMouseEnter, etc.).
+	 * Set by the reconciler when event handler props are provided.
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	_eventHandlers?: Record<string, ((...args: any[]) => void) | undefined>;
 } & InkNode;
 
 export type TextNode = {

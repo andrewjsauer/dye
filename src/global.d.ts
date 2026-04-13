@@ -2,6 +2,7 @@ import {type ReactNode, type Key, type Ref} from 'react';
 import {type Except} from 'type-fest';
 import {type DOMElement} from './dom.js';
 import {type Styles} from './styles.js';
+import {type ClickEvent} from './events/click-event.js';
 
 declare module 'react' {
 	namespace JSX {
@@ -21,6 +22,9 @@ declare namespace Ink {
 		ref?: Ref<DOMElement>;
 		style?: Except<Styles, 'textWrap'>;
 		internal_accessibility?: DOMElement['internal_accessibility'];
+		onClick?: (event: ClickEvent) => void;
+		onMouseEnter?: () => void;
+		onMouseLeave?: () => void;
 	};
 
 	type Text = {

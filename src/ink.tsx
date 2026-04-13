@@ -14,6 +14,8 @@ import {getWindowSize} from './utils.js';
 import reconciler from './reconciler.js';
 import render from './renderer.js';
 import {type Screen} from './screen.js';
+import {parseMouse, type ParsedMouse} from './mouse.js';
+import {dispatchClick, dispatchHover} from './events/dispatch.js';
 import * as dom from './dom.js';
 import {hideCursorEscape, showCursorEscape} from './cursor-helpers.js';
 import logUpdate, {type LogUpdate, type CursorPosition} from './log-update.js';
@@ -944,6 +946,34 @@ export default class Ink {
 	 */
 	getScreen(): Screen | undefined {
 		return this.currentScreen;
+	}
+
+	/**
+	 * Handle a parsed mouse event from stdin.
+	 * Routes to hit-test + dispatch for clicks, or hover tracking for motion.
+	 */
+	handleMouseEvent(mouse: ParsedMouse): void {
+		if (mouse.action === 'press') {
+			dispatchClick(this.rootNode, mouse.col, mouse.row, {
+				button: mouse.button === 'none' ? undefined : mouse.button,
+				shift: mouse.shift,
+				alt: mouse.alt,
+				ctrl: mouse.ctrl,
+			});
+		} else if (mouse.action === 'drag') {
+			dispatchHover(this.rootNode, mouse.col, mouse.row);
+		}
+	}
+
+	/**
+	 * Try to parse raw input as a mouse event.
+	 * Returns true if the input was consumed as a mouse event.
+	 */
+	tryHandleMouseInput(input: string): boolean {
+		const mouse = parseMouse(input);
+		if (!mouse) return false;
+		this.handleMouseEvent(mouse);
+		return true;
 	}
 
 	clear(): void {

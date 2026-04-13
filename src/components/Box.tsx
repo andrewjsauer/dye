@@ -2,10 +2,28 @@ import React, {forwardRef, useContext, type PropsWithChildren} from 'react';
 import {type Except} from 'type-fest';
 import {type Styles} from '../styles.js';
 import {type DOMElement} from '../dom.js';
+import {type ClickEvent} from '../events/click-event.js';
 import {accessibilityContext} from './AccessibilityContext.js';
 import {backgroundContext} from './BackgroundContext.js';
 
 export type Props = Except<Styles, 'textWrap'> & {
+	/**
+	Handler called when the element is clicked (mouse button press).
+	Requires mouse tracking to be enabled (via AlternateScreen with mouseTracking).
+	*/
+	readonly onClick?: (event: ClickEvent) => void;
+
+	/**
+	Handler called when the mouse enters this element's bounds.
+	Non-bubbling. No event argument.
+	*/
+	readonly onMouseEnter?: () => void;
+
+	/**
+	Handler called when the mouse leaves this element's bounds.
+	Non-bubbling. No event argument.
+	*/
+	readonly onMouseLeave?: () => void;
 	/**
 	A label for the element for screen readers.
 	*/
@@ -63,6 +81,9 @@ const Box = forwardRef<DOMElement, PropsWithChildren<Props>>(
 		{
 			children,
 			backgroundColor,
+			onClick,
+			onMouseEnter,
+			onMouseLeave,
 			'aria-label': ariaLabel,
 			'aria-hidden': ariaHidden,
 			'aria-role': role,
@@ -80,6 +101,9 @@ const Box = forwardRef<DOMElement, PropsWithChildren<Props>>(
 		const boxElement = (
 			<ink-box
 				ref={ref}
+				onClick={onClick}
+				onMouseEnter={onMouseEnter}
+				onMouseLeave={onMouseLeave}
 				style={{
 					flexWrap: 'nowrap',
 					flexDirection: 'row',

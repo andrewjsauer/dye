@@ -25,6 +25,30 @@ import {
 import applyStyles, {type Styles} from './styles.js';
 import {type OutputTransformer} from './render-node-to-output.js';
 
+/**
+ * Event handler prop names recognized by the reconciler.
+ * These are stored in DOMElement._eventHandlers instead of attributes.
+ */
+const EVENT_HANDLER_PROPS = new Set([
+	'onClick',
+	'onMouseEnter',
+	'onMouseLeave',
+]);
+
+function isEventHandlerProp(key: string): boolean {
+	return EVENT_HANDLER_PROPS.has(key);
+}
+
+function setEventHandler(node: DOMElement, key: string, value: unknown): void {
+	if (!node._eventHandlers) {
+		node._eventHandlers = {};
+	}
+
+	node._eventHandlers[key] = typeof value === 'function'
+		? value as (...args: unknown[]) => void
+		: undefined;
+}
+
 // We need to conditionally perform devtools connection to avoid
 // accidentally breaking other third-party code.
 // See https://github.com/vadimdemedes/ink/issues/384
@@ -234,6 +258,11 @@ export default createReconciler<
 				continue;
 			}
 
+			if (isEventHandlerProp(key)) {
+				setEventHandler(node, key, value);
+				continue;
+			}
+
 			setAttribute(node, key, value as DOMNodeAttribute);
 		}
 
@@ -329,6 +358,11 @@ export default createReconciler<
 
 				if (key === 'internal_static') {
 					node.internal_static = true;
+					continue;
+				}
+
+				if (isEventHandlerProp(key)) {
+					setEventHandler(node, key, value);
 					continue;
 				}
 
