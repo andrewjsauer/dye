@@ -7,18 +7,33 @@ import {
 	tokenize,
 } from '@alcalzone/ansi-tokenize';
 import {type OutputTransformer} from './render-node-to-output.js';
+import {CharPool, StylePool, HyperlinkPool} from './pools.js';
+import {
+	type Screen,
+	createScreen,
+	setCellAt,
+	CellWidth,
+} from './screen.js';
 
 /**
 "Virtual" output class
 
-Handles the positioning and saving of the output of each node in the tree. Also responsible for applying transformations to each character of the output.
+Handles the positioning and saving of the output of each node in the tree.
+Also responsible for applying transformations to each character of the output.
 
-Used to generate the final output of all nodes before writing it to actual output stream (e.g. stdout)
+Used to generate the final output of all nodes before writing it to actual
+output stream (e.g. stdout).
+
+In Dye, Output populates a Screen buffer (packed Int32Array cells) alongside
+the traditional StyledChar grid. The Screen is available via getScreen() for
+the cell-level diff pipeline, while get() returns the same string output as
+before for backward compatibility.
 */
 
 type Options = {
 	width: number;
 	height: number;
+	stylePool?: StylePool;
 };
 
 type Operation = WriteOperation | ClipOperation | UnclipOperation;
@@ -95,11 +110,20 @@ export default class Output {
 	private readonly operations: Operation[] = [];
 	private readonly caches: OutputCaches = new OutputCaches();
 
+	// Dye additions: interning pools and screen buffer
+	readonly charPool: CharPool;
+	readonly stylePool: StylePool;
+	readonly hyperlinkPool: HyperlinkPool;
+	private screen: Screen | undefined;
+
 	constructor(options: Options) {
 		const {width, height} = options;
 
 		this.width = width;
 		this.height = height;
+		this.charPool = new CharPool();
+		this.stylePool = options.stylePool ?? new StylePool();
+		this.hyperlinkPool = new HyperlinkPool();
 	}
 
 	write(
@@ -136,6 +160,11 @@ export default class Output {
 		});
 	}
 
+	/**
+	 * Process all operations and return the string output.
+	 * This maintains full backward compatibility with the original Ink output.
+	 * Internally, also populates the Screen buffer for cell-level diffing.
+	 */
 	get(): {output: string; height: number} {
 		// Initialize output array with a specific set of rows, so that margin/padding at the bottom is preserved
 		const output: StyledChar[][] = [];
@@ -154,6 +183,15 @@ export default class Output {
 
 			output.push(row);
 		}
+
+		// Also create the Screen buffer
+		this.screen = createScreen(
+			this.width,
+			this.height,
+			this.stylePool,
+			this.charPool,
+			this.hyperlinkPool,
+		);
 
 		const clips: Clip[] = [];
 
@@ -267,16 +305,33 @@ export default class Output {
 							1
 					) {
 						currentLine[offsetX - 1] = spaceCell;
+
+						// Also clean in Screen
+						setCellAt(this.screen, offsetX - 1, y + offsetY, 0, 0, 0, CellWidth.Narrow);
 					}
 
 					for (const character of characters) {
 						currentLine[offsetX] = character;
 
-						// Determine printed width using string-width to align with measurement
+						// Write to Screen buffer too
+						const charId = this.charPool.intern(character.value);
+						const styleCodes = character.styles.map(s => {
+							// Extract the numeric SGR code from the ANSI string
+							// e.g., '\x1b[1m' → 1
+							const match = s.code.match(/\x1b\[(\d+(?:;\d+)*)m/);
+							if (match) {
+								return match[1]!.split(';').map(Number);
+							}
+
+							return [];
+						}).flat();
+						const styleId = this.stylePool.intern(styleCodes);
 						const characterWidth = Math.max(
 							1,
 							this.caches.getStringWidth(character.value),
 						);
+						const cellWidth = characterWidth > 1 ? CellWidth.Wide : CellWidth.Narrow;
+						setCellAt(this.screen, offsetX, y + offsetY, charId, styleId, 0, cellWidth);
 
 						// For multi-column characters, clear following cells to avoid stray spaces/artifacts
 						if (characterWidth > 1) {
@@ -287,6 +342,17 @@ export default class Output {
 									fullWidth: false,
 									styles: character.styles,
 								};
+
+								// Spacer tail in Screen
+								setCellAt(
+									this.screen,
+									offsetX + index,
+									y + offsetY,
+									this.charPool.intern(''),
+									styleId,
+									0,
+									CellWidth.SpacerTail,
+								);
 							}
 						}
 
@@ -295,6 +361,7 @@ export default class Output {
 
 					if (currentLine[offsetX]?.value === '') {
 						currentLine[offsetX] = spaceCell;
+						setCellAt(this.screen, offsetX, y + offsetY, 0, 0, 0, CellWidth.Narrow);
 					}
 
 					offsetY++;
@@ -315,5 +382,13 @@ export default class Output {
 			output: generatedOutput,
 			height: output.length,
 		};
+	}
+
+	/**
+	 * Return the Screen buffer populated during the last get() call.
+	 * Must call get() first.
+	 */
+	getScreen(): Screen | undefined {
+		return this.screen;
 	}
 }
