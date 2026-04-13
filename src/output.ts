@@ -165,7 +165,7 @@ export default class Output {
 	 * This maintains full backward compatibility with the original Ink output.
 	 * Internally, also populates the Screen buffer for cell-level diffing.
 	 */
-	get(): {output: string; height: number} {
+	get(): {output: string; height: number; screen: Screen} {
 		// Initialize output array with a specific set of rows, so that margin/padding at the bottom is preserved
 		const output: StyledChar[][] = [];
 
@@ -315,16 +315,25 @@ export default class Output {
 
 						// Write to Screen buffer too
 						const charId = this.charPool.intern(character.value);
-						const styleCodes = character.styles.map(s => {
-							// Extract the numeric SGR code from the ANSI string
-							// e.g., '\x1b[1m' → 1
-							const match = s.code.match(/\x1b\[(\d+(?:;\d+)*)m/);
+						const styleCodes: number[] = [];
+						for (const s of character.styles) {
+							// Match SGR sequences: \x1b[Nm, \x1b[N;N;...m, or bare \x1b[m (reset)
+							const match = s.code.match(/\x1b\[(\d+(?:;\d+)*)?m/);
 							if (match) {
-								return match[1]!.split(';').map(Number);
+								if (match[1]) {
+									for (const n of match[1].split(';')) {
+										const code = Number(n);
+										if (Number.isInteger(code)) {
+											styleCodes.push(code);
+										}
+									}
+								} else {
+									// Bare \x1b[m is equivalent to \x1b[0m (reset)
+									styleCodes.push(0);
+								}
 							}
+						}
 
-							return [];
-						}).flat();
 						const styleId = this.stylePool.intern(styleCodes);
 						const characterWidth = Math.max(
 							1,
@@ -381,12 +390,13 @@ export default class Output {
 		return {
 			output: generatedOutput,
 			height: output.length,
+			screen: this.screen!,
 		};
 	}
 
 	/**
 	 * Return the Screen buffer populated during the last get() call.
-	 * Must call get() first.
+	 * @deprecated Use the `screen` property from get() return value instead.
 	 */
 	getScreen(): Screen | undefined {
 		return this.screen;

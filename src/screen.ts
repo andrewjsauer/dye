@@ -95,6 +95,7 @@ export type Screen = {
 	/** Packed cell data: 2 Int32s per cell. Index = (y * width + x) * 2. */
 	readonly cells: Int32Array;
 	readonly charPool: CharPool;
+	readonly stylePool: StylePool;
 	readonly hyperlinkPool: HyperlinkPool;
 	/** The styleId for empty/unstyled cells (always 0). */
 	readonly emptyStyleId: number;
@@ -105,7 +106,7 @@ export type Screen = {
 export function createScreen(
 	width: number,
 	height: number,
-	_stylePool: StylePool,
+	stylePool: StylePool,
 	charPool?: CharPool,
 	hyperlinkPool?: HyperlinkPool,
 ): Screen {
@@ -114,6 +115,7 @@ export function createScreen(
 	return {
 		width: w,
 		height: h,
+		stylePool,
 		cells: new Int32Array(w * h * 2),
 		charPool: charPool ?? new CharPool(),
 		hyperlinkPool: hyperlinkPool ?? new HyperlinkPool(),

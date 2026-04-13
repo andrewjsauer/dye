@@ -18,6 +18,7 @@ import {
 } from '../src/screen.js';
 import {diffScreens} from '../src/diff.js';
 import {optimize, diffToString} from '../src/optimizer.js';
+import Output from '../src/output.js';
 
 // ---------------------------------------------------------------------------
 // CharPool
@@ -355,4 +356,280 @@ test('optimizer - removes clear with count 0', t => {
 		{type: 'clear', count: 0},
 	]);
 	t.is(result.length, 0);
+});
+
+// ---------------------------------------------------------------------------
+// Review finding tests — testing gaps identified during code review
+// ---------------------------------------------------------------------------
+
+// --- shiftRows negative delta (scroll down) ---
+
+test('Screen - shiftRows scrolls down (negative delta)', t => {
+	const stylePool = new StylePool();
+	const screen = createScreen(3, 4, stylePool);
+	const aId = screen.charPool.intern('A');
+	// Write 'A' at row 0
+	setCellAt(screen, 0, 0, aId, 0, 0, CellWidth.Narrow);
+	// Scroll down by 1 in region [0, 4)
+	shiftRows(screen, 0, 4, -1);
+	// 'A' should now be at row 1
+	t.is(screen.charPool.resolve(getCellCharId(screen, 0, 1)), 'A');
+	// Row 0 (top) should be blank
+	t.is(getCellCharId(screen, 0, 0), 0);
+});
+
+test('Screen - shiftRows scroll down by 2', t => {
+	const stylePool = new StylePool();
+	const screen = createScreen(3, 5, stylePool);
+	const bId = screen.charPool.intern('B');
+	setCellAt(screen, 1, 0, bId, 0, 0, CellWidth.Narrow);
+	setCellAt(screen, 1, 1, bId, 0, 0, CellWidth.Narrow);
+	shiftRows(screen, 0, 5, -2);
+	// Row 0 and 1 should be blank
+	t.is(getCellCharId(screen, 1, 0), 0);
+	t.is(getCellCharId(screen, 1, 1), 0);
+	// Original rows 0,1 should now be at rows 2,3
+	t.is(screen.charPool.resolve(getCellCharId(screen, 1, 2)), 'B');
+	t.is(screen.charPool.resolve(getCellCharId(screen, 1, 3)), 'B');
+});
+
+// --- StylePool general transition (non-zero to non-zero) ---
+
+test('StylePool - transition between two non-default styles', t => {
+	const pool = new StylePool();
+	const boldId = pool.intern([1]);
+	const redId = pool.intern([31]);
+	const result = pool.transition(boldId, redId);
+	// Should reset then apply new style
+	t.is(result, '\x1b[0m\x1b[31m');
+});
+
+test('StylePool - transition caches result', t => {
+	const pool = new StylePool();
+	const boldId = pool.intern([1]);
+	const redId = pool.intern([31]);
+	const first = pool.transition(boldId, redId);
+	const second = pool.transition(boldId, redId);
+	t.is(first, second);
+});
+
+// --- diff with hyperlinks ---
+
+test('diff - hyperlink transition produces OSC 8 patches', t => {
+	const stylePool = new StylePool();
+	const charPool = new CharPool();
+	const prev = createScreen(5, 1, stylePool, charPool);
+	const next = createScreen(5, 1, stylePool, charPool);
+	const aId = charPool.intern('A');
+	const linkId = next.hyperlinkPool.intern('https://example.com');
+	setCellAt(next, 0, 0, aId, 0, linkId, CellWidth.Narrow);
+	const diff = diffScreens(prev, next, {stylePool});
+	const str = diffToString(optimize(diff));
+	// Should contain OSC 8 open and close
+	t.true(str.includes('\x1b]8;;https://example.com\x1b\\'));
+	t.true(str.includes('A'));
+	// Should close hyperlink at end
+	t.true(str.includes('\x1b]8;;\x1b\\'));
+});
+
+// --- diff with different dimensions ---
+
+test('diff - height increase includes new rows', t => {
+	const stylePool = new StylePool();
+	const charPool = new CharPool();
+	const prev = createScreen(5, 2, stylePool, charPool);
+	const next = createScreen(5, 4, stylePool, charPool);
+	const xId = charPool.intern('X');
+	setCellAt(next, 0, 3, xId, 0, 0, CellWidth.Narrow);
+	const diff = diffScreens(prev, next, {stylePool});
+	const str = diffToString(optimize(diff));
+	t.true(str.includes('X'));
+});
+
+test('diff - width increase includes new columns', t => {
+	const stylePool = new StylePool();
+	const charPool = new CharPool();
+	const prev = createScreen(3, 2, stylePool, charPool);
+	const next = createScreen(6, 2, stylePool, charPool);
+	const yId = charPool.intern('Y');
+	setCellAt(next, 4, 0, yId, 0, 0, CellWidth.Narrow);
+	const diff = diffScreens(prev, next, {stylePool});
+	const str = diffToString(optimize(diff));
+	t.true(str.includes('Y'));
+});
+
+// --- diff with wide characters ---
+
+test('diff - wide character advances cursor by 2', t => {
+	const stylePool = new StylePool();
+	const charPool = new CharPool();
+	const prev = createScreen(6, 1, stylePool, charPool);
+	const next = createScreen(6, 1, stylePool, charPool);
+	const wideId = charPool.intern('中');
+	const spacerId = charPool.intern('');
+	const aId = charPool.intern('A');
+	// Wide char at col 0, spacer at col 1, narrow char at col 2
+	setCellAt(next, 0, 0, wideId, 0, 0, CellWidth.Wide);
+	setCellAt(next, 1, 0, spacerId, 0, 0, CellWidth.SpacerTail);
+	setCellAt(next, 2, 0, aId, 0, 0, CellWidth.Narrow);
+	const diff = diffScreens(prev, next, {stylePool});
+	const str = diffToString(optimize(diff));
+	t.true(str.includes('中'));
+	t.true(str.includes('A'));
+});
+
+// --- screenToString with SpacerTail ---
+
+test('Screen - screenToString skips SpacerTail cells for wide chars', t => {
+	const stylePool = new StylePool();
+	const screen = createScreen(4, 1, stylePool);
+	const wideId = screen.charPool.intern('中');
+	const spacerId = screen.charPool.intern('');
+	setCellAt(screen, 0, 0, wideId, 0, 0, CellWidth.Wide);
+	setCellAt(screen, 1, 0, spacerId, 0, 0, CellWidth.SpacerTail);
+	const str = screenToString(screen);
+	// Should have the wide char once, not duplicated
+	t.is(str.split('中').length, 2); // one occurrence means 2 parts after split
+	// Should not contain the empty spacer as visible character
+	t.false(str.includes('  中')); // no leading double-space
+});
+
+// --- optimizer cursorMove cancellation ---
+
+test('optimizer - cancels cursorMove pair that sums to zero', t => {
+	const result = optimize([
+		{type: 'cursorMove', x: 3, y: 2},
+		{type: 'cursorMove', x: -3, y: -2},
+	]);
+	t.is(result.length, 0);
+});
+
+// --- optimizer styleStr concatenation ---
+
+test('optimizer - concatenates adjacent styleStr patches', t => {
+	const result = optimize([
+		{type: 'styleStr', str: '\x1b[1m'},
+		{type: 'styleStr', str: '\x1b[31m'},
+	]);
+	t.is(result.length, 1);
+	t.deepEqual(result[0], {type: 'styleStr', str: '\x1b[1m\x1b[31m'});
+});
+
+test('optimizer - removes empty styleStr patches', t => {
+	const result = optimize([
+		{type: 'styleStr', str: ''},
+		{type: 'styleStr', str: '\x1b[1m'},
+	]);
+	t.is(result.length, 1);
+	t.deepEqual(result[0], {type: 'styleStr', str: '\x1b[1m'});
+});
+
+// --- optimizer cursorTo collapse ---
+
+test('optimizer - collapses consecutive cursorTo to last one', t => {
+	const result = optimize([
+		{type: 'cursorTo', col: 5},
+		{type: 'cursorTo', col: 10},
+	]);
+	t.is(result.length, 1);
+	t.deepEqual(result[0], {type: 'cursorTo', col: 10});
+});
+
+// --- optimizer cursorHide/Show non-adjacent should NOT cancel ---
+
+test('optimizer - does not cancel cursorHide/Show with patches between', t => {
+	const result = optimize([
+		{type: 'cursorHide'},
+		{type: 'stdout', content: 'x'},
+		{type: 'cursorShow'},
+	]);
+	t.is(result.length, 3);
+	t.deepEqual(result[0], {type: 'cursorHide'});
+	t.deepEqual(result[2], {type: 'cursorShow'});
+});
+
+// ---------------------------------------------------------------------------
+// Output dual-write tests — verify Screen buffer matches string output
+// ---------------------------------------------------------------------------
+
+test('Output - getScreen returns undefined before get()', t => {
+	const output = new Output({width: 5, height: 1});
+	t.is(output.getScreen(), undefined);
+});
+
+test('Output - getScreen returns Screen after get()', t => {
+	const output = new Output({width: 5, height: 1});
+	output.write(0, 0, 'hi', {transformers: []});
+	output.get();
+	const screen = output.getScreen();
+	t.truthy(screen);
+	t.is(screen!.width, 5);
+	t.is(screen!.height, 1);
+});
+
+test('Output - Screen contains correct characters after write', t => {
+	const output = new Output({width: 10, height: 1});
+	output.write(0, 0, 'ABC', {transformers: []});
+	output.get();
+	const screen = output.getScreen()!;
+	t.is(screen.charPool.resolve(getCellCharId(screen, 0, 0)), 'A');
+	t.is(screen.charPool.resolve(getCellCharId(screen, 1, 0)), 'B');
+	t.is(screen.charPool.resolve(getCellCharId(screen, 2, 0)), 'C');
+	// Unwritten cell should be space (charId 0)
+	t.is(getCellCharId(screen, 3, 0), 0);
+});
+
+test('Output - Screen handles multiline write', t => {
+	const output = new Output({width: 5, height: 3});
+	output.write(0, 0, 'ab\ncd\nef', {transformers: []});
+	output.get();
+	const screen = output.getScreen()!;
+	t.is(screen.charPool.resolve(getCellCharId(screen, 0, 0)), 'a');
+	t.is(screen.charPool.resolve(getCellCharId(screen, 1, 0)), 'b');
+	t.is(screen.charPool.resolve(getCellCharId(screen, 0, 1)), 'c');
+	t.is(screen.charPool.resolve(getCellCharId(screen, 1, 1)), 'd');
+	t.is(screen.charPool.resolve(getCellCharId(screen, 0, 2)), 'e');
+	t.is(screen.charPool.resolve(getCellCharId(screen, 1, 2)), 'f');
+});
+
+test('Output - Screen and string output agree on plain text content', t => {
+	const output = new Output({width: 10, height: 2});
+	output.write(1, 0, 'hello', {transformers: []});
+	output.write(0, 1, 'world', {transformers: []});
+	const {output: str} = output.get();
+	const screen = output.getScreen()!;
+	const screenStr = screenToString(screen);
+	// Both should contain the same text (screen stripped of styles)
+	t.true(str.includes('hello'));
+	t.true(str.includes('world'));
+	t.true(screenStr.includes('hello'));
+	t.true(screenStr.includes('world'));
+});
+
+test('Output - Screen handles overlapping writes', t => {
+	const output = new Output({width: 10, height: 1});
+	output.write(0, 0, 'AAAA', {transformers: []});
+	output.write(2, 0, 'BB', {transformers: []});
+	output.get();
+	const screen = output.getScreen()!;
+	t.is(screen.charPool.resolve(getCellCharId(screen, 0, 0)), 'A');
+	t.is(screen.charPool.resolve(getCellCharId(screen, 1, 0)), 'A');
+	t.is(screen.charPool.resolve(getCellCharId(screen, 2, 0)), 'B');
+	t.is(screen.charPool.resolve(getCellCharId(screen, 3, 0)), 'B');
+});
+
+test('Output - Screen clipping works', t => {
+	const output = new Output({width: 10, height: 3});
+	output.clip({x1: 2, x2: 5, y1: 0, y2: 2});
+	output.write(0, 0, 'ABCDEFGH', {transformers: []});
+	output.unclip();
+	output.get();
+	const screen = output.getScreen()!;
+	// Cells outside clip region should be empty (space)
+	t.is(getCellCharId(screen, 0, 0), 0); // Before clip
+	t.is(getCellCharId(screen, 1, 0), 0); // Before clip
+	// Cells inside clip region should have content
+	t.not(getCellCharId(screen, 2, 0), 0); // Inside clip
+	t.not(getCellCharId(screen, 3, 0), 0); // Inside clip
+	t.not(getCellCharId(screen, 4, 0), 0); // Inside clip
 });
