@@ -4,6 +4,7 @@ import renderNodeToOutput, {
 import Output from './output.js';
 import {type DOMElement} from './dom.js';
 import {type Screen} from './screen.js';
+import {type StylePool} from './pools.js';
 
 type Result = {
 	output: string;
@@ -11,6 +12,8 @@ type Result = {
 	staticOutput: string;
 	/** The Screen buffer for cell-level diffing (undefined for screen reader mode). */
 	screen?: Screen;
+	/** The StylePool used to intern styleIds in the Screen. Required by diffScreens. */
+	stylePool?: StylePool;
 };
 
 const renderer = (node: DOMElement, isScreenReaderEnabled: boolean): Result => {
@@ -68,6 +71,7 @@ const renderer = (node: DOMElement, isScreenReaderEnabled: boolean): Result => {
 			// interactive output will override last line of static output
 			staticOutput: staticOutput ? `${staticOutput.get().output}\n` : '',
 			screen: output.getScreen(),
+			stylePool: output.stylePool,
 		};
 	}
 

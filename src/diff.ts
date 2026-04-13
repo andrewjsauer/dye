@@ -65,10 +65,11 @@ class VirtualCursor {
 		if (dy !== 0) {
 			if (x === 0) {
 				// Moving to a different row, column 0: emit CR + vertical move
-				this.patches.push({type: 'carriageReturn'});
-				if (dy !== 0) {
-					this.patches.push({type: 'cursorMove', x: 0, y: dy});
+				if (this.x !== 0) {
+					this.patches.push({type: 'carriageReturn'});
 				}
+
+				this.patches.push({type: 'cursorMove', x: 0, y: dy});
 			} else {
 				// Move vertically first, then horizontally
 				this.patches.push({type: 'cursorMove', x: 0, y: dy});
