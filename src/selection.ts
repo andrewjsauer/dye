@@ -240,6 +240,37 @@ export function selectLineAt(screen: Screen, row: number): SelectionState {
 // ---------------------------------------------------------------------------
 
 /**
+ * Compute the [startCol, endCol] range (inclusive) for a given row in
+ * a normalized selection. Shared by getSelectedText and the overlay
+ * renderer so the geometry is defined in one place.
+ */
+export function selectionColRange(
+	mode: SelectionMode,
+	start: Point,
+	end: Point,
+	row: number,
+	screenWidth: number,
+): readonly [number, number] {
+	if (mode === 'line') {
+		return [0, screenWidth - 1];
+	}
+
+	if (row === start.row && row === end.row) {
+		return [start.col, end.col];
+	}
+
+	if (row === start.row) {
+		return [start.col, screenWidth - 1];
+	}
+
+	if (row === end.row) {
+		return [0, end.col];
+	}
+
+	return [0, screenWidth - 1];
+}
+
+/**
  * Get the text content of the selected cells.
  * Trims trailing whitespace from each row and joins rows with '\n'.
  * Skips SpacerTail cells (they're part of the preceding wide char).
@@ -254,25 +285,13 @@ export function getSelectedText(
 	for (let row = start.row; row <= end.row; row++) {
 		if (row < 0 || row >= screen.height) continue;
 
-		let startCol: number;
-		let endCol: number;
-
-		if (selection.mode === 'line') {
-			startCol = 0;
-			endCol = screen.width - 1;
-		} else if (row === start.row && row === end.row) {
-			startCol = start.col;
-			endCol = end.col;
-		} else if (row === start.row) {
-			startCol = start.col;
-			endCol = screen.width - 1;
-		} else if (row === end.row) {
-			startCol = 0;
-			endCol = end.col;
-		} else {
-			startCol = 0;
-			endCol = screen.width - 1;
-		}
+		const [startCol, endCol] = selectionColRange(
+			selection.mode,
+			start,
+			end,
+			row,
+			screen.width,
+		);
 
 		let line = '';
 		for (let col = startCol; col <= endCol && col < screen.width; col++) {
@@ -303,24 +322,25 @@ export function getSelectedText(
  *
  * Platforms:
  * - macOS: pbcopy
- * - Linux: xclip (X11) or wl-copy (Wayland)
+ * - Linux: xclip (X11), falling back to wl-copy (Wayland)
  * - Windows: clip.exe
+ *
+ * The command name is selected from a fixed allowlist — only hard-coded
+ * strings reach execFile. No caller input influences the command or args.
  */
-export function copyToClipboard(text: string): Promise<void> {
+const CLIPBOARD_ALLOWLIST = new Set(['pbcopy', 'clip', 'xclip', 'wl-copy']);
+
+function runClipboardCommand(
+	command: string,
+	args: string[],
+	text: string,
+): Promise<void> {
+	// Defence in depth: prevent a future refactor from passing non-literal commands
+	if (!CLIPBOARD_ALLOWLIST.has(command)) {
+		return Promise.reject(new Error(`Clipboard command not allowed: ${command}`));
+	}
+
 	return new Promise((resolve, reject) => {
-		let command: string;
-		let args: string[] = [];
-
-		if (platform === 'darwin') {
-			command = 'pbcopy';
-		} else if (platform === 'win32') {
-			command = 'clip';
-		} else {
-			// Linux: try xclip first, fall back to wl-copy
-			command = 'xclip';
-			args = ['-selection', 'clipboard'];
-		}
-
 		const child = execFile(command, args, error => {
 			if (error) {
 				reject(error);
@@ -329,7 +349,23 @@ export function copyToClipboard(text: string): Promise<void> {
 			}
 		});
 
+		child.on('error', reject);
+		child.stdin?.on('error', reject);
 		child.stdin?.write(text);
 		child.stdin?.end();
 	});
+}
+
+export function copyToClipboard(text: string): Promise<void> {
+	if (platform === 'darwin') {
+		return runClipboardCommand('pbcopy', [], text);
+	}
+
+	if (platform === 'win32') {
+		return runClipboardCommand('clip', [], text);
+	}
+
+	// Linux/other: try xclip first, fall back to wl-copy on Wayland
+	return runClipboardCommand('xclip', ['-selection', 'clipboard'], text)
+		.catch(() => runClipboardCommand('wl-copy', [], text));
 }

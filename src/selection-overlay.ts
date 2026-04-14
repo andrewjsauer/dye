@@ -21,6 +21,7 @@ import {
 } from './screen.js';
 import {
 	normalizeSelection,
+	selectionColRange,
 	type SelectionState,
 } from './selection.js';
 
@@ -47,25 +48,13 @@ export function applySelectionOverlay(
 	for (let row = start.row; row <= end.row; row++) {
 		if (row < 0 || row >= screen.height) continue;
 
-		let startCol: number;
-		let endCol: number;
-
-		if (selection.mode === 'line') {
-			startCol = 0;
-			endCol = screen.width - 1;
-		} else if (row === start.row && row === end.row) {
-			startCol = start.col;
-			endCol = end.col;
-		} else if (row === start.row) {
-			startCol = start.col;
-			endCol = screen.width - 1;
-		} else if (row === end.row) {
-			startCol = 0;
-			endCol = end.col;
-		} else {
-			startCol = 0;
-			endCol = screen.width - 1;
-		}
+		const [startCol, endCol] = selectionColRange(
+			selection.mode,
+			start,
+			end,
+			row,
+			screen.width,
+		);
 
 		for (let col = startCol; col <= endCol && col < screen.width; col++) {
 			if (col < 0) continue;

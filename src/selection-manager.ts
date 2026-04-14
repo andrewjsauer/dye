@@ -30,32 +30,59 @@ import {type Screen} from './screen.js';
 
 type Listener = () => void;
 
+/**
+ * A frozen snapshot of the manager's state at a point in time.
+ * Returned by getSnapshot() so useSyncExternalStore consumers see
+ * a consistent view of (selection, selectedText) without tearing.
+ */
+export type SelectionSnapshot = {
+	readonly selection: SelectionState | undefined;
+	readonly selectedText: string;
+};
+
 export class SelectionManager {
 	private selection: SelectionState | undefined;
 	private readonly tracker: MultiClickTracker = createMultiClickTracker();
 	private readonly listeners = new Set<Listener>();
 	private screen: Screen | undefined;
 	private dragging = false;
+	/**
+	 * Frozen snapshot of the current state. Recomputed on every state
+	 * change so useSyncExternalStore can return a stable reference
+	 * between renders and consumers see (selection, text) together.
+	 */
+	private snapshot: SelectionSnapshot = {selection: undefined, selectedText: ''};
 
 	/** Update the screen reference. Called after each render. */
 	setScreen(screen: Screen | undefined): void {
 		this.screen = screen;
+		// Screen changes can affect selectedText even when selection itself hasn't
+		// moved (e.g., content under the selection was re-rendered).
+		this.refreshSnapshot();
 	}
 
 	/** Get the current selection state (may be undefined). */
 	getSelection(): SelectionState | undefined {
-		return this.selection;
+		return this.snapshot.selection;
 	}
 
 	/** Check if there is an active selection. */
 	hasSelection(): boolean {
-		return this.selection !== undefined;
+		return this.snapshot.selection !== undefined;
 	}
 
 	/** Get the text content of the current selection. */
 	getSelectedText(): string {
-		if (!this.selection || !this.screen) return '';
-		return getSelectedText(this.screen, this.selection);
+		return this.snapshot.selectedText;
+	}
+
+	/**
+	 * Return a frozen snapshot of (selection, selectedText). Stable between
+	 * state changes so useSyncExternalStore can use reference equality to
+	 * skip unnecessary renders.
+	 */
+	getSnapshot(): SelectionSnapshot {
+		return this.snapshot;
 	}
 
 	/** Clear the current selection and notify listeners. */
@@ -63,6 +90,7 @@ export class SelectionManager {
 		if (this.selection === undefined) return;
 		this.selection = undefined;
 		this.dragging = false;
+		this.refreshSnapshot();
 		this.notify();
 	}
 
@@ -83,6 +111,7 @@ export class SelectionManager {
 		}
 
 		this.dragging = true;
+		this.refreshSnapshot();
 		this.notify();
 	}
 
@@ -91,6 +120,7 @@ export class SelectionManager {
 		if (!this.dragging || !this.selection) return;
 		const focus: Point = {col, row};
 		this.selection = extendSelection(this.selection, focus, this.screen);
+		this.refreshSnapshot();
 		this.notify();
 	}
 
@@ -117,6 +147,13 @@ export class SelectionManager {
 		return () => {
 			this.listeners.delete(listener);
 		};
+	}
+
+	private refreshSnapshot(): void {
+		const selectedText = this.selection && this.screen
+			? getSelectedText(this.screen, this.selection)
+			: '';
+		this.snapshot = {selection: this.selection, selectedText};
 	}
 
 	private notify(): void {

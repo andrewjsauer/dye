@@ -7,10 +7,14 @@ export type SelectionContextValue = {
 
 /**
  * Context providing the SelectionManager instance to components.
- * Created by the Ink render root.
+ * The Ink render root supplies the real manager; the default value is a
+ * no-op manager that works outside of render (e.g., in renderToString)
+ * so useSelection returns hasSelection=false instead of throwing.
  */
+const defaultManager = new SelectionManager();
+
 const SelectionContext = createContext<SelectionContextValue>({
-	manager: new SelectionManager(),
+	manager: defaultManager,
 });
 
 SelectionContext.displayName = 'DyeSelectionContext';

@@ -996,11 +996,6 @@ export default class Ink {
 		}
 	}
 
-	/** Get the selection manager for this instance. */
-	getSelectionManager(): SelectionManager {
-		return this.selectionManager;
-	}
-
 	/**
 	 * Try to parse raw input as a mouse event.
 	 * Returns true if the input was consumed as a mouse event.

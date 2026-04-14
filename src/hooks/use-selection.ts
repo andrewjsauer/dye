@@ -18,8 +18,9 @@ export type UseSelectionResult = {
 /**
  * React hook that subscribes to the current text selection state.
  *
- * Re-renders when the selection changes. Returns an object with
- * hasSelection, selectedText, selection state, and control methods.
+ * Uses SelectionManager's frozen snapshot so that `selection` and
+ * `selectedText` are always consistent with each other — no torn
+ * state in concurrent mode.
  */
 export default function useSelection(): UseSelectionResult {
 	const {manager} = useContext(SelectionContext);
@@ -30,19 +31,19 @@ export default function useSelection(): UseSelectionResult {
 	);
 
 	const getSnapshot = useCallback(
-		() => manager.getSelection(),
+		() => manager.getSnapshot(),
 		[manager],
 	);
 
-	const selection = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+	const snapshot = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
 	const clearSelection = useCallback(() => manager.clearSelection(), [manager]);
 	const copy = useCallback(() => manager.copy(), [manager]);
 
 	return {
-		hasSelection: selection !== undefined,
-		selectedText: manager.getSelectedText(),
-		selection,
+		hasSelection: snapshot.selection !== undefined,
+		selectedText: snapshot.selectedText,
+		selection: snapshot.selection,
 		clearSelection,
 		copy,
 	};

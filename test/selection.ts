@@ -3,6 +3,7 @@ import {StylePool, CharPool} from '../src/pools.js';
 import {
 	createScreen,
 	setCellAt,
+	getCell,
 	CellWidth,
 } from '../src/screen.js';
 import {
@@ -17,6 +18,7 @@ import {
 	getSelectedText,
 	snapToWordStart,
 	snapToWordEnd,
+	selectionColRange,
 } from '../src/selection.js';
 import {applySelectionOverlay} from '../src/selection-overlay.js';
 import {SelectionManager} from '../src/selection-manager.js';
@@ -207,10 +209,33 @@ test('applySelectionOverlay - adds inverse style to selected cells', t => {
 	const mutated = applySelectionOverlay(screen, extended);
 	t.true(mutated);
 
-	// Cell 0 should now have a style with SGR 7 (inverse)
-	// We can verify by checking it's different from what we set (styleId 0)
-	const charId = charPool.intern('h');
-	t.not(charId, 0);
+	// Read back the styleId on each selected cell and verify SGR 7 is present
+	for (let col = 0; col <= 4; col++) {
+		const {styleId} = getCell(screen, col, 0);
+		const codes = stylePool.resolve(styleId);
+		t.true(codes.includes(7), `cell ${col} should have SGR 7 (inverse)`);
+	}
+
+	// Cell 5 (outside selection) should not have SGR 7
+	const {styleId: unselectedStyle} = getCell(screen, 5, 0);
+	t.false(stylePool.resolve(unselectedStyle).includes(7));
+});
+
+test('applySelectionOverlay - skips cells already marked with SGR 7', t => {
+	const stylePool = new StylePool();
+	const charPool = new CharPool();
+	const screen = createScreen(10, 1, stylePool, charPool);
+	// Pre-populate cell 0 with an inverse style
+	const preInverse = stylePool.intern([7]);
+	setCellAt(screen, 0, 0, charPool.intern('X'), preInverse, 0, CellWidth.Narrow);
+
+	const sel = startSelection({col: 0, row: 0}, 'character');
+	const extended = extendSelection(sel, {col: 2, row: 0});
+	applySelectionOverlay(screen, extended);
+
+	// Cell 0 should still have exactly [7], not [7, 7]
+	const {styleId} = getCell(screen, 0, 0);
+	t.deepEqual(stylePool.resolve(styleId), [7]);
 });
 
 test('applySelectionOverlay - returns false on empty selection', t => {
@@ -341,4 +366,166 @@ test('SelectionManager - subscribe/unsubscribe', t => {
 	unsub();
 	mgr.handleMousePress(5, 1);
 	t.is(callCount, 2); // no more calls after unsubscribe
+});
+
+// ---------------------------------------------------------------------------
+// SelectionManager snapshot consistency (concurrent-mode safe)
+// ---------------------------------------------------------------------------
+
+test('SelectionManager - getSnapshot returns consistent selection + text', t => {
+	const stylePool = new StylePool();
+	const screen = createScreen(20, 1, stylePool);
+	writeString(screen, 'hello world');
+	const mgr = new SelectionManager();
+	mgr.setScreen(screen);
+
+	mgr.handleMousePress(0, 0);
+	mgr.handleMouseDrag(4, 0);
+
+	const snapshot = mgr.getSnapshot();
+	t.truthy(snapshot.selection);
+	t.is(snapshot.selectedText, 'hello');
+	// Returned snapshot should be a stable reference until next state change
+	t.is(mgr.getSnapshot(), snapshot);
+});
+
+test('SelectionManager - snapshot updates atomically on state change', t => {
+	const stylePool = new StylePool();
+	const screen = createScreen(20, 1, stylePool);
+	writeString(screen, 'hello world');
+	const mgr = new SelectionManager();
+	mgr.setScreen(screen);
+
+	mgr.handleMousePress(0, 0);
+	const snap1 = mgr.getSnapshot();
+	mgr.handleMouseDrag(4, 0);
+	const snap2 = mgr.getSnapshot();
+	// New state → new snapshot reference
+	t.not(snap1, snap2);
+	t.is(snap2.selectedText, 'hello');
+});
+
+// ---------------------------------------------------------------------------
+// copy() paths (behavior only — not actually spawning clipboard)
+// ---------------------------------------------------------------------------
+
+test('SelectionManager - copy returns false when no selection', async t => {
+	const mgr = new SelectionManager();
+	const result = await mgr.copy();
+	t.false(result);
+});
+
+test('SelectionManager - copy returns false when selectedText is empty', async t => {
+	const stylePool = new StylePool();
+	const screen = createScreen(10, 1, stylePool);
+	// Screen is empty (no writes), so selection produces empty text
+	const mgr = new SelectionManager();
+	mgr.setScreen(screen);
+	mgr.handleMousePress(0, 0);
+	mgr.handleMouseDrag(2, 0);
+	const result = await mgr.copy();
+	t.false(result);
+});
+
+// ---------------------------------------------------------------------------
+// Wide character handling in getSelectedText
+// ---------------------------------------------------------------------------
+
+test('getSelectedText - wide char appears once, not duplicated via SpacerTail', t => {
+	const stylePool = new StylePool();
+	const charPool = new CharPool();
+	const screen = createScreen(10, 1, stylePool, charPool);
+	const wideId = charPool.intern('中');
+	const spacerId = charPool.intern('');
+	const aId = charPool.intern('A');
+	setCellAt(screen, 0, 0, wideId, 0, 0, CellWidth.Wide);
+	setCellAt(screen, 1, 0, spacerId, 0, 0, CellWidth.SpacerTail);
+	setCellAt(screen, 2, 0, aId, 0, 0, CellWidth.Narrow);
+
+	const sel = startSelection({col: 0, row: 0}, 'character');
+	const extended = extendSelection(sel, {col: 2, row: 0});
+	const text = getSelectedText(screen, extended);
+	t.is(text, '中A');
+});
+
+// ---------------------------------------------------------------------------
+// Whitespace snapping edge cases
+// ---------------------------------------------------------------------------
+
+test('snapToWordStart - returns col unchanged on whitespace', t => {
+	const stylePool = new StylePool();
+	const screen = createScreen(20, 1, stylePool);
+	writeString(screen, 'hello world');
+	// Click on the space at col 5
+	const point = snapToWordStart(screen, 5, 0);
+	t.is(point.col, 5);
+});
+
+test('selectWordAt - on whitespace returns zero-width selection', t => {
+	const stylePool = new StylePool();
+	const screen = createScreen(20, 1, stylePool);
+	writeString(screen, 'hello world');
+	const sel = selectWordAt(screen, 5, 0); // on space
+	t.is(sel.mode, 'word');
+	t.deepEqual(sel.anchor, {col: 5, row: 0});
+	t.deepEqual(sel.focus, {col: 5, row: 0});
+});
+
+// ---------------------------------------------------------------------------
+// selectionColRange helper
+// ---------------------------------------------------------------------------
+
+test('selectionColRange - line mode returns full row', t => {
+	const range = selectionColRange(
+		'line',
+		{col: 0, row: 0},
+		{col: 19, row: 0},
+		0,
+		20,
+	);
+	t.deepEqual(range, [0, 19]);
+});
+
+test('selectionColRange - single-row character selection', t => {
+	const range = selectionColRange(
+		'character',
+		{col: 3, row: 1},
+		{col: 8, row: 1},
+		1,
+		20,
+	);
+	t.deepEqual(range, [3, 8]);
+});
+
+test('selectionColRange - first row of multi-row selection', t => {
+	const range = selectionColRange(
+		'character',
+		{col: 5, row: 0},
+		{col: 3, row: 2},
+		0,
+		20,
+	);
+	t.deepEqual(range, [5, 19]);
+});
+
+test('selectionColRange - middle row of multi-row selection', t => {
+	const range = selectionColRange(
+		'character',
+		{col: 5, row: 0},
+		{col: 3, row: 2},
+		1,
+		20,
+	);
+	t.deepEqual(range, [0, 19]);
+});
+
+test('selectionColRange - last row of multi-row selection', t => {
+	const range = selectionColRange(
+		'character',
+		{col: 5, row: 0},
+		{col: 3, row: 2},
+		2,
+		20,
+	);
+	t.deepEqual(range, [0, 3]);
 });
