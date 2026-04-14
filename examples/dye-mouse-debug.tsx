@@ -11,13 +11,19 @@
  *   - You see nothing when clicking → terminal isn't reporting mouse at all
  *     (likely need to enable in Preferences → Profiles → Terminal)
  */
-import React, {useState, useEffect} from 'react';
 import process from 'node:process';
-import {render, Box, Text, useApp, useInput} from '../src/index.js';
+import React, {useState, useEffect} from 'react';
+import {
+	render,
+	Box,
+	Text,
+	useApp,
+	useInput,
+} from '../src/index.js';
 
 // Raw SGR mouse enable — bypasses AlternateScreen component entirely
-const MOUSE_ENABLE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
-const MOUSE_DISABLE = '\x1b[?1006l\x1b[?1002l\x1b[?1000l';
+const MOUSE_ENABLE = '\u001B[?1000h\u001B[?1002h\u001B[?1006h';
+const MOUSE_DISABLE = '\u001B[?1006l\u001B[?1002l\u001B[?1000l';
 
 function App() {
 	const [events, setEvents] = useState<string[]>([]);

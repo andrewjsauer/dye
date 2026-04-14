@@ -72,14 +72,14 @@ Everything exported from Ink v7 is exported from Dye with compatible signatures.
 - Box props: `onClick`, `onMouseEnter`, `onMouseLeave`, `onMouseDown`, `onMouseUp`
 - `render` options: `onFrame`, `mouseTracking` (when used inside `<AlternateScreen>`)
 
-## What Dye did *not* port from Claude Code's internal fork
+## Deliberately out of scope for v0.1
 
-Claude Code's internal Ink has components tightly coupled to its product surface. These were intentionally left out:
+Some surface area was considered and intentionally left out of the core package to keep it focused on renderer features rather than application-level widgets:
 
-- `components/Button.tsx`, `Link.tsx`, `ScrollBox.tsx`, `NoSelect.tsx`, `RawAnsi.tsx` — application-level components, not renderer features
-- `hooks/use-search-highlight.ts`, `use-tab-status.ts`, `use-terminal-title.ts`, `use-terminal-viewport.ts` — product-specific hooks
-- `events/focus-event.ts`, `input-event.ts`, `keyboard-event.ts`, `terminal-event.ts` — the full event hierarchy was simplified to `event.ts` + `click-event.ts` for the v0.1 surface
-- `ClockContext`, `TerminalFocusContext` — not generally useful without the product's scheduling model
+- Higher-level components like `Button`, `Link`, `ScrollBox`, `NoSelect`, `RawAnsi` — application-level components, not renderer features
+- Product-specific hooks like `useSearchHighlight`, `useTabStatus`, `useTerminalTitle`, `useTerminalViewport`
+- A full event class hierarchy (focus/input/keyboard/terminal events) — simplified to `event.ts` + `click-event.ts` for the v0.1 surface
+- Scheduling/clock and terminal-focus contexts — not generally useful without an opinionated scheduling model
 
 These may return as separate opt-in packages; they are deliberately out of `@andrewjsauer/dye` core.
 
