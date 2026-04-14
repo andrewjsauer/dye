@@ -34,7 +34,10 @@ export class CharPool {
 			const code = value.charCodeAt(0);
 			if (code < 128) {
 				const existing = this.asciiTable[code]!;
-				if (existing >= 0) return existing;
+				if (existing >= 0) {
+					return existing;
+				}
+
 				const id = this.strings.length;
 				this.strings.push(value);
 				this.asciiTable[code] = id;
@@ -44,7 +47,9 @@ export class CharPool {
 
 		// General path: Map lookup
 		const existing = this.map.get(value);
-		if (existing !== undefined) return existing;
+		if (existing !== undefined) {
+			return existing;
+		}
 
 		const id = this.strings.length;
 		this.strings.push(value);
@@ -84,14 +89,29 @@ const VISIBLE_ON_SPACE_CODES = new Set([
 	// Inverse
 	7,
 	// Underline variants
-	4, 21,
+	4,
+	21,
 	// Strikethrough
 	9,
 	// Overline
 	53,
 	// Background colors (40-47, 49, 100-107)
-	40, 41, 42, 43, 44, 45, 46, 47,
-	100, 101, 102, 103, 104, 105, 106, 107,
+	40,
+	41,
+	42,
+	43,
+	44,
+	45,
+	46,
+	47,
+	100,
+	101,
+	102,
+	103,
+	104,
+	105,
+	106,
+	107,
 	// 48 = extended background (48;5;n or 48;2;r;g;b) — handled specially
 	48,
 ]);
@@ -113,7 +133,9 @@ export class StylePool {
 	intern(codes: StyleDescriptor): number {
 		const key = codes.join(';');
 		const existing = this.keys.get(key);
-		if (existing !== undefined) return existing;
+		if (existing !== undefined) {
+			return existing;
+		}
 
 		const visibleOnSpace = codes.some(c => VISIBLE_ON_SPACE_CODES.has(c));
 		// Encode visible-on-space in bit 0: actual index is id >> 1
@@ -140,11 +162,15 @@ export class StylePool {
 	 * Cached after first computation.
 	 */
 	transition(fromId: number, toId: number): string {
-		if (fromId === toId) return '';
+		if (fromId === toId) {
+			return '';
+		}
 
-		const cacheKey = fromId * 0x100000 + toId;
+		const cacheKey = fromId * 0x10_00_00 + toId;
 		const cached = this.transitionCache.get(cacheKey);
-		if (cached !== undefined) return cached;
+		if (cached !== undefined) {
+			return cached;
+		}
 
 		const result = this.computeTransition(fromId, toId);
 		this.transitionCache.set(cacheKey, result);
@@ -156,20 +182,20 @@ export class StylePool {
 
 		// Going to default style: just reset
 		if (toCodes.length === 0) {
-			return '\x1b[0m';
+			return '\u001B[0m';
 		}
 
 		const fromCodes = this.resolve(fromId);
 
 		// Coming from default: just apply the target style
 		if (fromCodes.length === 0) {
-			return `\x1b[${toCodes.join(';')}m`;
+			return `\u001B[${toCodes.join(';')}m`;
 		}
 
 		// General case: reset then apply target.
 		// A smarter approach would compute the minimal diff, but reset+apply
 		// is always correct and the string is cached anyway.
-		return `\x1b[0m\x1b[${toCodes.join(';')}m`;
+		return `\u001B[0m\u001B[${toCodes.join(';')}m`;
 	}
 
 	get size(): number {
@@ -192,10 +218,14 @@ export class HyperlinkPool {
 
 	/** Intern a hyperlink URI and return its ID. 0 = no hyperlink. */
 	intern(uri: string): number {
-		if (!uri) return 0;
+		if (!uri) {
+			return 0;
+		}
 
 		const existing = this.map.get(uri);
-		if (existing !== undefined) return existing;
+		if (existing !== undefined) {
+			return existing;
+		}
 
 		const id = this.uris.length;
 		this.uris.push(uri);

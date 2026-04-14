@@ -29,14 +29,25 @@ import {
 // Damage union
 // ---------------------------------------------------------------------------
 
-function unionRect(a: Rectangle | undefined, b: Rectangle | undefined): Rectangle | undefined {
-	if (!a) return b;
-	if (!b) return a;
+function unionRect(
+	a: Rectangle | undefined,
+	b: Rectangle | undefined,
+): Rectangle | undefined {
+	if (!a) {
+		return b;
+	}
+
+	if (!b) {
+		return a;
+	}
+
 	const x1 = Math.min(a.x, b.x);
 	const y1 = Math.min(a.y, b.y);
 	const x2 = Math.max(a.x + a.width, b.x + b.width);
 	const y2 = Math.max(a.y + a.height, b.y + b.height);
-	return {x: x1, y: y1, width: x2 - x1, height: y2 - y1};
+	return {
+		x: x1, y: y1, width: x2 - x1, height: y2 - y1,
+	};
 }
 
 // ---------------------------------------------------------------------------
@@ -57,7 +68,9 @@ class VirtualCursor {
 	 * Uses CR for returning to column 0, relative moves otherwise.
 	 */
 	moveTo(x: number, y: number): void {
-		if (this.x === x && this.y === y) return;
+		if (this.x === x && this.y === y) {
+			return;
+		}
 
 		const dy = y - this.y;
 		const dx = x - this.x;
@@ -152,7 +165,12 @@ export function diffScreens(
 			const minH = Math.min(prev.height, next.height);
 			const maxH = Math.max(prev.height, next.height);
 			const maxW = Math.max(prev.width, next.width);
-			scanRegion = unionRect(scanRegion, {x: 0, y: minH, width: maxW, height: maxH - minH});
+			scanRegion = unionRect(scanRegion, {
+				x: 0,
+				y: minH,
+				width: maxW,
+				height: maxH - minH,
+			});
 		}
 
 		if (prev.width !== next.width) {
@@ -160,25 +178,44 @@ export function diffScreens(
 			const minW = Math.min(prev.width, next.width);
 			const maxW = Math.max(prev.width, next.width);
 			const maxH = Math.max(prev.height, next.height);
-			scanRegion = unionRect(scanRegion, {x: minW, y: 0, width: maxW - minW, height: maxH});
+			scanRegion = unionRect(scanRegion, {
+				x: minW,
+				y: 0,
+				width: maxW - minW,
+				height: maxH,
+			});
 		}
 	}
 
 	// If no damage at all and same dimensions, no patches needed
-	if (!scanRegion && !options.fullDiff && prev.width === next.width && prev.height === next.height) {
+	if (
+		!scanRegion
+		&& !options.fullDiff
+		&& prev.width === next.width
+		&& prev.height === next.height
+	) {
 		return [];
 	}
 
 	// Fall back to full scan if no damage info
-	if (!scanRegion) {
-		scanRegion = {x: 0, y: 0, width: Math.max(prev.width, next.width), height: Math.max(prev.height, next.height)};
-	}
+	scanRegion ||= {
+		x: 0,
+		y: 0,
+		width: Math.max(prev.width, next.width),
+		height: Math.max(prev.height, next.height),
+	};
 
 	// Clamp scan region
 	const startY = Math.max(0, scanRegion.y);
-	const endY = Math.min(Math.max(prev.height, next.height), scanRegion.y + scanRegion.height);
+	const endY = Math.min(
+		Math.max(prev.height, next.height),
+		scanRegion.y + scanRegion.height,
+	);
 	const startX = Math.max(0, scanRegion.x);
-	const endX = Math.min(Math.max(prev.width, next.width), scanRegion.x + scanRegion.width);
+	const endX = Math.min(
+		Math.max(prev.width, next.width),
+		scanRegion.x + scanRegion.width,
+	);
 
 	let currentStyleId = 0;
 	let currentHyperlinkId = 0;
@@ -186,10 +223,14 @@ export function diffScreens(
 	for (let y = startY; y < endY; y++) {
 		for (let x = startX; x < endX; x++) {
 			// Read cells from both screens (out of bounds = empty)
-			const prevCharId = (x < prev.width && y < prev.height) ? getCellCharId(prev, x, y) : 0;
-			const prevWord1 = (x < prev.width && y < prev.height) ? getCellWord1(prev, x, y) : 0;
-			const nextCharId = (x < next.width && y < next.height) ? getCellCharId(next, x, y) : 0;
-			const nextWord1 = (x < next.width && y < next.height) ? getCellWord1(next, x, y) : 0;
+			const prevCharId
+				= x < prev.width && y < prev.height ? getCellCharId(prev, x, y) : 0;
+			const prevWord1
+				= x < prev.width && y < prev.height ? getCellWord1(prev, x, y) : 0;
+			const nextCharId
+				= x < next.width && y < next.height ? getCellCharId(next, x, y) : 0;
+			const nextWord1
+				= x < next.width && y < next.height ? getCellWord1(next, x, y) : 0;
 
 			// Fast path: cell unchanged
 			if (prevCharId === nextCharId && prevWord1 === nextWord1) {
@@ -232,7 +273,7 @@ export function diffScreens(
 
 	// Reset style at end if we changed it
 	if (currentStyleId !== 0) {
-		cursor.style('\x1b[0m');
+		cursor.style('\u001B[0m');
 	}
 
 	// Close hyperlink if open

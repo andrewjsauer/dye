@@ -39,7 +39,5 @@ if (await isDevToolsReachable()) {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 	(devtools as any).connectToDevTools();
 } else {
-	console.warn(
-		'DEV is set to true, but the React DevTools server is not running. Start it with:\n\n$ npx react-devtools\n',
-	);
+	console.warn('DEV is set to true, but the React DevTools server is not running. Start it with:\n\n$ npx react-devtools\n');
 }

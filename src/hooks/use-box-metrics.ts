@@ -1,4 +1,6 @@
-import {type RefObject, useState, useEffect, useCallback, useMemo} from 'react';
+import {
+	type RefObject, useState, useEffect, useCallback, useMemo,
+} from 'react';
 import {type DOMElement, addLayoutListener} from '../dom.js';
 import useStdout from './use-stdout.js';
 
@@ -91,11 +93,11 @@ const useBoxMetrics = (ref: RefObject<DOMElement>): UseBoxMetricsResult => {
 		const layout = ref.current?.yogaNode?.getComputedLayout() ?? emptyMetrics;
 
 		setMetrics(previousMetrics => {
-			const hasChanged =
-				previousMetrics.width !== layout.width ||
-				previousMetrics.height !== layout.height ||
-				previousMetrics.left !== layout.left ||
-				previousMetrics.top !== layout.top;
+			const hasChanged
+				= previousMetrics.width !== layout.width
+					|| previousMetrics.height !== layout.height
+					|| previousMetrics.left !== layout.left
+					|| previousMetrics.top !== layout.top;
 
 			return hasChanged ? layout : previousMetrics;
 		});

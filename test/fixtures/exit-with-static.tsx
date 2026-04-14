@@ -1,5 +1,7 @@
 import React, {useEffect} from 'react';
-import {render, Static, Text, useApp} from '../../src/index.js';
+import {
+	render, Static, Text, useApp,
+} from '../../src/index.js';
 
 function Test() {
 	const {exit} = useApp();

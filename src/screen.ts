@@ -37,17 +37,19 @@ export type CellWidth = (typeof CellWidth)[keyof typeof CellWidth];
 const STYLE_SHIFT = 17;
 const HYPERLINK_SHIFT = 2;
 const WIDTH_MASK = 0b11;
-const HYPERLINK_MASK = 0x7fff; // 15 bits
-const STYLE_MASK = 0x7fff; // 15 bits
+const HYPERLINK_MASK = 0x7F_FF; // 15 bits
+const STYLE_MASK = 0x7F_FF; // 15 bits
 
 export function packWord1(
 	styleId: number,
 	hyperlinkId: number,
 	width: CellWidth,
 ): number {
-	return ((styleId & STYLE_MASK) << STYLE_SHIFT)
+	return (
+		((styleId & STYLE_MASK) << STYLE_SHIFT)
 		| ((hyperlinkId & HYPERLINK_MASK) << HYPERLINK_SHIFT)
-		| (width & WIDTH_MASK);
+		| (width & WIDTH_MASK)
+	);
 }
 
 export function unpackStyleId(word1: number): number {
@@ -73,16 +75,26 @@ export type Rectangle = {
 	height: number;
 };
 
-function expandRect(rect: Rectangle | undefined, x: number, y: number, w: number, h: number): Rectangle {
+function expandRect(
+	rect: Rectangle | undefined,
+	x: number,
+	y: number,
+	w: number,
+	h: number,
+): Rectangle {
 	if (!rect) {
-		return {x, y, width: w, height: h};
+		return {
+			x, y, width: w, height: h,
+		};
 	}
 
 	const x1 = Math.min(rect.x, x);
 	const y1 = Math.min(rect.y, y);
 	const x2 = Math.max(rect.x + rect.width, x + w);
 	const y2 = Math.max(rect.y + rect.height, y + h);
-	return {x: x1, y: y1, width: x2 - x1, height: y2 - y1};
+	return {
+		x: x1, y: y1, width: x2 - x1, height: y2 - y1,
+	};
 }
 
 // ---------------------------------------------------------------------------
@@ -143,7 +155,9 @@ export function setCellAt(
 	hyperlinkId: number,
 	width: CellWidth,
 ): void {
-	if (x < 0 || x >= screen.width || y < 0 || y >= screen.height) return;
+	if (x < 0 || x >= screen.width || y < 0 || y >= screen.height) {
+		return;
+	}
 
 	const idx = cellIndex(screen, x, y);
 	screen.cells[idx] = charId;
@@ -155,13 +169,19 @@ export function setCellAt(
 
 /** Read a cell's charId. */
 export function getCellCharId(screen: Screen, x: number, y: number): number {
-	if (x < 0 || x >= screen.width || y < 0 || y >= screen.height) return 0;
+	if (x < 0 || x >= screen.width || y < 0 || y >= screen.height) {
+		return 0;
+	}
+
 	return screen.cells[cellIndex(screen, x, y)]!;
 }
 
 /** Read a cell's packed word1. */
 export function getCellWord1(screen: Screen, x: number, y: number): number {
-	if (x < 0 || x >= screen.width || y < 0 || y >= screen.height) return 0;
+	if (x < 0 || x >= screen.width || y < 0 || y >= screen.height) {
+		return 0;
+	}
+
 	return screen.cells[cellIndex(screen, x, y) + 1]!;
 }
 
@@ -225,11 +245,15 @@ export function shiftRows(
 	bottom: number,
 	delta: number,
 ): void {
-	if (delta === 0) return;
+	if (delta === 0) {
+		return;
+	}
 
 	const t = Math.max(0, top);
 	const b = Math.min(screen.height, bottom);
-	if (t >= b) return;
+	if (t >= b) {
+		return;
+	}
 
 	const rowSize = screen.width * 2; // Int32s per row
 
@@ -237,7 +261,7 @@ export function shiftRows(
 		// Scroll up: move rows [t+delta..b) → [t..b-delta), blank [b-delta..b)
 		const srcStart = (t + delta) * rowSize;
 		const dstStart = t * rowSize;
-		const count = Math.max(0, (b - t - delta)) * rowSize;
+		const count = Math.max(0, b - t - delta) * rowSize;
 		if (count > 0) {
 			screen.cells.copyWithin(dstStart, srcStart, srcStart + count);
 		}
@@ -251,7 +275,7 @@ export function shiftRows(
 		const absDelta = -delta;
 		const srcStart = t * rowSize;
 		const dstStart = (t + absDelta) * rowSize;
-		const count = Math.max(0, (b - t - absDelta)) * rowSize;
+		const count = Math.max(0, b - t - absDelta) * rowSize;
 		if (count > 0) {
 			screen.cells.copyWithin(dstStart, srcStart, srcStart + count);
 		}
@@ -279,18 +303,12 @@ export function blitRegion(
 	width: number,
 	height: number,
 ): void {
-	const w = Math.min(
-		width,
-		src.width - srcX,
-		dst.width - dstX,
-	);
-	const h = Math.min(
-		height,
-		src.height - srcY,
-		dst.height - dstY,
-	);
+	const w = Math.min(width, src.width - srcX, dst.width - dstX);
+	const h = Math.min(height, src.height - srcY, dst.height - dstY);
 
-	if (w <= 0 || h <= 0) return;
+	if (w <= 0 || h <= 0) {
+		return;
+	}
 
 	for (let row = 0; row < h; row++) {
 		const srcIdx = cellIndex(src, srcX, srcY + row);

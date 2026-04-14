@@ -8,9 +8,7 @@ import Text from './Text.js';
 
 // Error's source file is reported as file:///home/user/file.js
 // This function removes the file://[cwd] part
-const cleanupPath = (path: string | undefined): string | undefined => {
-	return path?.replace(`file://${cwd()}/`, '');
-};
+const cleanupPath = (path: string | undefined): string | undefined => path?.replace(`file://${cwd()}/`, '');
 
 const stackUtils = new StackUtils({
 	cwd: cwd(),
@@ -40,9 +38,9 @@ export default function ErrorOverview({error}: Props) {
 	}
 
 	return (
-		<Box flexDirection="column" padding={1}>
+		<Box flexDirection='column' padding={1}>
 			<Box>
-				<Text backgroundColor="red" color="white">
+				<Text backgroundColor='red' color='white'>
 					{' '}
 					ERROR{' '}
 				</Text>
@@ -50,47 +48,51 @@ export default function ErrorOverview({error}: Props) {
 				<Text> {error.message}</Text>
 			</Box>
 
-			{origin && filePath ? (
-				<Box marginTop={1}>
-					<Text dimColor>
-						{filePath}:{origin.line}:{origin.column}
-					</Text>
-				</Box>
-			) : null}
+			{origin && filePath
+				? (
+					<Box marginTop={1}>
+						<Text dimColor>
+							{filePath}:{origin.line}:{origin.column}
+						</Text>
+					</Box>
+				)
+				: null}
 
-			{origin && excerpt ? (
-				<Box marginTop={1} flexDirection="column">
-					{excerpt.map(({line, value}) => (
-						<Box key={line}>
-							<Box width={lineWidth + 1}>
+			{origin && excerpt
+				? (
+					<Box marginTop={1} flexDirection='column'>
+						{excerpt.map(({line, value}) => (
+							<Box key={line}>
+								<Box width={lineWidth + 1}>
+									<Text
+										dimColor={line !== origin.line}
+										backgroundColor={line === origin.line ? 'red' : undefined}
+										color={line === origin.line ? 'white' : undefined}
+										aria-label={
+											line === origin.line
+												? `Line ${line}, error`
+												: `Line ${line}`
+										}
+									>
+										{String(line).padStart(lineWidth, ' ')}:
+									</Text>
+								</Box>
+
 								<Text
-									dimColor={line !== origin.line}
+									key={line}
 									backgroundColor={line === origin.line ? 'red' : undefined}
 									color={line === origin.line ? 'white' : undefined}
-									aria-label={
-										line === origin.line
-											? `Line ${line}, error`
-											: `Line ${line}`
-									}
 								>
-									{String(line).padStart(lineWidth, ' ')}:
+									{' ' + value}
 								</Text>
 							</Box>
-
-							<Text
-								key={line}
-								backgroundColor={line === origin.line ? 'red' : undefined}
-								color={line === origin.line ? 'white' : undefined}
-							>
-								{' ' + value}
-							</Text>
-						</Box>
-					))}
-				</Box>
-			) : null}
+						))}
+					</Box>
+				)
+				: null}
 
 			{error.stack ? (
-				<Box marginTop={1} flexDirection="column">
+				<Box marginTop={1} flexDirection='column'>
 					{error.stack
 						.split('\n')
 						.slice(1)
@@ -118,7 +120,7 @@ export default function ErrorOverview({error}: Props) {
 									</Text>
 									<Text
 										dimColor
-										color="gray"
+										color='gray'
 										aria-label={`at ${
 											cleanupPath(parsedLine.file) ?? ''
 										} line ${parsedLine.line} column ${parsedLine.column}`}

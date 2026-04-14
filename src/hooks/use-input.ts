@@ -157,9 +157,8 @@ const UserInput = () => {
 ```
 */
 const useInput = (inputHandler: Handler, options: Options = {}) => {
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	const {setRawMode, internal_exitOnCtrlC, internal_eventEmitter} =
-		useStdinContext();
+	const {setRawMode, internal_exitOnCtrlC, internal_eventEmitter}
+		= useStdinContext();
 
 	useEffect(() => {
 		if (options.isActive === false) {
@@ -225,8 +224,8 @@ const useInput = (inputHandler: Handler, options: Options = {}) => {
 		}
 
 		if (
-			!keypress.isKittyProtocol &&
-			nonAlphanumericKeys.includes(keypress.name)
+			!keypress.isKittyProtocol
+			&& nonAlphanumericKeys.includes(keypress.name)
 		) {
 			input = '';
 		}

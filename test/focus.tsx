@@ -3,7 +3,9 @@ import React, {useEffect} from 'react';
 import delay from 'delay';
 import test from 'ava';
 import {spy, stub} from 'sinon';
-import {render, Box, Text, useFocus, useFocusManager} from '../src/index.js';
+import {
+	render, Box, Text, useFocus, useFocusManager,
+} from '../src/index.js';
 import createStdout from './helpers/create-stdout.js';
 
 const createStdin = () => {
@@ -83,12 +85,14 @@ function Test({
 	}
 
 	return (
-		<Box flexDirection="column">
-			{showFirst ? (
-				<Item label="First" autoFocus={autoFocus} disabled={disableFirst} />
-			) : null}
-			<Item label="Second" autoFocus={autoFocus} disabled={disableSecond} />
-			<Item label="Third" autoFocus={autoFocus} disabled={disableThird} />
+		<Box flexDirection='column'>
+			{showFirst
+				? (
+					<Item label='First' autoFocus={autoFocus} disabled={disableFirst} />
+				)
+				: null}
+			<Item label='Second' autoFocus={autoFocus} disabled={disableSecond} />
+			<Item label='Third' autoFocus={autoFocus} disabled={disableThird} />
 		</Box>
 	);
 }
@@ -594,14 +598,14 @@ test('activeId from useFocusManager reflects currently focused component', async
 	let capturedActiveId: string | undefined;
 
 	render(
-		<Box flexDirection="column">
+		<Box flexDirection='column'>
 			<ActiveIdReader
 				onActiveId={id => {
 					capturedActiveId = id;
 				}}
 			/>
-			<ItemWithId label="First" id="first" />
-			<ItemWithId label="Second" id="second" />
+			<ItemWithId label='First' id='first' />
+			<ItemWithId label='Second' id='second' />
 		</Box>,
 		{stdout, stdin, debug: true},
 	);
@@ -624,13 +628,13 @@ test('activeId resets to undefined on Esc', async t => {
 	let capturedActiveId: string | undefined;
 
 	render(
-		<Box flexDirection="column">
+		<Box flexDirection='column'>
 			<ActiveIdReader
 				onActiveId={id => {
 					capturedActiveId = id;
 				}}
 			/>
-			<ItemWithId label="First" id="first" />
+			<ItemWithId label='First' id='first' />
 		</Box>,
 		{stdout, stdin, debug: true},
 	);
@@ -651,14 +655,14 @@ test('activeId is set immediately when component uses autoFocus', async t => {
 	let capturedActiveId: string | undefined;
 
 	render(
-		<Box flexDirection="column">
+		<Box flexDirection='column'>
 			<ActiveIdReader
 				onActiveId={id => {
 					capturedActiveId = id;
 				}}
 			/>
-			<ItemWithId autoFocus label="First" id="first" />
-			<ItemWithId label="Second" id="second" />
+			<ItemWithId autoFocus label='First' id='first' />
+			<ItemWithId label='Second' id='second' />
 		</Box>,
 		{stdout, stdin, debug: true},
 	);
@@ -680,15 +684,15 @@ test('activeId updates when focus is changed programmatically', async t => {
 	}
 
 	render(
-		<Box flexDirection="column">
+		<Box flexDirection='column'>
 			<ActiveIdReader
 				onActiveId={id => {
 					capturedActiveId = id;
 				}}
 			/>
 			<FocusCapture />
-			<ItemWithId label="First" id="first" />
-			<ItemWithId label="Second" id="second" />
+			<ItemWithId label='First' id='first' />
+			<ItemWithId label='Second' id='second' />
 		</Box>,
 		{stdout, stdin, debug: true},
 	);
@@ -711,14 +715,14 @@ test('activeId resets to undefined when focused component unmounts', async t => 
 	let capturedActiveId: string | undefined;
 
 	const {rerender} = render(
-		<Box flexDirection="column">
+		<Box flexDirection='column'>
 			<ActiveIdReader
 				onActiveId={id => {
 					capturedActiveId = id;
 				}}
 			/>
-			<ItemWithId autoFocus label="First" id="first" />
-			<ItemWithId label="Second" id="second" />
+			<ItemWithId autoFocus label='First' id='first' />
+			<ItemWithId label='Second' id='second' />
 		</Box>,
 		{stdout, stdin, debug: true},
 	);
@@ -726,16 +730,14 @@ test('activeId resets to undefined when focused component unmounts', async t => 
 	await delay(50);
 	t.is(capturedActiveId, 'first');
 
-	rerender(
-		<Box flexDirection="column">
-			<ActiveIdReader
-				onActiveId={id => {
-					capturedActiveId = id;
-				}}
-			/>
-			<ItemWithId label="Second" id="second" />
-		</Box>,
-	);
+	rerender(<Box flexDirection='column'>
+		<ActiveIdReader
+			onActiveId={id => {
+				capturedActiveId = id;
+			}}
+		/>
+		<ItemWithId label='Second' id='second' />
+	</Box>);
 
 	await delay(50);
 	t.is(capturedActiveId, undefined);

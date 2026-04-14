@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
-import {render, Text, Box, useInput} from '../../src/index.js';
+import {
+	render, Text, Box, useInput,
+} from '../../src/index.js';
 
 let messageId = 0;
 
@@ -33,8 +35,8 @@ function ChatApp() {
 	});
 
 	return (
-		<Box flexDirection="column" padding={1}>
-			<Box flexDirection="column">
+		<Box flexDirection='column' padding={1}>
+			<Box flexDirection='column'>
 				{messages.map(message => (
 					<Text key={message.id}>{message.text}</Text>
 				))}

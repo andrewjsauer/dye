@@ -16,14 +16,16 @@ function Erase() {
 	}, []);
 
 	return (
-		<Box flexDirection="column">
-			{show ? (
-				<>
-					<Text>A</Text>
-					<Text>B</Text>
-					<Text>C</Text>
-				</>
-			) : null}
+		<Box flexDirection='column'>
+			{show
+				? (
+					<>
+						<Text>A</Text>
+						<Text>B</Text>
+						<Text>C</Text>
+					</>
+				)
+				: null}
 		</Box>
 	);
 }

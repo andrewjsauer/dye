@@ -6,7 +6,9 @@ import React, {
 	useEffect,
 	useRef,
 } from 'react';
-import {render, Box, Text, useInput, useApp} from '../../src/index.js';
+import {
+	render, Box, Text, useInput, useApp,
+} from '../../src/index.js';
 
 function App() {
 	const {exit} = useApp();
@@ -22,9 +24,7 @@ function App() {
 			}
 
 			done.current = true;
-			process.stdout.write(
-				`\nFINAL query:${JSON.stringify(query)} deferred:${JSON.stringify(deferredQuery)}\n`,
-			);
+			process.stdout.write(`\nFINAL query:${JSON.stringify(query)} deferred:${JSON.stringify(deferredQuery)}\n`);
 			exit();
 			return;
 		}
@@ -56,7 +56,7 @@ function App() {
 	}, []);
 
 	return (
-		<Box flexDirection="column">
+		<Box flexDirection='column'>
 			<Text>query:{query}</Text>
 			<Text>deferred:{deferredQuery}</Text>
 			<Text>filtered:{filteredResult}</Text>

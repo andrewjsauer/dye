@@ -12,9 +12,7 @@ function UserInput({test}: {readonly test: string | undefined}) {
 		}
 
 		const timeout = setTimeout(() => {
-			throw new Error(
-				`Expected 3 down arrows and enter, received ${rapidDownArrowCountRef.current} down arrow events`,
-			);
+			throw new Error(`Expected 3 down arrows and enter, received ${rapidDownArrowCountRef.current} down arrow events`);
 		}, 6000);
 
 		return () => {
@@ -35,9 +33,7 @@ function UserInput({test}: {readonly test: string | undefined}) {
 					return;
 				}
 
-				throw new Error(
-					`Expected enter after 3 down arrows, received ${rapidDownArrowCountRef.current}`,
-				);
+				throw new Error(`Expected enter after 3 down arrows, received ${rapidDownArrowCountRef.current}`);
 			}
 
 			throw new Error('Expected only down arrows and enter');

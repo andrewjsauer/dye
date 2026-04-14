@@ -76,15 +76,13 @@ const createStandard = (
 		const cursorSuffix = buildCursorSuffix(visibleCount, activeCursor);
 
 		if (str === previousOutput && cursorChanged) {
-			stream.write(
-				buildCursorOnlySequence({
-					cursorWasShown,
-					previousLineCount,
-					previousCursorPosition,
-					visibleLineCount: visibleCount,
-					cursorPosition: activeCursor,
-				}),
-			);
+			stream.write(buildCursorOnlySequence({
+				cursorWasShown,
+				previousLineCount,
+				previousCursorPosition,
+				visibleLineCount: visibleCount,
+				cursorPosition: activeCursor,
+			}));
 		} else {
 			previousOutput = str;
 			const returnPrefix = buildReturnToBottomPrefix(
@@ -92,12 +90,10 @@ const createStandard = (
 				previousLineCount,
 				previousCursorPosition,
 			);
-			stream.write(
-				returnPrefix +
-					ansiEscapes.eraseLines(previousLineCount) +
-					str +
-					cursorSuffix,
-			);
+			stream.write(returnPrefix
+				+ ansiEscapes.eraseLines(previousLineCount)
+				+ str
+				+ cursorSuffix);
 			previousLineCount = lines.length;
 		}
 
@@ -151,9 +147,7 @@ const createStandard = (
 		}
 
 		if (activeCursor) {
-			stream.write(
-				buildCursorSuffix(visibleLineCount(lines, str), activeCursor),
-			);
+			stream.write(buildCursorSuffix(visibleLineCount(lines, str), activeCursor));
 		}
 
 		previousCursorPosition = activeCursor ? {...activeCursor} : undefined;
@@ -219,15 +213,13 @@ const createIncremental = (
 		const previousVisible = visibleLineCount(previousLines, previousOutput);
 
 		if (str === previousOutput && cursorChanged) {
-			stream.write(
-				buildCursorOnlySequence({
-					cursorWasShown,
-					previousLineCount: previousLines.length,
-					previousCursorPosition,
-					visibleLineCount: visibleCount,
-					cursorPosition: activeCursor,
-				}),
-			);
+			stream.write(buildCursorOnlySequence({
+				cursorWasShown,
+				previousLineCount: previousLines.length,
+				previousCursorPosition,
+				visibleLineCount: visibleCount,
+				cursorPosition: activeCursor,
+			}));
 			previousCursorPosition = activeCursor ? {...activeCursor} : undefined;
 			cursorWasShown = activeCursor !== undefined;
 			return true;
@@ -241,12 +233,10 @@ const createIncremental = (
 
 		if (str === '\n' || previousOutput.length === 0) {
 			const cursorSuffix = buildCursorSuffix(visibleCount, activeCursor);
-			stream.write(
-				returnPrefix +
-					ansiEscapes.eraseLines(previousLines.length) +
-					str +
-					cursorSuffix,
-			);
+			stream.write(returnPrefix
+				+ ansiEscapes.eraseLines(previousLines.length)
+				+ str
+				+ cursorSuffix);
 			cursorWasShown = activeCursor !== undefined;
 			previousCursorPosition = activeCursor ? {...activeCursor} : undefined;
 			previousOutput = str;
@@ -287,14 +277,12 @@ const createIncremental = (
 				continue;
 			}
 
-			buffer.push(
-				ansiEscapes.cursorTo(0) +
-					nextLines[i] +
-					ansiEscapes.eraseEndLine +
-					// Don't append newline after the last line when the input
-					// has no trailing newline (fullscreen mode).
-					(isLastLine && !hasTrailingNewline ? '' : '\n'),
-			);
+			buffer.push(ansiEscapes.cursorTo(0)
+				+ nextLines[i]
+				+ ansiEscapes.eraseEndLine
+			// Don't append newline after the last line when the input
+			// has no trailing newline (fullscreen mode).
+				+ (isLastLine && !hasTrailingNewline ? '' : '\n'));
 		}
 
 		const cursorSuffix = buildCursorSuffix(visibleCount, activeCursor);
@@ -354,9 +342,7 @@ const createIncremental = (
 		}
 
 		if (activeCursor) {
-			stream.write(
-				buildCursorSuffix(visibleLineCount(lines, str), activeCursor),
-			);
+			stream.write(buildCursorSuffix(visibleLineCount(lines, str), activeCursor));
 		}
 
 		previousCursorPosition = activeCursor ? {...activeCursor} : undefined;

@@ -1,12 +1,14 @@
 import React from 'react';
-import {render, Box, Text, useWindowSize} from '../../src/index.js';
+import {
+	render, Box, Text, useWindowSize,
+} from '../../src/index.js';
 
 function TerminalResizeExample() {
 	const {columns, rows} = useWindowSize();
 
 	return (
-		<Box flexDirection="column" padding={1}>
-			<Text bold color="cyan">
+		<Box flexDirection='column' padding={1}>
+			<Text bold color='cyan'>
 				Terminal Size
 			</Text>
 			<Text>Columns: {columns}</Text>

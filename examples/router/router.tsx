@@ -1,6 +1,10 @@
 import React from 'react';
-import {MemoryRouter, Routes, Route, useNavigate} from 'react-router';
-import {render, useInput, useApp, Box, Text} from '../../src/index.js';
+import {
+	MemoryRouter, Routes, Route, useNavigate,
+} from 'react-router';
+import {
+	render, useInput, useApp, Box, Text,
+} from '../../src/index.js';
 
 function Home() {
 	const {exit} = useApp();
@@ -17,8 +21,8 @@ function Home() {
 	});
 
 	return (
-		<Box flexDirection="column">
-			<Text bold color="green">
+		<Box flexDirection='column'>
+			<Text bold color='green'>
 				Home
 			</Text>
 			<Text>Press Enter to go to About, or "q" to quit.</Text>
@@ -41,8 +45,8 @@ function About() {
 	});
 
 	return (
-		<Box flexDirection="column">
-			<Text bold color="blue">
+		<Box flexDirection='column'>
+			<Text bold color='blue'>
 				About
 			</Text>
 			<Text>Press Enter to go back Home, or "q" to quit.</Text>
@@ -54,8 +58,8 @@ function App() {
 	return (
 		<MemoryRouter>
 			<Routes>
-				<Route path="/" element={<Home />} />
-				<Route path="/about" element={<About />} />
+				<Route path='/' element={<Home />} />
+				<Route path='/about' element={<About />} />
 			</Routes>
 		</MemoryRouter>
 	);

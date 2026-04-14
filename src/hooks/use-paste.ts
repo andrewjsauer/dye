@@ -40,9 +40,8 @@ const usePaste = (
 	handler: (text: string) => void,
 	options: Options = {},
 ): void => {
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	const {setRawMode, setBracketedPasteMode, internal_eventEmitter} =
-		useStdinContext();
+	const {setRawMode, setBracketedPasteMode, internal_eventEmitter}
+		= useStdinContext();
 
 	useEffect(() => {
 		if (options.isActive === false) {

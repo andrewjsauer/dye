@@ -39,8 +39,6 @@ function Fallback() {
 	return <Text>Loading...</Text>;
 }
 
-render(
-	<React.Suspense fallback={<Fallback />}>
-		<Example />
-	</React.Suspense>,
-);
+render(<React.Suspense fallback={<Fallback />}>
+	<Example />
+</React.Suspense>);

@@ -32,7 +32,6 @@ declare namespace Ink {
 		key?: Key;
 		style?: Styles;
 
-		// eslint-disable-next-line @typescript-eslint/naming-convention
 		internal_transform?: (children: string, index: number) => string;
 		internal_accessibility?: DOMElement['internal_accessibility'];
 	};

@@ -7,17 +7,13 @@ import {
 } from './helpers/render-to-string.js';
 import createStdout from './helpers/create-stdout.js';
 
-const renderWithAlignContent = (
-	alignContent: NonNullable<React.ComponentProps<typeof Box>['alignContent']>,
-): string =>
-	renderToString(
-		<Box width={2} height={6} flexWrap="wrap" alignContent={alignContent}>
-			<Text>A</Text>
-			<Text>B</Text>
-			<Text>C</Text>
-			<Text>D</Text>
-		</Box>,
-	);
+const renderWithAlignContent = (alignContent: NonNullable<React.ComponentProps<typeof Box>['alignContent']>): string =>
+	renderToString(<Box width={2} height={6} flexWrap='wrap' alignContent={alignContent}>
+		<Text>A</Text>
+		<Text>B</Text>
+		<Text>C</Text>
+		<Text>D</Text>
+	</Box>);
 
 for (const [alignContent, expectedOutput] of [
 	['flex-start', 'AB\nCD\n\n\n\n'],
@@ -35,27 +31,23 @@ for (const [alignContent, expectedOutput] of [
 }
 
 test('align content defaults to flex-start', t => {
-	const output = renderToString(
-		<Box width={2} height={6} flexWrap="wrap">
-			<Text>A</Text>
-			<Text>B</Text>
-			<Text>C</Text>
-			<Text>D</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={2} height={6} flexWrap='wrap'>
+		<Text>A</Text>
+		<Text>B</Text>
+		<Text>C</Text>
+		<Text>D</Text>
+	</Box>);
 
 	t.is(output, 'AB\nCD\n\n\n\n');
 });
 
 test('align content does not add extra spacing when there is no free cross-axis space', t => {
-	const output = renderToString(
-		<Box width={2} height={2} flexWrap="wrap" alignContent="center">
-			<Text>A</Text>
-			<Text>B</Text>
-			<Text>C</Text>
-			<Text>D</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={2} height={2} flexWrap='wrap' alignContent='center'>
+		<Text>A</Text>
+		<Text>B</Text>
+		<Text>C</Text>
+		<Text>D</Text>
+	</Box>);
 
 	t.is(output, 'AB\nCD');
 });
@@ -69,7 +61,7 @@ test('clears alignContent on rerender to default flex-start', t => {
 		readonly alignContent?: React.ComponentProps<typeof Box>['alignContent'];
 	}) {
 		return (
-			<Box width={2} height={6} flexWrap="wrap" alignContent={alignContent}>
+			<Box width={2} height={6} flexWrap='wrap' alignContent={alignContent}>
 				<Text>A</Text>
 				<Text>B</Text>
 				<Text>C</Text>
@@ -78,7 +70,7 @@ test('clears alignContent on rerender to default flex-start', t => {
 		);
 	}
 
-	const {rerender} = render(<Test alignContent="center" />, {
+	const {rerender} = render(<Test alignContent='center' />, {
 		stdout,
 		debug: true,
 	});
@@ -98,7 +90,7 @@ test('clears alignContent from stretch on rerender to default flex-start', t => 
 		readonly alignContent?: React.ComponentProps<typeof Box>['alignContent'];
 	}) {
 		return (
-			<Box width={2} height={6} flexWrap="wrap" alignContent={alignContent}>
+			<Box width={2} height={6} flexWrap='wrap' alignContent={alignContent}>
 				<Text>A</Text>
 				<Text>B</Text>
 				<Text>C</Text>
@@ -107,7 +99,7 @@ test('clears alignContent from stretch on rerender to default flex-start', t => 
 		);
 	}
 
-	const {rerender} = render(<Test alignContent="stretch" />, {
+	const {rerender} = render(<Test alignContent='stretch' />, {
 		stdout,
 		debug: true,
 	});
@@ -126,7 +118,7 @@ test('clears alignContent when prop is omitted on rerender', t => {
 			<Box
 				width={2}
 				height={6}
-				flexWrap="wrap"
+				flexWrap='wrap'
 				{...(showAlignContent ? {alignContent: 'center' as const} : {})}
 			>
 				<Text>A</Text>
@@ -149,14 +141,12 @@ test('clears alignContent when prop is omitted on rerender', t => {
 });
 
 test('align content center - concurrent', async t => {
-	const output = await renderToStringAsync(
-		<Box width={2} height={6} flexWrap="wrap" alignContent="center">
-			<Text>A</Text>
-			<Text>B</Text>
-			<Text>C</Text>
-			<Text>D</Text>
-		</Box>,
-	);
+	const output = await renderToStringAsync(<Box width={2} height={6} flexWrap='wrap' alignContent='center'>
+		<Text>A</Text>
+		<Text>B</Text>
+		<Text>C</Text>
+		<Text>D</Text>
+	</Box>);
 
 	t.is(output, '\n\nAB\nCD\n\n');
 });

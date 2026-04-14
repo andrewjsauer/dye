@@ -32,9 +32,9 @@ export const buildCursorSuffix = (
 
 	const moveUp = visibleLineCount - cursorPosition.y;
 	return (
-		(moveUp > 0 ? ansiEscapes.cursorUp(moveUp) : '') +
-		ansiEscapes.cursorTo(cursorPosition.x) +
-		showCursorEscape
+		(moveUp > 0 ? ansiEscapes.cursorUp(moveUp) : '')
+		+ ansiEscapes.cursorTo(cursorPosition.x)
+		+ showCursorEscape
 	);
 };
 
@@ -97,7 +97,7 @@ export const buildReturnToBottomPrefix = (
 	}
 
 	return (
-		hideCursorEscape +
-		buildReturnToBottom(previousLineCount, previousCursorPosition)
+		hideCursorEscape
+		+ buildReturnToBottom(previousLineCount, previousCursorPosition)
 	);
 };

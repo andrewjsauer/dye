@@ -5,9 +5,7 @@ type ColorType = 'foreground' | 'background';
 const rgbRegex = /^rgb\(\s?(\d+),\s?(\d+),\s?(\d+)\s?\)$/;
 const ansiRegex = /^ansi256\(\s?(\d+)\s?\)$/;
 
-const isNamedColor = (color: string): color is ForegroundColorName => {
-	return color in chalk;
-};
+const isNamedColor = (color: string): color is ForegroundColorName => color in chalk;
 
 const colorize = (
 	str: string,

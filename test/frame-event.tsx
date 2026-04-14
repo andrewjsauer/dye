@@ -12,7 +12,10 @@ test('FrameTimer - mark accumulates into named phase', t => {
 	const timer = new FrameTimer();
 	// Busy-wait briefly to accumulate measurable time
 	const start = performance.now();
-	while (performance.now() - start < 2) { /* spin */ }
+	while (performance.now() - start < 2) {
+		/* Spin */
+	}
+
 	timer.mark('render');
 	const event = timer.finish();
 	t.true(event.phases.render > 0);
@@ -24,7 +27,9 @@ test('FrameTimer - multiple marks for different phases', t => {
 	const timer = new FrameTimer();
 	const spin = (ms: number) => {
 		const start = performance.now();
-		while (performance.now() - start < ms) { /* spin */ }
+		while (performance.now() - start < ms) {
+			/* Spin */
+		}
 	};
 
 	spin(1);
@@ -44,7 +49,9 @@ test('FrameTimer - finish returns durationMs approximately equal to phase sum', 
 	const timer = new FrameTimer();
 	const spin = (ms: number) => {
 		const start = performance.now();
-		while (performance.now() - start < ms) { /* spin */ }
+		while (performance.now() - start < ms) {
+			/* Spin */
+		}
 	};
 
 	spin(1);
@@ -55,13 +62,13 @@ test('FrameTimer - finish returns durationMs approximately equal to phase sum', 
 	const event = timer.finish();
 	const phaseSum
 		= event.phases.reconcile
-		+ event.phases.layout
-		+ event.phases.render
-		+ event.phases.diff
-		+ event.phases.optimize
-		+ event.phases.write;
+			+ event.phases.layout
+			+ event.phases.render
+			+ event.phases.diff
+			+ event.phases.optimize
+			+ event.phases.write;
 	// Phase sum should be ≤ durationMs (sum only covers marked phases)
-	t.true(phaseSum <= event.durationMs + 0.1); // small tolerance
+	t.true(phaseSum <= event.durationMs + 0.1); // Small tolerance
 	// Should be reasonably close — no more than 5ms overhead
 	t.true(event.durationMs - phaseSum < 5);
 });
@@ -87,7 +94,10 @@ test('FrameTimer - finish callable multiple times', t => {
 	const e1 = timer.finish();
 	// Small delay
 	const start = performance.now();
-	while (performance.now() - start < 1) { /* spin */ }
+	while (performance.now() - start < 1) {
+		/* Spin */
+	}
+
 	const e2 = timer.finish();
 	// Second call returns a later durationMs
 	t.true(e2.durationMs >= e1.durationMs);
@@ -109,7 +119,7 @@ test('onFrame fires on render', t => {
 		},
 	});
 
-	t.true(events.length >= 1);
+	t.true(events.length > 0);
 	const first = events[0]!;
 	t.true(first.durationMs > 0);
 	t.true(first.phases.render > 0);
@@ -150,7 +160,10 @@ test('onFrame fires on rerender', t => {
 	const initialCount = events.length;
 	instance.rerender(<Text>Two</Text>);
 
-	t.true(events.length > initialCount, 'rerender should produce additional FrameEvent');
+	t.true(
+		events.length > initialCount,
+		'rerender should produce additional FrameEvent',
+	);
 });
 
 test('onFrame survives a throwing callback and fires again on rerender', t => {
@@ -163,7 +176,10 @@ test('onFrame survives a throwing callback and fires again on rerender', t => {
 		debug: true,
 		onFrame() {
 			callCount++;
-			if (callCount === 1) throw new Error('first-frame boom');
+			if (callCount === 1) {
+				throw new Error('first-frame boom');
+			}
+
 			sawSecond = true;
 		},
 	});
@@ -197,5 +213,5 @@ test('onFrame reentrant rerender does not throw or hang', t => {
 		instance.unmount();
 	});
 
-	t.true(events.length >= 1);
+	t.true(events.length > 0);
 });

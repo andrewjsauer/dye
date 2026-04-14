@@ -23,8 +23,8 @@ const squashTextNodes = (node: DOMElement): string => {
 			nodeText = childNode.nodeValue;
 		} else {
 			if (
-				childNode.nodeName === 'ink-text' ||
-				childNode.nodeName === 'ink-virtual-text'
+				childNode.nodeName === 'ink-text'
+				|| childNode.nodeName === 'ink-virtual-text'
 			) {
 				nodeText = squashTextNodes(childNode);
 			}
@@ -32,8 +32,8 @@ const squashTextNodes = (node: DOMElement): string => {
 			// Since these text nodes are being concatenated, `Output` instance won't be able to
 			// apply children transform, so we have to do it manually here for each text node
 			if (
-				nodeText.length > 0 &&
-				typeof childNode.internal_transform === 'function'
+				nodeText.length > 0
+				&& typeof childNode.internal_transform === 'function'
 			) {
 				nodeText = childNode.internal_transform(nodeText, index);
 			}

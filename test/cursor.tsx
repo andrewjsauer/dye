@@ -1,5 +1,7 @@
 import test, {type ExecutionContext} from 'ava';
-import React, {Suspense, act, useEffect, useState} from 'react';
+import React, {
+	Suspense, act, useEffect, useState,
+} from 'react';
 import ansiEscapes from 'ansi-escapes';
 import delay from 'delay';
 import {
@@ -47,9 +49,7 @@ const waitForCondition = async (condition: () => boolean): Promise<void> => {
 				}
 			} catch (error) {
 				clearInterval(interval);
-				reject(
-					error instanceof Error ? error : new Error('Condition check threw'),
-				);
+				reject(error instanceof Error ? error : new Error('Condition check threw'));
 				return;
 			}
 
@@ -319,7 +319,7 @@ test.serial('screen does not scroll up on subsequent renders', async t => {
 		setCursorPosition({x: 2 + text.length, y: 1});
 
 		return (
-			<Box flexDirection="column">
+			<Box flexDirection='column'>
 				<Text>Header</Text>
 				<Text>{`> ${text}`}</Text>
 			</Box>
@@ -462,14 +462,11 @@ test.serial('debug mode: useStdout().write() replays latest frame', async t => {
 	const {unmount} = render(<DebugStdoutWriteApp />, {stdout, debug: true});
 	await waitForCondition(() =>
 		getWriteCalls(stdout).some(write =>
-			write.includes('from stdout hook\nHello'),
-		),
-	);
+			write.includes('from stdout hook\nHello')));
 
 	const writes = getWriteCalls(stdout);
 	const hookWrite = writes.find(write =>
-		write.includes('from stdout hook\nHello'),
-	);
+		write.includes('from stdout hook\nHello'));
 
 	t.truthy(hookWrite);
 	t.false(writes.includes(''));
@@ -489,9 +486,7 @@ test.serial(
 		});
 		await waitForCondition(() =>
 			getWriteCalls(stdout).some(write =>
-				write.includes('from stdout hook\nHello'),
-			),
-		);
+				write.includes('from stdout hook\nHello')));
 
 		const stderrWrites = getWriteCalls(stderr);
 		t.false(stderrWrites.some(write => write.includes('from stdout hook\n')));
@@ -513,8 +508,7 @@ test.serial(
 			debug: true,
 		});
 		await waitForCondition(() =>
-			getWriteCalls(stderr).some(write => write.includes('from stderr hook\n')),
-		);
+			getWriteCalls(stderr).some(write => write.includes('from stderr hook\n')));
 		await waitForCondition(() => getWriteCalls(stdout).length > 1);
 
 		const stdoutWrites = getWriteCalls(stdout);
@@ -524,14 +518,9 @@ test.serial(
 		t.true(stderrWrites.some(write => write.includes('from stderr hook\n')));
 		t.false(stderrWrites.some(write => write.includes('Hello')));
 		t.true(stdoutWritesAfterInitialRender.length > 0);
-		t.true(
-			stdoutWritesAfterInitialRender.some(write => write.includes('Hello')),
-		);
-		t.false(
-			stdoutWritesAfterInitialRender.some(write =>
-				write.includes('from stderr hook\n'),
-			),
-		);
+		t.true(stdoutWritesAfterInitialRender.some(write => write.includes('Hello')));
+		t.false(stdoutWritesAfterInitialRender.some(write =>
+			write.includes('from stderr hook\n')));
 		t.false(stdoutWrites.includes(''));
 		t.false(stderrWrites.includes(''));
 
@@ -583,18 +572,12 @@ test.serial(
 		});
 		await waitForCondition(() =>
 			getWriteCalls(stdout).some(write =>
-				write.includes('from stdout hook\nUpdated'),
-			),
-		);
+				write.includes('from stdout hook\nUpdated')));
 
 		const stdoutWrites = getWriteCalls(stdout);
 
-		t.true(
-			stdoutWrites.some(write => write.includes('from stdout hook\nUpdated')),
-		);
-		t.false(
-			stdoutWrites.some(write => write.includes('from stdout hook\nInitial')),
-		);
+		t.true(stdoutWrites.some(write => write.includes('from stdout hook\nUpdated')));
+		t.false(stdoutWrites.some(write => write.includes('from stdout hook\nInitial')));
 		t.false(stdoutWrites.includes(''));
 
 		unmount();
@@ -612,13 +595,11 @@ test.serial(
 			debug: true,
 		});
 		await waitForCondition(() =>
-			getWriteCalls(stderr).some(write => write.includes('from stderr hook\n')),
-		);
+			getWriteCalls(stderr).some(write => write.includes('from stderr hook\n')));
 		await waitForCondition(() =>
 			getWriteCalls(stdout)
 				.slice(1)
-				.some(write => write.includes('Updated')),
-		);
+				.some(write => write.includes('Updated')));
 
 		const stdoutWrites = getWriteCalls(stdout);
 		const stderrWrites = getWriteCalls(stderr);
@@ -627,17 +608,10 @@ test.serial(
 		t.true(stderrWrites.some(write => write.includes('from stderr hook\n')));
 		t.false(stderrWrites.some(write => write.includes('Updated')));
 		t.false(stderrWrites.some(write => write.includes('Initial')));
-		t.true(
-			stdoutWritesAfterInitialRender.some(write => write.includes('Updated')),
-		);
-		t.false(
-			stdoutWritesAfterInitialRender.some(write => write.includes('Initial')),
-		);
-		t.false(
-			stdoutWritesAfterInitialRender.some(write =>
-				write.includes('from stderr hook\n'),
-			),
-		);
+		t.true(stdoutWritesAfterInitialRender.some(write => write.includes('Updated')));
+		t.false(stdoutWritesAfterInitialRender.some(write => write.includes('Initial')));
+		t.false(stdoutWritesAfterInitialRender.some(write =>
+			write.includes('from stderr hook\n')));
 		t.false(stdoutWrites.includes(''));
 		t.false(stderrWrites.includes(''));
 

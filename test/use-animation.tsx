@@ -192,10 +192,8 @@ test.serial(
 			t.is(mocks.setTimeoutCallCount, 2);
 
 			await clock.tickAsync(120);
-			t.true(
-				Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10) >=
-					1,
-			);
+			t.true(Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10)
+				>= 1);
 
 			secondRender.unmount();
 			t.true(mocks.clearTimeoutCallCount >= 2);
@@ -432,10 +430,8 @@ test.serial('no timer leak when all animations are inactive', async t => {
 		t.is(mocks.setTimeoutCallCount, 1);
 
 		await clock.tickAsync(120);
-		t.true(
-			Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10) >=
-				1,
-		);
+		t.true(Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10)
+			>= 1);
 
 		// Deactivate — subscriber unsubscribes, timer should be cleaned up
 		rerender(<ConditionalAnimation isActive={false} interval={50} />);
@@ -649,10 +645,8 @@ test.serial('defaults to 100ms interval', async t => {
 
 		await clock.tickAsync(250);
 
-		t.true(
-			Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10) >=
-				1,
-		);
+		t.true(Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10)
+			>= 1);
 
 		unmount();
 	} finally {
@@ -675,10 +669,8 @@ test.serial('treats NaN interval as the default interval', async t => {
 
 		await clock.tickAsync(250);
 
-		t.true(
-			Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10) >=
-				1,
-		);
+		t.true(Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10)
+			>= 1);
 
 		unmount();
 	} finally {
@@ -704,10 +696,8 @@ test.serial('treats Infinity interval as the default interval', async t => {
 
 		await clock.tickAsync(250);
 
-		t.true(
-			Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10) >=
-				1,
-		);
+		t.true(Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10)
+			>= 1);
 
 		unmount();
 	} finally {
@@ -735,10 +725,8 @@ test.serial(
 
 			await clock.tickAsync(250);
 
-			t.true(
-				Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10) >=
-					1,
-			);
+			t.true(Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10)
+				>= 1);
 
 			unmount();
 		} finally {
@@ -989,10 +977,8 @@ test.serial(
 			});
 
 			await clock.tickAsync(25);
-			t.true(
-				Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10) >=
-					1,
-			);
+			t.true(Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10)
+				>= 1);
 
 			rerender(<DynamicInterval interval={200} />);
 
@@ -1035,10 +1021,8 @@ test.serial('wall clock changes do not move animations backwards', async t => {
 		wallClockTime = 900;
 		await clock.tickAsync(25);
 
-		t.true(
-			Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10) >=
-				frameBeforeClockJump,
-		);
+		t.true(Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10)
+			>= frameBeforeClockJump);
 
 		unmount();
 	} finally {
@@ -1065,10 +1049,8 @@ test.serial(
 
 			await clock.tickAsync(25);
 
-			t.true(
-				Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10) >=
-					1,
-			);
+			t.true(Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10)
+				>= 1);
 
 			unmount();
 		} finally {
@@ -1400,10 +1382,8 @@ test.serial(
 
 			// Let a few frames accumulate
 			await clock.tickAsync(200);
-			t.true(
-				Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10) >=
-					1,
-			);
+			t.true(Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10)
+				>= 1);
 
 			// Pause the animation
 			rerender(<PausableAnimation isActive={false} />);
@@ -1420,10 +1400,8 @@ test.serial(
 
 			// And then advance again to confirm animation restarts cleanly
 			await clock.tickAsync(100);
-			t.true(
-				Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10) >=
-					1,
-			);
+			t.true(Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10)
+				>= 1);
 
 			unmount();
 		} finally {
@@ -1476,21 +1454,17 @@ test.serial(
 			t.true(frameBefore >= 1);
 
 			await act(async () => {
-				instance!.rerender(
-					<Suspense fallback={<Text>loading</Text>}>
-						<MaybeSuspendingAnimation shouldSuspend interval={200} />
-					</Suspense>,
-				);
+				instance!.rerender(<Suspense fallback={<Text>loading</Text>}>
+					<MaybeSuspendingAnimation shouldSuspend interval={200} />
+				</Suspense>);
 			});
 
 			t.is(stdout.get(), 'loading');
 
 			await act(async () => {
-				instance!.rerender(
-					<Suspense fallback={<Text>loading</Text>}>
-						<MaybeSuspendingAnimation interval={200} shouldSuspend={false} />
-					</Suspense>,
-				);
+				instance!.rerender(<Suspense fallback={<Text>loading</Text>}>
+					<MaybeSuspendingAnimation interval={200} shouldSuspend={false} />
+				</Suspense>);
 			});
 
 			t.is(stdout.get(), '0');
@@ -1548,30 +1522,24 @@ test.serial(
 
 			// Cycle 1
 			await clock.tickAsync(120);
-			t.true(
-				Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10) >=
-					1,
-			);
+			t.true(Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10)
+				>= 1);
 			rerender(<ConditionalAnimation isActive={false} interval={50} />);
 			rerender(<ConditionalAnimation isActive interval={50} />);
 			t.is((stdout.write as any).lastCall.args[0], '0');
 
 			// Cycle 2
 			await clock.tickAsync(120);
-			t.true(
-				Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10) >=
-					1,
-			);
+			t.true(Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10)
+				>= 1);
 			rerender(<ConditionalAnimation isActive={false} interval={50} />);
 			rerender(<ConditionalAnimation isActive interval={50} />);
 			t.is((stdout.write as any).lastCall.args[0], '0');
 
 			// Cycle 3
 			await clock.tickAsync(120);
-			t.true(
-				Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10) >=
-					1,
-			);
+			t.true(Number.parseInt((stdout.write as any).lastCall.args[0] as string, 10)
+				>= 1);
 			rerender(<ConditionalAnimation isActive={false} interval={50} />);
 			rerender(<ConditionalAnimation isActive interval={50} />);
 			t.is((stdout.write as any).lastCall.args[0], '0');

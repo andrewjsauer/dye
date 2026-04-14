@@ -31,7 +31,9 @@ export function dispatchClick(
 	},
 ): boolean {
 	const target = hitTest(root, col, row);
-	if (!target) return false;
+	if (!target) {
+		return false;
+	}
 
 	const event = new ClickEvent({
 		col,
@@ -49,8 +51,13 @@ export function dispatchClick(
 	let handled = false;
 
 	while (node) {
-		if (event.isImmediatePropagationStopped()) break;
-		if (event.isPropagationStopped() && node !== target) break;
+		if (event.isImmediatePropagationStopped()) {
+			break;
+		}
+
+		if (event.isPropagationStopped() && node !== target) {
+			break;
+		}
 
 		event.currentTarget = node;
 
@@ -91,7 +98,9 @@ export function dispatchHover(
 ): void {
 	const newHoverNode = hitTest(root, col, row) ?? undefined;
 
-	if (newHoverNode === currentHoverNode) return;
+	if (newHoverNode === currentHoverNode) {
+		return;
+	}
 
 	// Collect ancestor chains for old and new hover nodes
 	const oldChain = getAncestorChain(currentHoverNode);
@@ -104,7 +113,9 @@ export function dispatchHover(
 	for (const node of oldChain) {
 		if (!newChain.includes(node)) {
 			const handler = node._eventHandlers?.['onMouseLeave'];
-			if (handler) handler();
+			if (handler) {
+				handler();
+			}
 		}
 	}
 
@@ -112,7 +123,9 @@ export function dispatchHover(
 	for (const node of newChain) {
 		if (!oldSet.has(node)) {
 			const handler = node._eventHandlers?.['onMouseEnter'];
-			if (handler) handler();
+			if (handler) {
+				handler();
+			}
 		}
 	}
 

@@ -46,7 +46,7 @@ function DataItem({
 	const data = fetchData(name, delay);
 	return (
 		<Box marginLeft={2}>
-			<Text color="green">{data}</Text>
+			<Text color='green'>{data}</Text>
 		</Box>
 	);
 }
@@ -55,7 +55,7 @@ function DataItem({
 function Loading({message}: {readonly message: string}) {
 	return (
 		<Box marginLeft={2}>
-			<Text color="yellow">{message}</Text>
+			<Text color='yellow'>{message}</Text>
 		</Box>
 	);
 }
@@ -75,7 +75,7 @@ function App() {
 	}, []);
 
 	return (
-		<Box flexDirection="column">
+		<Box flexDirection='column'>
 			<Text bold underline>
 				Concurrent Suspense Demo
 			</Text>
@@ -85,33 +85,35 @@ function App() {
 			<Box marginTop={1} />
 
 			<Text>Fast data (200ms):</Text>
-			<Suspense fallback={<Loading message="Loading fast data..." />}>
-				<DataItem name="fast" delay={200} />
+			<Suspense fallback={<Loading message='Loading fast data...' />}>
+				<DataItem name='fast' delay={200} />
 			</Suspense>
 
 			<Box marginTop={1} />
 
 			<Text>Medium data (800ms):</Text>
-			<Suspense fallback={<Loading message="Loading medium data..." />}>
-				<DataItem name="medium" delay={800} />
+			<Suspense fallback={<Loading message='Loading medium data...' />}>
+				<DataItem name='medium' delay={800} />
 			</Suspense>
 
 			<Box marginTop={1} />
 
 			<Text>Slow data (1500ms):</Text>
-			<Suspense fallback={<Loading message="Loading slow data..." />}>
-				<DataItem name="slow" delay={1500} />
+			<Suspense fallback={<Loading message='Loading slow data...' />}>
+				<DataItem name='slow' delay={1500} />
 			</Suspense>
 
-			{showMore ? (
-				<>
-					<Box marginTop={1} />
-					<Text>Dynamically added (500ms):</Text>
-					<Suspense fallback={<Loading message="Loading dynamic data..." />}>
-						<DataItem name="dynamic" delay={500} />
-					</Suspense>
-				</>
-			) : null}
+			{showMore
+				? (
+					<>
+						<Box marginTop={1} />
+						<Text>Dynamically added (500ms):</Text>
+						<Suspense fallback={<Loading message='Loading dynamic data...' />}>
+							<DataItem name='dynamic' delay={500} />
+						</Suspense>
+					</>
+				)
+				: null}
 		</Box>
 	);
 }

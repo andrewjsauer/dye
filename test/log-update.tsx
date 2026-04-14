@@ -13,9 +13,7 @@ test('standard rendering - renders and updates output', t => {
 
 	render('World\n');
 	t.is((stdout.write as any).callCount, 2);
-	t.true(
-		((stdout.write as any).secondCall.args[0] as string).includes('World'),
-	);
+	t.true(((stdout.write as any).secondCall.args[0] as string).includes('World'));
 });
 
 test('standard rendering - skips identical output', t => {
@@ -41,9 +39,7 @@ test('incremental rendering - renders and updates output', t => {
 
 	render('World\n');
 	t.is((stdout.write as any).callCount, 2);
-	t.true(
-		((stdout.write as any).secondCall.args[0] as string).includes('World'),
-	);
+	t.true(((stdout.write as any).secondCall.args[0] as string).includes('World'));
 });
 
 test('incremental rendering - skips identical output', t => {
@@ -133,12 +129,8 @@ test('incremental rendering - single write call with multiple surgical updates',
 		incremental: true,
 	});
 
-	render(
-		'Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10\n',
-	);
-	render(
-		'Line 1\nUpdated 2\nLine 3\nUpdated 4\nLine 5\nUpdated 6\nLine 7\nUpdated 8\nLine 9\nUpdated 10\n',
-	);
+	render('Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10\n');
+	render('Line 1\nUpdated 2\nLine 3\nUpdated 4\nLine 5\nUpdated 6\nLine 7\nUpdated 8\nLine 9\nUpdated 10\n');
 
 	t.is((stdout.write as any).callCount, 2); // Only 2 writes total (initial + update)
 });
@@ -158,9 +150,9 @@ test('incremental rendering - shrinking output keeps screen tight', t => {
 
 	t.is(
 		thirdCall,
-		ansiEscapes.eraseLines(2) + // Erase Line 2 and ending cursorNextLine
-			ansiEscapes.cursorUp(1) + // Move to beginning of Line 1
-			ansiEscapes.cursorNextLine, // Move to next line after Line 1
+		ansiEscapes.eraseLines(2) // Erase Line 2 and ending cursorNextLine
+		+ ansiEscapes.cursorUp(1) // Move to beginning of Line 1
+		+ ansiEscapes.cursorNextLine, // Move to next line after Line 1
 	);
 });
 
@@ -267,11 +259,7 @@ test('standard rendering - positions cursor after output when cursorPosition is 
 	// To reach y=1: cursorUp(3 - 1) = cursorUp(2)
 	// Then cursorTo(5) and show cursor
 	t.true(written.includes('Line 3'));
-	t.true(
-		written.endsWith(
-			ansiEscapes.cursorUp(2) + ansiEscapes.cursorTo(5) + showCursorEscape,
-		),
-	);
+	t.true(written.endsWith(ansiEscapes.cursorUp(2) + ansiEscapes.cursorTo(5) + showCursorEscape));
 });
 
 test('standard rendering - hides cursor before erase when cursor was previously shown', t => {
@@ -287,11 +275,7 @@ test('standard rendering - hides cursor before erase when cursor was previously 
 	// Should start with hide cursor before erasing
 	t.true(secondCall.startsWith(hideCursorEscape));
 	// Should end with show cursor at position
-	t.true(
-		secondCall.endsWith(
-			ansiEscapes.cursorUp(1) + ansiEscapes.cursorTo(0) + showCursorEscape,
-		),
-	);
+	t.true(secondCall.endsWith(ansiEscapes.cursorUp(1) + ansiEscapes.cursorTo(0) + showCursorEscape));
 });
 
 test('standard rendering - no cursor positioning when cursorPosition is undefined', t => {
@@ -314,11 +298,7 @@ test('standard rendering - cursor position at second-to-last line emits cursorUp
 	const written = (stdout.write as any).firstCall.args[0] as string;
 	// Output has 3 visible lines. After write, cursor is at line 3 (past last visible).
 	// To reach y=2: cursorUp(3 - 2) = cursorUp(1)
-	t.true(
-		written.endsWith(
-			ansiEscapes.cursorUp(1) + ansiEscapes.cursorTo(3) + showCursorEscape,
-		),
-	);
+	t.true(written.endsWith(ansiEscapes.cursorUp(1) + ansiEscapes.cursorTo(3) + showCursorEscape));
 });
 
 for (const {name, incremental} of renderingModes) {
@@ -366,11 +346,7 @@ test('incremental rendering - positions cursor after surgical updates', t => {
 	const written = (stdout.write as any).firstCall.args[0] as string;
 	// After incremental write, cursor is at line 3 (past last visible)
 	// To reach y=1: cursorUp(3 - 1) = cursorUp(2)
-	t.true(
-		written.endsWith(
-			ansiEscapes.cursorUp(2) + ansiEscapes.cursorTo(5) + showCursorEscape,
-		),
-	);
+	t.true(written.endsWith(ansiEscapes.cursorUp(2) + ansiEscapes.cursorTo(5) + showCursorEscape));
 });
 
 test('incremental rendering - positions cursor after update', t => {
@@ -388,11 +364,7 @@ test('incremental rendering - positions cursor after update', t => {
 	const secondCall = (stdout.write as any).secondCall.args[0] as string;
 	// After incremental update, cursor is at line 3
 	// To reach y=0: cursorUp(3)
-	t.true(
-		secondCall.endsWith(
-			ansiEscapes.cursorUp(3) + ansiEscapes.cursorTo(2) + showCursorEscape,
-		),
-	);
+	t.true(secondCall.endsWith(ansiEscapes.cursorUp(3) + ansiEscapes.cursorTo(2) + showCursorEscape));
 });
 
 for (const {name, incremental} of renderingModes) {

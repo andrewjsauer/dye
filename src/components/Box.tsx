@@ -76,65 +76,63 @@ export type Props = Except<Styles, 'textWrap'> & {
 /**
 `<Box>` is an essential Ink component to build your layout. It's like `<div style="display: flex">` in the browser.
 */
-const Box = forwardRef<DOMElement, PropsWithChildren<Props>>(
-	(
-		{
-			children,
-			backgroundColor,
-			onClick,
-			onMouseEnter,
-			onMouseLeave,
-			'aria-label': ariaLabel,
-			'aria-hidden': ariaHidden,
-			'aria-role': role,
-			'aria-state': ariaState,
-			...style
-		},
-		ref,
-	) => {
-		const {isScreenReaderEnabled} = useContext(accessibilityContext);
-		const label = ariaLabel ? <ink-text>{ariaLabel}</ink-text> : undefined;
-		if (isScreenReaderEnabled && ariaHidden) {
-			return null;
-		}
-
-		const boxElement = (
-			<ink-box
-				ref={ref}
-				onClick={onClick}
-				onMouseEnter={onMouseEnter}
-				onMouseLeave={onMouseLeave}
-				style={{
-					flexWrap: 'nowrap',
-					flexDirection: 'row',
-					flexGrow: 0,
-					flexShrink: 1,
-					...style,
-					backgroundColor,
-					overflowX: style.overflowX ?? style.overflow ?? 'visible',
-					overflowY: style.overflowY ?? style.overflow ?? 'visible',
-				}}
-				internal_accessibility={{
-					role,
-					state: ariaState,
-				}}
-			>
-				{isScreenReaderEnabled && label ? label : children}
-			</ink-box>
-		);
-
-		// If this Box has a background color, provide it to children via context
-		if (backgroundColor) {
-			return (
-				<backgroundContext.Provider value={backgroundColor}>
-					{boxElement}
-				</backgroundContext.Provider>
-			);
-		}
-
-		return boxElement;
+const Box = forwardRef<DOMElement, PropsWithChildren<Props>>((
+	{
+		children,
+		backgroundColor,
+		onClick,
+		onMouseEnter,
+		onMouseLeave,
+		'aria-label': ariaLabel,
+		'aria-hidden': ariaHidden,
+		'aria-role': role,
+		'aria-state': ariaState,
+		...style
 	},
-);
+	ref,
+) => {
+	const {isScreenReaderEnabled} = useContext(accessibilityContext);
+	const label = ariaLabel ? <ink-text>{ariaLabel}</ink-text> : undefined;
+	if (isScreenReaderEnabled && ariaHidden) {
+		return null;
+	}
+
+	const boxElement = (
+		<ink-box
+			ref={ref}
+			style={{
+				flexWrap: 'nowrap',
+				flexDirection: 'row',
+				flexGrow: 0,
+				flexShrink: 1,
+				...style,
+				backgroundColor,
+				overflowX: style.overflowX ?? style.overflow ?? 'visible',
+				overflowY: style.overflowY ?? style.overflow ?? 'visible',
+			}}
+			internal_accessibility={{
+				role,
+				state: ariaState,
+			}}
+			onClick={onClick}
+			onMouseEnter={onMouseEnter}
+			onMouseLeave={onMouseLeave}
+		>
+			{isScreenReaderEnabled && label ? label : children}
+		</ink-box>
+	);
+
+	// If this Box has a background color, provide it to children via context
+	if (backgroundColor) {
+		return (
+			<backgroundContext.Provider value={backgroundColor}>
+				{boxElement}
+			</backgroundContext.Provider>
+		);
+	}
+
+	return boxElement;
+});
 
 Box.displayName = 'Box';
 

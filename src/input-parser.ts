@@ -11,23 +11,17 @@ type ParsedInput = {
 
 type ParsedSequence =
 	| {
-			readonly sequence: string;
-			readonly nextIndex: number;
-	  }
+		readonly sequence: string;
+		readonly nextIndex: number;
+	}
 	| 'pending'
 	| undefined;
 
-const isCsiParameterByte = (byte: number): boolean => {
-	return byte >= 0x30 && byte <= 0x3f;
-};
+const isCsiParameterByte = (byte: number): boolean => byte >= 0x30 && byte <= 0x3F;
 
-const isCsiIntermediateByte = (byte: number): boolean => {
-	return byte >= 0x20 && byte <= 0x2f;
-};
+const isCsiIntermediateByte = (byte: number): boolean => byte >= 0x20 && byte <= 0x2F;
 
-const isCsiFinalByte = (byte: number): boolean => {
-	return byte >= 0x40 && byte <= 0x7e;
-};
+const isCsiFinalByte = (byte: number): boolean => byte >= 0x40 && byte <= 0x7E;
 
 const parseCsiSequence = (
 	input: string,
@@ -47,7 +41,7 @@ const parseCsiSequence = (
 		}
 
 		// Preserve legacy terminal function-key sequences like ESC[[A and ESC[[5~.
-		if (byte === 0x5b && index === csiPayloadStart) {
+		if (byte === 0x5B && index === csiPayloadStart) {
 			continue;
 		}
 
@@ -114,8 +108,8 @@ const parseEscapedCodePoint = (
 	readonly nextIndex: number;
 } => {
 	const nextCodePoint = input.codePointAt(escapeIndex + 1);
-	const nextCodePointLength =
-		nextCodePoint !== undefined && nextCodePoint > 0xff_ff ? 2 : 1;
+	const nextCodePointLength
+		= nextCodePoint !== undefined && nextCodePoint > 0xFF_FF ? 2 : 1;
 	const nextIndex = escapeIndex + 1 + nextCodePointLength;
 
 	return {
@@ -126,9 +120,9 @@ const parseEscapedCodePoint = (
 
 type ParsedEscapeSequence =
 	| {
-			readonly sequence: string;
-			readonly nextIndex: number;
-	  }
+		readonly sequence: string;
+		readonly nextIndex: number;
+	}
 	| 'pending';
 
 const parseEscapeSequence = (
@@ -266,9 +260,9 @@ export const createInputParser = (): InputParser => {
 			// Don't trigger the escape flush timer while assembling a paste start
 			// marker (`\u001B[200` and then `~`) or while waiting for paste end.
 			return (
-				pending.startsWith(escape) &&
-				!pending.startsWith(pasteStart) &&
-				pending !== '\u001B[200'
+				pending.startsWith(escape)
+				&& !pending.startsWith(pasteStart)
+				&& pending !== '\u001B[200'
 			);
 		},
 		flushPendingEscape() {

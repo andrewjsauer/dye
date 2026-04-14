@@ -30,15 +30,14 @@ export default function useSelection(): UseSelectionResult {
 		[manager],
 	);
 
-	const getSnapshot = useCallback(
-		() => manager.getSnapshot(),
-		[manager],
-	);
+	const getSnapshot = useCallback(() => manager.getSnapshot(), [manager]);
 
 	const snapshot = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
-	const clearSelection = useCallback(() => manager.clearSelection(), [manager]);
-	const copy = useCallback(() => manager.copy(), [manager]);
+	const clearSelection = useCallback(() => {
+		manager.clearSelection();
+	}, [manager]);
+	const copy = useCallback(async () => manager.copy(), [manager]);
 
 	return {
 		hasSelection: snapshot.selection !== undefined,

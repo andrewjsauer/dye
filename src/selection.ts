@@ -13,9 +13,8 @@
  * wide characters and row boundaries.
  */
 
-import process from 'node:process';
+import process, {platform} from 'node:process';
 import {execFile} from 'node:child_process';
-import {platform} from 'node:process';
 import {
 	type Screen,
 	CellWidth,
@@ -62,7 +61,9 @@ export type MultiClickTracker = {
 export const MULTI_CLICK_THRESHOLD_MS = 300;
 
 export function createMultiClickTracker(): MultiClickTracker {
-	return {lastCol: -1, lastRow: -1, lastTime: 0, count: 0};
+	return {
+		lastCol: -1, lastRow: -1, lastTime: 0, count: 0,
+	};
 }
 
 /**
@@ -97,8 +98,14 @@ export function recordClick(
  * 1 → character, 2 → word, 3 → line.
  */
 export function clickCountToMode(count: number): SelectionMode {
-	if (count >= 3) return 'line';
-	if (count === 2) return 'word';
+	if (count >= 3) {
+		return 'line';
+	}
+
+	if (count === 2) {
+		return 'word';
+	}
+
 	return 'character';
 }
 
@@ -110,11 +117,12 @@ export function clickCountToMode(count: number): SelectionMode {
  * Normalize a selection so anchor ≤ focus in reading order (top-to-bottom,
  * left-to-right). Returns [start, end] points.
  */
-export function normalizeSelection(
-	selection: SelectionState,
-): readonly [Point, Point] {
+export function normalizeSelection(selection: SelectionState): readonly [Point, Point] {
 	const {anchor, focus} = selection;
-	if (anchor.row < focus.row || (anchor.row === focus.row && anchor.col <= focus.col)) {
+	if (
+		anchor.row < focus.row
+		|| (anchor.row === focus.row && anchor.col <= focus.col)
+	) {
 		return [anchor, focus];
 	}
 
@@ -124,7 +132,10 @@ export function normalizeSelection(
 /**
  * Create a character-mode selection starting at the anchor point.
  */
-export function startSelection(anchor: Point, mode: SelectionMode): SelectionState {
+export function startSelection(
+	anchor: Point,
+	mode: SelectionMode,
+): SelectionState {
 	return {anchor, focus: anchor, mode};
 }
 
@@ -145,8 +156,9 @@ export function extendSelection(
 	if (selection.mode === 'word' && screen) {
 		// Word mode: snap focus to word boundary
 		const {anchor} = selection;
-		const forward = focus.row > anchor.row
-			|| (focus.row === anchor.row && focus.col >= anchor.col);
+		const forward
+			= focus.row > anchor.row
+				|| (focus.row === anchor.row && focus.col >= anchor.col);
 		const snapped = forward
 			? snapToWordEnd(screen, focus.col, focus.row)
 			: snapToWordStart(screen, focus.col, focus.row);
@@ -165,19 +177,29 @@ export function extendSelection(
  * Non-word characters separate words (whitespace, punctuation).
  */
 function isWordChar(char: string): boolean {
-	if (char === '' || char === ' ') return false;
+	if (char === '' || char === ' ') {
+		return false;
+	}
+
 	// Letters, digits, underscore, and common identifier characters
 	return /[\w-]/.test(char);
 }
 
 function getCharAt(screen: Screen, col: number, row: number): string {
 	const charId = getCellCharId(screen, col, row);
-	if (charId === 0) return ' ';
+	if (charId === 0) {
+		return ' ';
+	}
+
 	return screen.charPool.resolve(charId);
 }
 
 /** Find the start of the word containing (col, row). */
-export function snapToWordStart(screen: Screen, col: number, row: number): Point {
+export function snapToWordStart(
+	screen: Screen,
+	col: number,
+	row: number,
+): Point {
 	if (col < 0 || col >= screen.width || row < 0 || row >= screen.height) {
 		return {col, row};
 	}
@@ -216,7 +238,11 @@ export function snapToWordEnd(screen: Screen, col: number, row: number): Point {
 /**
  * Select the entire word at (col, row). Returns a {anchor, focus} pair.
  */
-export function selectWordAt(screen: Screen, col: number, row: number): SelectionState {
+export function selectWordAt(
+	screen: Screen,
+	col: number,
+	row: number,
+): SelectionState {
 	return {
 		anchor: snapToWordStart(screen, col, row),
 		focus: snapToWordEnd(screen, col, row),
@@ -283,8 +309,10 @@ export function getSelectedText(
 	const [start, end] = normalizeSelection(selection);
 	const lines: string[] = [];
 
-	for (let row = start.row; row <= end.row; row++) {
-		if (row < 0 || row >= screen.height) continue;
+	for (let {row} = start; row <= end.row; row++) {
+		if (row < 0 || row >= screen.height) {
+			continue;
+		}
 
 		const [startCol, endCol] = selectionColRange(
 			selection.mode,
@@ -301,7 +329,9 @@ export function getSelectedText(
 			const width = unpackWidth(word1);
 
 			// Skip spacer cells (they're part of the preceding wide char)
-			if (width === CellWidth.SpacerTail) continue;
+			if (width === CellWidth.SpacerTail) {
+				continue;
+			}
 
 			const char = charId === 0 ? ' ' : screen.charPool.resolve(charId);
 			line += char;
@@ -333,7 +363,7 @@ export function getSelectedText(
  */
 export function osc52ClipboardSequence(text: string): string {
 	const encoded = Buffer.from(text, 'utf8').toString('base64');
-	return `\x1b]52;c;${encoded}\x1b\\`;
+	return `\u001B]52;c;${encoded}\u001B\\`;
 }
 
 /**
@@ -349,13 +379,13 @@ const OSC52_MAX_BASE64_BYTES = 8000;
  */
 const CLIPBOARD_ALLOWLIST = new Set(['pbcopy', 'clip', 'xclip', 'wl-copy']);
 
-function runClipboardCommand(
+async function runClipboardCommand(
 	command: string,
 	args: string[],
 	text: string,
 ): Promise<void> {
 	if (!CLIPBOARD_ALLOWLIST.has(command)) {
-		return Promise.reject(new Error(`Clipboard command not allowed: ${command}`));
+		throw new Error(`Clipboard command not allowed: ${command}`);
 	}
 
 	return new Promise((resolve, reject) => {
@@ -374,7 +404,7 @@ function runClipboardCommand(
 	});
 }
 
-function runShellOutFallback(text: string): Promise<void> {
+async function runShellOutFallback(text: string): Promise<void> {
 	if (platform === 'darwin') {
 		return runClipboardCommand('pbcopy', [], text);
 	}
@@ -383,8 +413,7 @@ function runShellOutFallback(text: string): Promise<void> {
 		return runClipboardCommand('clip', [], text);
 	}
 
-	return runClipboardCommand('xclip', ['-selection', 'clipboard'], text)
-		.catch(() => runClipboardCommand('wl-copy', [], text));
+	return runClipboardCommand('xclip', ['-selection', 'clipboard'], text).catch(async () => runClipboardCommand('wl-copy', [], text));
 }
 
 export type ClipboardOptions = {
@@ -392,7 +421,7 @@ export type ClipboardOptions = {
 	 * Stream to emit OSC 52 to. Defaults to process.stdout.
 	 * Set to null to skip OSC 52 entirely (use the shell-out path).
 	 */
-	readonly stdout?: NodeJS.WriteStream | null;
+	readonly stdout?: NodeJS.WriteStream | undefined;
 };
 
 /**
@@ -406,18 +435,18 @@ export type ClipboardOptions = {
  *
  * Users can disable OSC 52 by passing `{stdout: null}` to force shell-out.
  */
-export function copyToClipboard(
+export async function copyToClipboard(
 	text: string,
 	options: ClipboardOptions = {},
 ): Promise<void> {
 	const stdout = options.stdout === undefined ? process.stdout : options.stdout;
-	const encodedLength = Math.ceil(text.length * 4 / 3); // approximate base64 length
+	const encodedLength = Math.ceil((text.length * 4) / 3); // Approximate base64 length
 
 	// OSC 52 path — preferred when a TTY is available and content fits
 	if (stdout?.isTTY && encodedLength <= OSC52_MAX_BASE64_BYTES) {
 		try {
 			stdout.write(osc52ClipboardSequence(text));
-			return Promise.resolve();
+			return;
 		} catch {
 			// Fall through to shell-out
 		}

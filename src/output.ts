@@ -9,10 +9,7 @@ import {
 import {type OutputTransformer} from './render-node-to-output.js';
 import {CharPool, StylePool, HyperlinkPool} from './pools.js';
 import {
-	type Screen,
-	createScreen,
-	setCellAt,
-	CellWidth,
+	type Screen, createScreen, setCellAt, CellWidth,
 } from './screen.js';
 
 /**
@@ -212,11 +209,11 @@ export default class Output {
 				const clip = clips.at(-1);
 
 				if (clip) {
-					const clipHorizontally =
-						typeof clip?.x1 === 'number' && typeof clip?.x2 === 'number';
+					const clipHorizontally
+						= typeof clip?.x1 === 'number' && typeof clip?.x2 === 'number';
 
-					const clipVertically =
-						typeof clip?.y1 === 'number' && typeof clip?.y2 === 'number';
+					const clipVertically
+						= typeof clip?.y1 === 'number' && typeof clip?.y2 === 'number';
 
 					// If text is positioned outside of clipping area altogether,
 					// skip to the next operation to avoid unnecessary calculations
@@ -299,15 +296,23 @@ export default class Output {
 					// of a wide character, the boundary cells need cleanup so
 					// the terminal never renders a half-visible wide character.
 					if (
-						currentLine[offsetX]?.value === '' &&
-						offsetX > 0 &&
-						this.caches.getStringWidth(currentLine[offsetX - 1]?.value ?? '') >
-							1
+						currentLine[offsetX]?.value === ''
+						&& offsetX > 0
+						&& this.caches.getStringWidth(currentLine[offsetX - 1]?.value ?? '')
+						> 1
 					) {
 						currentLine[offsetX - 1] = spaceCell;
 
 						// Also clean in Screen
-						setCellAt(this.screen, offsetX - 1, y + offsetY, 0, 0, 0, CellWidth.Narrow);
+						setCellAt(
+							this.screen,
+							offsetX - 1,
+							y + offsetY,
+							0,
+							0,
+							0,
+							CellWidth.Narrow,
+						);
 					}
 
 					for (const character of characters) {
@@ -318,7 +323,7 @@ export default class Output {
 						const styleCodes: number[] = [];
 						for (const s of character.styles) {
 							// Match SGR sequences: \x1b[Nm, \x1b[N;N;...m, or bare \x1b[m (reset)
-							const match = s.code.match(/\x1b\[(\d+(?:;\d+)*)?m/);
+							const match = /\u001B\[(\d+(?:;\d+)*)?m/.exec(s.code);
 							if (match) {
 								if (match[1]) {
 									for (const n of match[1].split(';')) {
@@ -339,8 +344,17 @@ export default class Output {
 							1,
 							this.caches.getStringWidth(character.value),
 						);
-						const cellWidth = characterWidth > 1 ? CellWidth.Wide : CellWidth.Narrow;
-						setCellAt(this.screen, offsetX, y + offsetY, charId, styleId, 0, cellWidth);
+						const cellWidth
+							= characterWidth > 1 ? CellWidth.Wide : CellWidth.Narrow;
+						setCellAt(
+							this.screen,
+							offsetX,
+							y + offsetY,
+							charId,
+							styleId,
+							0,
+							cellWidth,
+						);
 
 						// For multi-column characters, clear following cells to avoid stray spaces/artifacts
 						if (characterWidth > 1) {
@@ -370,7 +384,15 @@ export default class Output {
 
 					if (currentLine[offsetX]?.value === '') {
 						currentLine[offsetX] = spaceCell;
-						setCellAt(this.screen, offsetX, y + offsetY, 0, 0, 0, CellWidth.Narrow);
+						setCellAt(
+							this.screen,
+							offsetX,
+							y + offsetY,
+							0,
+							0,
+							0,
+							CellWidth.Narrow,
+						);
 					}
 
 					offsetY++;
@@ -390,7 +412,7 @@ export default class Output {
 		return {
 			output: generatedOutput,
 			height: output.length,
-			screen: this.screen!,
+			screen: this.screen,
 		};
 	}
 

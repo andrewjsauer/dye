@@ -14,13 +14,11 @@ test.after(() => {
 });
 
 test('border with background color', t => {
-	const output = renderToString(
-		<Box borderStyle="single" borderColor="white" borderBackgroundColor="blue">
-			<Box width={4}>
-				<Text>Test</Text>
-			</Box>
-		</Box>,
-	);
+	const output = renderToString(<Box borderStyle='single' borderColor='white' borderBackgroundColor='blue'>
+		<Box width={4}>
+			<Text>Test</Text>
+		</Box>
+	</Box>);
 
 	// Verify the border characters are rendered
 	t.true(output.includes('┌'));
@@ -35,19 +33,17 @@ test('border with background color', t => {
 });
 
 test('border with different background colors per side', t => {
-	const output = renderToString(
-		<Box
-			borderStyle="single"
-			borderTopBackgroundColor="red"
-			borderBottomBackgroundColor="blue"
-			borderLeftBackgroundColor="green"
-			borderRightBackgroundColor="yellow"
-		>
-			<Box width={4}>
-				<Text>Test</Text>
-			</Box>
-		</Box>,
-	);
+	const output = renderToString(<Box
+		borderStyle='single'
+		borderTopBackgroundColor='red'
+		borderBottomBackgroundColor='blue'
+		borderLeftBackgroundColor='green'
+		borderRightBackgroundColor='yellow'
+	>
+		<Box width={4}>
+			<Text>Test</Text>
+		</Box>
+	</Box>);
 
 	// Verify the border characters are rendered
 	t.true(output.includes('┌'));
@@ -65,17 +61,15 @@ test('border with different background colors per side', t => {
 });
 
 test('border background color fallback to general borderBackgroundColor', t => {
-	const output = renderToString(
-		<Box
-			borderStyle="single"
-			borderBackgroundColor="magenta"
-			borderTopBackgroundColor="cyan"
-		>
-			<Box width={4}>
-				<Text>Test</Text>
-			</Box>
-		</Box>,
-	);
+	const output = renderToString(<Box
+		borderStyle='single'
+		borderBackgroundColor='magenta'
+		borderTopBackgroundColor='cyan'
+	>
+		<Box width={4}>
+			<Text>Test</Text>
+		</Box>
+	</Box>);
 
 	// Verify the border characters are rendered
 	t.true(output.includes('┌'));
@@ -90,24 +84,20 @@ test('border background color fallback to general borderBackgroundColor', t => {
 });
 
 test('vertical border background does not bleed into content rows', t => {
-	const output = renderToString(
-		<Box
-			borderStyle="classic"
-			borderBackgroundColor="cyan"
-			alignSelf="flex-start"
-			width={12}
-		>
-			<Text>Text longer than the Box width, so will definitely wrap.</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box
+		borderStyle='classic'
+		borderBackgroundColor='cyan'
+		alignSelf='flex-start'
+		width={12}
+	>
+		<Text>Text longer than the Box width, so will definitely wrap.</Text>
+	</Box>);
 
 	const bgCyanPattern = '\u001B\\[46m';
 	const bgResetPattern = '\u001B\\[49m';
 	const tableBorderChar = '|';
 	const tableBorderPattern = bgCyanPattern + tableBorderChar + bgResetPattern;
-	const contentRowPattern = new RegExp(
-		`^${tableBorderPattern}.*${tableBorderPattern}$$`,
-	);
+	const contentRowPattern = new RegExp(`^${tableBorderPattern}.*${tableBorderPattern}$$`);
 
 	const tableRows = output.split('\n');
 	const contentRows = tableRows.slice(1, -1);
@@ -118,17 +108,15 @@ test('vertical border background does not bleed into content rows', t => {
 });
 
 test('foreground, background and dim combine correctly', t => {
-	const output = renderToString(
-		<Box
-			borderTopDimColor
-			borderStyle="single"
-			borderTopColor="red"
-			borderTopBackgroundColor="cyan"
-			alignSelf="flex-start"
-		>
-			<Text>Hi</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box
+		borderTopDimColor
+		borderStyle='single'
+		borderTopColor='red'
+		borderTopBackgroundColor='cyan'
+		alignSelf='flex-start'
+	>
+		<Text>Hi</Text>
+	</Box>);
 
 	// Expect red FG (31), cyan BG (46) and dim (2) to appear
 	t.true(output.includes('\u001B[31m'));

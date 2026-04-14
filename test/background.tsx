@@ -50,83 +50,69 @@ test.after(() => {
 
 // Text inheritance tests (these work in non-TTY)
 test('Text inherits parent Box background color', t => {
-	const output = renderToString(
-		<Box backgroundColor="green" alignSelf="flex-start">
-			<Text>Hello World</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box backgroundColor='green' alignSelf='flex-start'>
+		<Text>Hello World</Text>
+	</Box>);
 
 	t.is(output, chalk.bgGreen('Hello World'));
 });
 
 test('Text explicit background color overrides inherited', t => {
-	const output = renderToString(
-		<Box backgroundColor="red" alignSelf="flex-start">
-			<Text backgroundColor="blue">Hello World</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box backgroundColor='red' alignSelf='flex-start'>
+		<Text backgroundColor='blue'>Hello World</Text>
+	</Box>);
 
 	t.is(output, chalk.bgBlue('Hello World'));
 });
 
 test('Nested Box background inheritance', t => {
-	const output = renderToString(
-		<Box backgroundColor="red" alignSelf="flex-start">
-			<Box backgroundColor="blue">
-				<Text>Hello World</Text>
-			</Box>
-		</Box>,
-	);
+	const output = renderToString(<Box backgroundColor='red' alignSelf='flex-start'>
+		<Box backgroundColor='blue'>
+			<Text>Hello World</Text>
+		</Box>
+	</Box>);
 
 	t.is(output, chalk.bgBlue('Hello World'));
 });
 
 test('Text without parent Box background has no inheritance', t => {
-	const output = renderToString(
-		<Box alignSelf="flex-start">
-			<Text>Hello World</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box alignSelf='flex-start'>
+		<Text>Hello World</Text>
+	</Box>);
 
 	t.is(output, 'Hello World');
 });
 
 test('Multiple Text elements inherit same background', t => {
-	const output = renderToString(
-		<Box backgroundColor="yellow" alignSelf="flex-start">
-			<Text>Hello </Text>
-			<Text>World</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box backgroundColor='yellow' alignSelf='flex-start'>
+		<Text>Hello </Text>
+		<Text>World</Text>
+	</Box>);
 
 	// Text nodes are rendered as a single block with shared background
 	t.is(output, chalk.bgYellow('Hello World'));
 });
 
 test('Mixed text with and without background inheritance', t => {
-	const output = renderToString(
-		<Box backgroundColor="green" alignSelf="flex-start">
-			<Text>Inherited </Text>
-			<Text backgroundColor="">No BG </Text>
-			<Text backgroundColor="red">Red BG</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box backgroundColor='green' alignSelf='flex-start'>
+		<Text>Inherited </Text>
+		<Text backgroundColor=''>No BG </Text>
+		<Text backgroundColor='red'>Red BG</Text>
+	</Box>);
 
 	t.is(output, chalk.bgGreen('Inherited ') + 'No BG ' + chalk.bgRed('Red BG'));
 });
 
 test('Complex nested structure with background inheritance', t => {
-	const output = renderToString(
-		<Box backgroundColor="yellow" alignSelf="flex-start">
-			<Box>
-				<Text>Outer: </Text>
-				<Box backgroundColor="blue">
-					<Text>Inner: </Text>
-					<Text backgroundColor="red">Explicit</Text>
-				</Box>
+	const output = renderToString(<Box backgroundColor='yellow' alignSelf='flex-start'>
+		<Box>
+			<Text>Outer: </Text>
+			<Box backgroundColor='blue'>
+				<Text>Inner: </Text>
+				<Text backgroundColor='red'>Explicit</Text>
 			</Box>
-		</Box>,
-	);
+		</Box>
+	</Box>);
 
 	// Colors transition without reset codes between them - actual behavior from debug output
 	t.is(
@@ -137,72 +123,58 @@ test('Complex nested structure with background inheritance', t => {
 
 // Background color tests for different formats
 test('Box background with standard color', t => {
-	const output = renderToString(
-		<Box backgroundColor="red" alignSelf="flex-start">
-			<Text>Hello</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box backgroundColor='red' alignSelf='flex-start'>
+		<Text>Hello</Text>
+	</Box>);
 
 	t.is(output, chalk.bgRed('Hello'));
 });
 
 test('Box background with hex color', t => {
-	const output = renderToString(
-		<Box backgroundColor="#FF0000" alignSelf="flex-start">
-			<Text>Hello</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box backgroundColor='#FF0000' alignSelf='flex-start'>
+		<Text>Hello</Text>
+	</Box>);
 
 	t.is(output, chalk.bgHex('#FF0000')('Hello'));
 });
 
 test('Box background with rgb color', t => {
-	const output = renderToString(
-		<Box backgroundColor="rgb(255, 0, 0)" alignSelf="flex-start">
-			<Text>Hello</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box backgroundColor='rgb(255, 0, 0)' alignSelf='flex-start'>
+		<Text>Hello</Text>
+	</Box>);
 
 	t.is(output, chalk.bgRgb(255, 0, 0)('Hello'));
 });
 
 test('Box background with ansi256 color', t => {
-	const output = renderToString(
-		<Box backgroundColor="ansi256(9)" alignSelf="flex-start">
-			<Text>Hello</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box backgroundColor='ansi256(9)' alignSelf='flex-start'>
+		<Text>Hello</Text>
+	</Box>);
 
 	t.is(output, chalk.bgAnsi256(9)('Hello'));
 });
 
 test('Box background with wide characters', t => {
-	const output = renderToString(
-		<Box backgroundColor="yellow" alignSelf="flex-start">
-			<Text>こんにちは</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box backgroundColor='yellow' alignSelf='flex-start'>
+		<Text>こんにちは</Text>
+	</Box>);
 
 	t.is(output, chalk.bgYellow('こんにちは'));
 });
 
 test('Box background with emojis', t => {
-	const output = renderToString(
-		<Box backgroundColor="red" alignSelf="flex-start">
-			<Text>🎉🎊</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box backgroundColor='red' alignSelf='flex-start'>
+		<Text>🎉🎊</Text>
+	</Box>);
 
 	t.is(output, chalk.bgRed('🎉🎊'));
 });
 
 // Box background space fill tests - these should work with forced colors
 test('Box background fills entire area with standard color', t => {
-	const output = renderToString(
-		<Box backgroundColor="red" width={10} height={3} alignSelf="flex-start">
-			<Text>Hello</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box backgroundColor='red' width={10} height={3} alignSelf='flex-start'>
+		<Text>Hello</Text>
+	</Box>);
 
 	// Should contain background color codes and fill spaces for entire Box area
 	t.true(
@@ -218,11 +190,9 @@ test('Box background fills entire area with standard color', t => {
 });
 
 test('Box background fills with hex color', t => {
-	const output = renderToString(
-		<Box backgroundColor="#FF0000" width={10} height={3} alignSelf="flex-start">
-			<Text>Hello</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box backgroundColor='#FF0000' width={10} height={3} alignSelf='flex-start'>
+		<Text>Hello</Text>
+	</Box>);
 
 	// Should contain hex color background codes and fill spaces
 	t.true(output.includes('Hello'), 'Should contain the text');
@@ -234,16 +204,14 @@ test('Box background fills with hex color', t => {
 });
 
 test('Box background fills with rgb color', t => {
-	const output = renderToString(
-		<Box
-			backgroundColor="rgb(255, 0, 0)"
-			width={10}
-			height={3}
-			alignSelf="flex-start"
-		>
-			<Text>Hello</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box
+		backgroundColor='rgb(255, 0, 0)'
+		width={10}
+		height={3}
+		alignSelf='flex-start'
+	>
+		<Text>Hello</Text>
+	</Box>);
 
 	// Should contain RGB color background codes and fill spaces
 	t.true(output.includes('Hello'), 'Should contain the text');
@@ -252,16 +220,14 @@ test('Box background fills with rgb color', t => {
 });
 
 test('Box background fills with ansi256 color', t => {
-	const output = renderToString(
-		<Box
-			backgroundColor="ansi256(9)"
-			width={10}
-			height={3}
-			alignSelf="flex-start"
-		>
-			<Text>Hello</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box
+		backgroundColor='ansi256(9)'
+		width={10}
+		height={3}
+		alignSelf='flex-start'
+	>
+		<Text>Hello</Text>
+	</Box>);
 
 	// Should contain ANSI256 color background codes and fill spaces
 	t.true(output.includes('Hello'), 'Should contain the text');
@@ -273,17 +239,15 @@ test('Box background fills with ansi256 color', t => {
 });
 
 test('Box background with border fills content area', t => {
-	const output = renderToString(
-		<Box
-			backgroundColor="cyan"
-			borderStyle="round"
-			width={10}
-			height={5}
-			alignSelf="flex-start"
-		>
-			<Text>Hi</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box
+		backgroundColor='cyan'
+		borderStyle='round'
+		width={10}
+		height={5}
+		alignSelf='flex-start'
+	>
+		<Text>Hi</Text>
+	</Box>);
 
 	// Should have background fill inside the border and border characters
 	t.true(output.includes('Hi'), 'Should contain the text');
@@ -294,17 +258,15 @@ test('Box background with border fills content area', t => {
 });
 
 test('Box background with padding fills entire padded area', t => {
-	const output = renderToString(
-		<Box
-			backgroundColor="magenta"
-			padding={1}
-			width={10}
-			height={5}
-			alignSelf="flex-start"
-		>
-			<Text>Hi</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box
+		backgroundColor='magenta'
+		padding={1}
+		width={10}
+		height={5}
+		alignSelf='flex-start'
+	>
+		<Text>Hi</Text>
+	</Box>);
 
 	// Background should fill the entire Box area including padding
 	t.true(output.includes('Hi'), 'Should contain the text');
@@ -316,17 +278,15 @@ test('Box background with padding fills entire padded area', t => {
 });
 
 test('Box background with center alignment fills entire area', t => {
-	const output = renderToString(
-		<Box
-			backgroundColor="blue"
-			width={10}
-			height={3}
-			justifyContent="center"
-			alignSelf="flex-start"
-		>
-			<Text>Hi</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box
+		backgroundColor='blue'
+		width={10}
+		height={3}
+		justifyContent='center'
+		alignSelf='flex-start'
+	>
+		<Text>Hi</Text>
+	</Box>);
 
 	t.true(output.includes('Hi'), 'Should contain centered text');
 	t.true(output.includes(ansi.bgBlue), 'Should contain blue background code');
@@ -334,18 +294,16 @@ test('Box background with center alignment fills entire area', t => {
 });
 
 test('Box background with column layout fills entire area', t => {
-	const output = renderToString(
-		<Box
-			backgroundColor="green"
-			flexDirection="column"
-			width={10}
-			height={5}
-			alignSelf="flex-start"
-		>
-			<Text>Line 1</Text>
-			<Text>Line 2</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box
+		backgroundColor='green'
+		flexDirection='column'
+		width={10}
+		height={5}
+		alignSelf='flex-start'
+	>
+		<Text>Line 1</Text>
+		<Text>Line 2</Text>
+	</Box>);
 
 	t.true(output.includes('Line 1'), 'Should contain first line text');
 	t.true(output.includes('Line 2'), 'Should contain second line text');
@@ -359,7 +317,7 @@ test('Box background updates on rerender', t => {
 
 	function Test({bgColor}: {readonly bgColor?: string}) {
 		return (
-			<Box backgroundColor={bgColor} alignSelf="flex-start">
+			<Box backgroundColor={bgColor} alignSelf='flex-start'>
 				<Text>Hello</Text>
 			</Box>
 		);
@@ -372,7 +330,7 @@ test('Box background updates on rerender', t => {
 
 	t.is((stdout.write as any).lastCall.args[0], 'Hello');
 
-	rerender(<Test bgColor="green" />);
+	rerender(<Test bgColor='green' />);
 	t.is((stdout.write as any).lastCall.args[0], chalk.bgGreen('Hello'));
 
 	rerender(<Test />);
@@ -381,33 +339,27 @@ test('Box background updates on rerender', t => {
 
 // Concurrent mode tests
 test('Text inherits parent Box background color - concurrent', async t => {
-	const output = await renderToStringAsync(
-		<Box backgroundColor="green" alignSelf="flex-start">
-			<Text>Hello World</Text>
-		</Box>,
-	);
+	const output = await renderToStringAsync(<Box backgroundColor='green' alignSelf='flex-start'>
+		<Text>Hello World</Text>
+	</Box>);
 
 	t.is(output, chalk.bgGreen('Hello World'));
 });
 
 test('Nested Box background inheritance - concurrent', async t => {
-	const output = await renderToStringAsync(
-		<Box backgroundColor="red" alignSelf="flex-start">
-			<Box backgroundColor="blue">
-				<Text>Hello World</Text>
-			</Box>
-		</Box>,
-	);
+	const output = await renderToStringAsync(<Box backgroundColor='red' alignSelf='flex-start'>
+		<Box backgroundColor='blue'>
+			<Text>Hello World</Text>
+		</Box>
+	</Box>);
 
 	t.is(output, chalk.bgBlue('Hello World'));
 });
 
 test('Box background with hex color - concurrent', async t => {
-	const output = await renderToStringAsync(
-		<Box backgroundColor="#FF0000" alignSelf="flex-start">
-			<Text>Hello</Text>
-		</Box>,
-	);
+	const output = await renderToStringAsync(<Box backgroundColor='#FF0000' alignSelf='flex-start'>
+		<Text>Hello</Text>
+	</Box>);
 
 	t.is(output, chalk.bgHex('#FF0000')('Hello'));
 });
@@ -415,7 +367,7 @@ test('Box background with hex color - concurrent', async t => {
 test('Box background updates on rerender - concurrent', async t => {
 	function Test({bgColor}: {readonly bgColor?: string}) {
 		return (
-			<Box backgroundColor={bgColor} alignSelf="flex-start">
+			<Box backgroundColor={bgColor} alignSelf='flex-start'>
 				<Text>Hello</Text>
 			</Box>
 		);
@@ -425,7 +377,7 @@ test('Box background updates on rerender - concurrent', async t => {
 
 	t.is(getOutput(), 'Hello');
 
-	await rerenderAsync(<Test bgColor="green" />);
+	await rerenderAsync(<Test bgColor='green' />);
 	t.is(getOutput(), chalk.bgGreen('Hello'));
 
 	await rerenderAsync(<Test />);
@@ -434,11 +386,9 @@ test('Box background updates on rerender - concurrent', async t => {
 
 test('Box backgroundColor fills full width on every line when text wraps', t => {
 	// "Hello World!!" is 13 chars, width=10 forces wrapping into 2 lines
-	const output = renderToString(
-		<Box backgroundColor="red" width={10} alignSelf="flex-start">
-			<Text>Hello World!!</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box backgroundColor='red' width={10} alignSelf='flex-start'>
+		<Text>Hello World!!</Text>
+	</Box>);
 
 	// Both lines are padded to the full 10-char Box width with background color
 	t.is(
@@ -449,11 +399,9 @@ test('Box backgroundColor fills full width on every line when text wraps', t => 
 
 test('Text-only backgroundColor colors text content but does not fill Box width', t => {
 	// Without a Box backgroundColor, only the text characters are colored
-	const output = renderToString(
-		<Box width={10} alignSelf="flex-start">
-			<Text backgroundColor="red">Hello World!!</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={10} alignSelf='flex-start'>
+		<Text backgroundColor='red'>Hello World!!</Text>
+	</Box>);
 
 	// Text-only bg colors just the text, not the remaining space to fill Box width
 	t.is(

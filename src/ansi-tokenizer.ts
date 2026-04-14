@@ -62,37 +62,37 @@ export type AnsiToken =
 const isCsiParameterCharacter = (character: string): boolean => {
 	const codePoint = character.codePointAt(0);
 
-	return codePoint !== undefined && codePoint >= 0x30 && codePoint <= 0x3f;
+	return codePoint !== undefined && codePoint >= 0x30 && codePoint <= 0x3F;
 };
 
 const isCsiIntermediateCharacter = (character: string): boolean => {
 	const codePoint = character.codePointAt(0);
 
-	return codePoint !== undefined && codePoint >= 0x20 && codePoint <= 0x2f;
+	return codePoint !== undefined && codePoint >= 0x20 && codePoint <= 0x2F;
 };
 
 const isCsiFinalCharacter = (character: string): boolean => {
 	const codePoint = character.codePointAt(0);
 
-	return codePoint !== undefined && codePoint >= 0x40 && codePoint <= 0x7e;
+	return codePoint !== undefined && codePoint >= 0x40 && codePoint <= 0x7E;
 };
 
 const isEscapeIntermediateCharacter = (character: string): boolean => {
 	const codePoint = character.codePointAt(0);
 
-	return codePoint !== undefined && codePoint >= 0x20 && codePoint <= 0x2f;
+	return codePoint !== undefined && codePoint >= 0x20 && codePoint <= 0x2F;
 };
 
 const isEscapeFinalCharacter = (character: string): boolean => {
 	const codePoint = character.codePointAt(0);
 
-	return codePoint !== undefined && codePoint >= 0x30 && codePoint <= 0x7e;
+	return codePoint !== undefined && codePoint >= 0x30 && codePoint <= 0x7E;
 };
 
 const isC1ControlCharacter = (character: string): boolean => {
 	const codePoint = character.codePointAt(0);
 
-	return codePoint !== undefined && codePoint >= 0x80 && codePoint <= 0x9f;
+	return codePoint !== undefined && codePoint >= 0x80 && codePoint <= 0x9F;
 };
 
 // Standards references:
@@ -104,11 +104,11 @@ const readCsiSequence = (
 	fromIndex: number,
 ):
 	| {
-			readonly endIndex: number;
-			readonly parameterString: string;
-			readonly intermediateString: string;
-			readonly finalCharacter: string;
-	  }
+		readonly endIndex: number;
+		readonly parameterString: string;
+		readonly intermediateString: string;
+		readonly finalCharacter: string;
+	}
 	| undefined => {
 	let index = fromIndex;
 
@@ -189,10 +189,10 @@ const readEscapeSequence = (
 	fromIndex: number,
 ):
 	| {
-			readonly endIndex: number;
-			readonly intermediateString: string;
-			readonly finalCharacter: string;
-	  }
+		readonly endIndex: number;
+		readonly intermediateString: string;
+		readonly finalCharacter: string;
+	}
 	| undefined => {
 	let index = fromIndex;
 
@@ -221,13 +221,11 @@ const readEscapeSequence = (
 };
 
 // Centralize control-string rules so ESC and C1 paths do not diverge.
-const getControlStringFromEscapeIntroducer = (
-	character: string,
-):
+const getControlStringFromEscapeIntroducer = (character: string):
 	| {
-			readonly type: ControlStringType;
-			readonly allowBellTerminator: boolean;
-	  }
+		readonly type: ControlStringType;
+		readonly allowBellTerminator: boolean;
+	}
 	| undefined => {
 	switch (character) {
 		case ']': {
@@ -256,13 +254,11 @@ const getControlStringFromEscapeIntroducer = (
 	}
 };
 
-const getControlStringFromC1Introducer = (
-	character: string,
-):
+const getControlStringFromC1Introducer = (character: string):
 	| {
-			readonly type: ControlStringType;
-			readonly allowBellTerminator: boolean;
-	  }
+		readonly type: ControlStringType;
+		readonly allowBellTerminator: boolean;
+	}
 	| undefined => {
 	switch (character) {
 		case oscCharacter: {
@@ -329,7 +325,7 @@ export const tokenizeAnsi = (text: string): AnsiToken[] => {
 	const tokens: AnsiToken[] = [];
 	let textStartIndex = 0;
 
-	for (let index = 0; index < text.length; ) {
+	for (let index = 0; index < text.length;) {
 		const character = text[index];
 
 		if (character === undefined) {
@@ -366,8 +362,8 @@ export const tokenizeAnsi = (text: string): AnsiToken[] => {
 				continue;
 			}
 
-			const escapeControlString =
-				getControlStringFromEscapeIntroducer(followingCharacter);
+			const escapeControlString
+				= getControlStringFromEscapeIntroducer(followingCharacter);
 
 			if (escapeControlString !== undefined) {
 				const controlStringTerminatorIndex = findControlStringTerminatorIndex(

@@ -17,9 +17,9 @@ test('AlternateScreen writes enter sequence on mount', t => {
 	const allOutput = writes.join('');
 
 	// Should contain DEC 1049 enter
-	t.true(allOutput.includes('\x1b[?1049h'));
+	t.true(allOutput.includes('\u001B[?1049h'));
 	// Should contain screen clear
-	t.true(allOutput.includes('\x1b[2J'));
+	t.true(allOutput.includes('\u001B[2J'));
 });
 
 test('AlternateScreen with mouseTracking enables mouse modes', t => {
@@ -36,9 +36,9 @@ test('AlternateScreen with mouseTracking enables mouse modes', t => {
 	const allOutput = writes.join('');
 
 	// Should contain mouse enable sequences
-	t.true(allOutput.includes('\x1b[?1000h'));
-	t.true(allOutput.includes('\x1b[?1002h'));
-	t.true(allOutput.includes('\x1b[?1006h'));
+	t.true(allOutput.includes('\u001B[?1000h'));
+	t.true(allOutput.includes('\u001B[?1002h'));
+	t.true(allOutput.includes('\u001B[?1006h'));
 });
 
 test('AlternateScreen without mouseTracking does not enable mouse', t => {
@@ -55,5 +55,5 @@ test('AlternateScreen without mouseTracking does not enable mouse', t => {
 	const allOutput = writes.join('');
 
 	// Should NOT contain mouse enable sequences
-	t.false(allOutput.includes('\x1b[?1000h'));
+	t.false(allOutput.includes('\u001B[?1000h'));
 });

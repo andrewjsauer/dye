@@ -1,13 +1,13 @@
 import React, {useState, useMemo, useTransition} from 'react';
-import {render, Box, Text, useInput} from '../../src/index.js';
+import {
+	render, Box, Text, useInput,
+} from '../../src/index.js';
 
 // Generate a large list of items for demonstration
 function generateItems(filter: string): string[] {
 	const allItems: string[] = [];
 	for (let i = 0; i < 200; i++) {
-		allItems.push(
-			`Item ${i + 1}: ${['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'][i % 5]}`,
-		);
+		allItems.push(`Item ${i + 1}: ${['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'][i % 5]}`);
 	}
 
 	if (!filter) {
@@ -55,7 +55,7 @@ function SearchApp() {
 	});
 
 	return (
-		<Box flexDirection="column">
+		<Box flexDirection='column'>
 			<Text bold underline>
 				useTransition Demo
 			</Text>
@@ -66,24 +66,26 @@ function SearchApp() {
 
 			<Box>
 				<Text>Search: </Text>
-				<Text color="cyan">{query || '(type something)'}</Text>
-				{isPending ? <Text color="yellow"> (updating...)</Text> : null}
+				<Text color='cyan'>{query || '(type something)'}</Text>
+				{isPending ? <Text color='yellow'> (updating...)</Text> : null}
 			</Box>
 
-			<Box marginTop={1} flexDirection="column">
+			<Box marginTop={1} flexDirection='column'>
 				<Text bold>
 					Results{' '}
 					{deferredQuery ? `for "${deferredQuery}"` : '(showing first 10)'}:
 				</Text>
-				{filteredItems.length === 0 ? (
-					<Text dimColor> No items found</Text>
-				) : (
-					filteredItems.map(item => (
-						<Text key={item} dimColor={isPending}>
-							{item}
-						</Text>
-					))
-				)}
+				{filteredItems.length === 0
+					? (
+						<Text dimColor> No items found</Text>
+					)
+					: (
+						filteredItems.map(item => (
+							<Text key={item} dimColor={isPending}>
+								{item}
+							</Text>
+						))
+					)}
 			</Box>
 
 			<Box marginTop={1}>

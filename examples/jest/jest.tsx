@@ -59,13 +59,13 @@ function Jest() {
 	}, [runTest]);
 
 	return (
-		<Box flexDirection="column">
+		<Box flexDirection='column'>
 			<Static items={completedTests}>
 				{test => <Test key={test.path} status={test.status} path={test.path} />}
 			</Static>
 
 			{runningTests.length > 0 && (
-				<Box flexDirection="column" marginTop={1}>
+				<Box flexDirection='column' marginTop={1}>
 					{runningTests.map(test => (
 						<Test key={test.path} status={test.status} path={test.path} />
 					))}

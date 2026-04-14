@@ -360,7 +360,7 @@ test('emits empty paste for adjacent paste markers', t => {
 	t.deepEqual(parseChunks(['\u001B[200~\u001B[201~']), [{paste: ''}]);
 });
 
-test('handles pasteStart split before the tilde (\\u001B[200 without ~)', t => {
+test(String.raw`handles pasteStart split before the tilde (\u001B[200 without ~)`, t => {
 	const parser = createInputParser();
 
 	// Chunk ends exactly at the 5th byte of the 6-byte pasteStart sequence.
@@ -370,14 +370,14 @@ test('handles pasteStart split before the tilde (\\u001B[200 without ~)', t => {
 	t.deepEqual(parser.push('~hello\u001B[201~'), [{paste: 'hello'}]);
 });
 
-test('hasPendingEscape returns true for length-3 pasteStart prefix (\\u001B[2)', t => {
+test(String.raw`hasPendingEscape returns true for length-3 pasteStart prefix (\u001B[2)`, t => {
 	const parser = createInputParser();
 
 	t.deepEqual(parser.push('\u001B[2'), []);
 	t.true(parser.hasPendingEscape());
 });
 
-test('hasPendingEscape returns true for length-4 pasteStart prefix (\\u001B[20)', t => {
+test(String.raw`hasPendingEscape returns true for length-4 pasteStart prefix (\u001B[20)`, t => {
 	const parser = createInputParser();
 
 	t.deepEqual(parser.push('\u001B[20'), []);

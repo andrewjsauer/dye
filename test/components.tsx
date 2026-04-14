@@ -40,12 +40,10 @@ test('text with variable', t => {
 });
 
 test('multiple text nodes', t => {
-	const output = renderToString(
-		<Text>
-			{'Hello'}
-			{' World'}
-		</Text>,
-	);
+	const output = renderToString(<Text>
+		{'Hello'}
+		{' World'}
+	</Text>);
 
 	t.is(output, 'Hello World');
 });
@@ -55,101 +53,81 @@ test('text with component', t => {
 		return <Text>World</Text>;
 	}
 
-	const output = renderToString(
-		<Text>
-			Hello <World />
-		</Text>,
-	);
+	const output = renderToString(<Text>
+		Hello <World />
+	</Text>);
 
 	t.is(output, 'Hello World');
 });
 
 test('text with fragment', t => {
-	const output = renderToString(
-		<Text>
-			Hello <>World</> {/* eslint-disable-line react/jsx-no-useless-fragment */}
-		</Text>,
-	);
+	const output = renderToString(<Text>
+		Hello <>World</>
+	</Text>);
 
 	t.is(output, 'Hello World');
 });
 
 test('wrap text', t => {
-	const output = renderToString(
-		<Box width={7}>
-			<Text wrap="wrap">Hello World</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={7}>
+		<Text wrap='wrap'>Hello World</Text>
+	</Box>);
 
 	t.is(output, 'Hello\nWorld');
 });
 
 test('don’t wrap text if there is enough space', t => {
-	const output = renderToString(
-		<Box width={20}>
-			<Text wrap="wrap">Hello World</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={20}>
+		<Text wrap='wrap'>Hello World</Text>
+	</Box>);
 
 	t.is(output, 'Hello World');
 });
 
 test('hard wrap text', t => {
-	const output = renderToString(
-		<Box width={7}>
-			<Text wrap="hard">Hello World</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={7}>
+		<Text wrap='hard'>Hello World</Text>
+	</Box>);
 
 	t.is(output, 'Hello W\norld');
 });
 
 test('hard wrap with long word', t => {
-	const output = renderToString(
-		<Box width={5}>
-			<Text wrap="hard">aaaaaaaaaa</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={5}>
+		<Text wrap='hard'>aaaaaaaaaa</Text>
+	</Box>);
 
 	t.is(output, 'aaaaa\naaaaa');
 });
 
 test('don’t hard wrap text if there is enough space', t => {
-	const output = renderToString(
-		<Box width={20}>
-			<Text wrap="hard">Hello World</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={20}>
+		<Text wrap='hard'>Hello World</Text>
+	</Box>);
 
 	t.is(output, 'Hello World');
 });
 
 test('truncate text in the end', t => {
-	const output = renderToString(
-		<Box width={7}>
-			<Text wrap="truncate">Hello World</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={7}>
+		<Text wrap='truncate'>Hello World</Text>
+	</Box>);
 
 	t.is(output, 'Hello …');
 });
 
 test('truncate text in the middle', t => {
-	const output = renderToString(
-		<Box width={7}>
-			<Text wrap="truncate-middle">Hello World</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={7}>
+		<Text wrap='truncate-middle'>Hello World</Text>
+	</Box>);
 
 	t.is(output, 'Hel…rld');
 });
 
 test('truncate text in the beginning', t => {
-	const output = renderToString(
-		<Box width={7}>
-			<Text wrap="truncate-start">Hello World</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={7}>
+		<Text wrap='truncate-start'>Hello World</Text>
+	</Box>);
 
 	t.is(output, '… World');
 });
@@ -157,26 +135,22 @@ test('truncate text in the beginning', t => {
 // See https://github.com/vadimdemedes/ink/issues/633
 test('do not wrap text with BEL-terminated OSC hyperlinks', t => {
 	// "Click here" is 10 chars, box is 20 wide - should not wrap
-	const hyperlink =
-		'\u001B]8;;https://example.com\u0007Click here\u001B]8;;\u0007';
-	const output = renderToString(
-		<Box width={20}>
-			<Text wrap="wrap">{hyperlink}</Text>
-		</Box>,
-	);
+	const hyperlink
+		= '\u001B]8;;https://example.com\u0007Click here\u001B]8;;\u0007';
+	const output = renderToString(<Box width={20}>
+		<Text wrap='wrap'>{hyperlink}</Text>
+	</Box>);
 
 	t.is(stripAnsi(output), 'Click here');
 });
 
 // See https://github.com/vadimdemedes/ink/issues/633
 test('do not wrap text with ST-terminated OSC hyperlinks', t => {
-	const hyperlink =
-		'\u001B]8;;https://example.com\u001B\\Click here\u001B]8;;\u001B\\';
-	const output = renderToString(
-		<Box width={20}>
-			<Text wrap="wrap">{hyperlink}</Text>
-		</Box>,
-	);
+	const hyperlink
+		= '\u001B]8;;https://example.com\u001B\\Click here\u001B]8;;\u001B\\';
+	const output = renderToString(<Box width={20}>
+		<Text wrap='wrap'>{hyperlink}</Text>
+	</Box>);
 
 	t.is(stripAnsi(output), 'Click here');
 });
@@ -185,11 +159,9 @@ test('do not wrap text with ST-terminated OSC hyperlinks', t => {
 test('do not wrap text with non-hyperlink OSC sequences', t => {
 	// Title-setting OSC followed by visible text
 	const text = '\u001B]0;My Title\u0007Some text';
-	const output = renderToString(
-		<Box width={20}>
-			<Text wrap="wrap">{text}</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={20}>
+		<Text wrap='wrap'>{text}</Text>
+	</Box>);
 
 	t.is(stripAnsi(output), 'Some text');
 });
@@ -197,39 +169,33 @@ test('do not wrap text with non-hyperlink OSC sequences', t => {
 // See https://github.com/vadimdemedes/ink/issues/633
 test('hard-wrap single-word BEL-terminated OSC hyperlink', t => {
 	// "abcdefghij" is 10 chars, box is 5 wide - forces wrapWord codepath
-	const hyperlink =
-		'\u001B]8;;https://example.com\u0007abcdefghij\u001B]8;;\u0007';
-	const output = renderToString(
-		<Box width={5}>
-			<Text wrap="wrap">{hyperlink}</Text>
-		</Box>,
-	);
+	const hyperlink
+		= '\u001B]8;;https://example.com\u0007abcdefghij\u001B]8;;\u0007';
+	const output = renderToString(<Box width={5}>
+		<Text wrap='wrap'>{hyperlink}</Text>
+	</Box>);
 
 	t.is(stripAnsi(output), 'abcde\nfghij');
 });
 
 // See https://github.com/vadimdemedes/ink/issues/633
 test('hard-wrap single-word ST-terminated OSC hyperlink', t => {
-	const hyperlink =
-		'\u001B]8;;https://example.com\u001B\\abcdefghij\u001B]8;;\u001B\\';
-	const output = renderToString(
-		<Box width={5}>
-			<Text wrap="wrap">{hyperlink}</Text>
-		</Box>,
-	);
+	const hyperlink
+		= '\u001B]8;;https://example.com\u001B\\abcdefghij\u001B]8;;\u001B\\';
+	const output = renderToString(<Box width={5}>
+		<Text wrap='wrap'>{hyperlink}</Text>
+	</Box>);
 
 	t.is(stripAnsi(output), 'abcde\nfghij');
 });
 
 test('ignore empty text node', t => {
-	const output = renderToString(
-		<Box flexDirection="column">
-			<Box>
-				<Text>Hello World</Text>
-			</Box>
-			<Text>{''}</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box flexDirection='column'>
+		<Box>
+			<Text>Hello World</Text>
+		</Box>
+		<Text>{''}</Text>
+	</Box>);
 
 	t.is(output, 'Hello World');
 });
@@ -258,14 +224,12 @@ test('fail when text nodes are not within <Text> component', t => {
 		}
 	}
 
-	renderToString(
-		<ErrorBoundary>
-			<Box>
-				Hello
-				<Text>World</Text>
-			</Box>
-		</ErrorBoundary>,
-	);
+	renderToString(<ErrorBoundary>
+		<Box>
+			Hello
+			<Text>World</Text>
+		</Box>
+	</ErrorBoundary>);
 
 	t.truthy(error);
 	t.is(
@@ -287,11 +251,9 @@ test('fail when text node is not within <Text> component', t => {
 		}
 	}
 
-	renderToString(
-		<ErrorBoundary>
-			<Box>Hello World</Box>
-		</ErrorBoundary>,
-	);
+	renderToString(<ErrorBoundary>
+		<Box>Hello World</Box>
+	</ErrorBoundary>);
 
 	t.truthy(error);
 	t.is(
@@ -313,14 +275,12 @@ test('fail when <Box> is inside <Text> component', t => {
 		}
 	}
 
-	renderToString(
-		<ErrorBoundary>
-			<Text>
-				Hello World
-				<Box />
-			</Text>
-		</ErrorBoundary>,
-	);
+	renderToString(<ErrorBoundary>
+		<Text>
+			Hello World
+			<Box />
+		</Text>
+	</ErrorBoundary>);
 
 	t.truthy(error);
 	t.is((error as any).message, '<Box> can’t be nested inside <Text> component');
@@ -338,105 +298,91 @@ test('remeasure text dimensions on text change', t => {
 
 	t.is((stdout.write as any).lastCall.args[0], 'Hello');
 
-	rerender(
-		<Box>
-			<Text>Hello World</Text>
-		</Box>,
-	);
+	rerender(<Box>
+		<Text>Hello World</Text>
+	</Box>);
 
 	t.is((stdout.write as any).lastCall.args[0], 'Hello World');
 });
 
 test('fragment', t => {
 	const output = renderToString(
-		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>
 			<Text>Hello World</Text>
-		</>,
-	);
+		</>);
 
 	t.is(output, 'Hello World');
 });
 
 test('transform children', t => {
-	const output = renderToString(
-		<Transform
-			transform={(string: string, index: number) => `[${index}: ${string}]`}
-		>
-			<Text>
-				<Transform
-					transform={(string: string, index: number) => `{${index}: ${string}}`}
-				>
-					<Text>test</Text>
-				</Transform>
-			</Text>
-		</Transform>,
-	);
+	const output = renderToString(<Transform
+		transform={(string: string, index: number) => `[${index}: ${string}]`}
+	>
+		<Text>
+			<Transform
+				transform={(string: string, index: number) => `{${index}: ${string}}`}
+			>
+				<Text>test</Text>
+			</Transform>
+		</Text>
+	</Transform>);
 
 	t.is(output, '[0: {0: test}]');
 });
 
 test('squash multiple text nodes', t => {
-	const output = renderToString(
-		<Transform
-			transform={(string: string, index: number) => `[${index}: ${string}]`}
-		>
-			<Text>
-				<Transform
-					transform={(string: string, index: number) => `{${index}: ${string}}`}
-				>
-					{/* prettier-ignore */}
-					<Text>hello{' '}world</Text>
-				</Transform>
-			</Text>
-		</Transform>,
-	);
+	const output = renderToString(<Transform
+		transform={(string: string, index: number) => `[${index}: ${string}]`}
+	>
+		<Text>
+			<Transform
+				transform={(string: string, index: number) => `{${index}: ${string}}`}
+			>
+				{/* prettier-ignore */}
+				<Text>hello{' '}world</Text>
+			</Transform>
+		</Text>
+	</Transform>);
 
 	t.is(output, '[0: {0: hello world}]');
 });
 
 test('transform with multiple lines', t => {
-	const output = renderToString(
-		<Transform
-			transform={(string: string, index: number) => `[${index}: ${string}]`}
-		>
-			{/* prettier-ignore */}
-			<Text>hello{' '}world{'\n'}goodbye{' '}world</Text>
-		</Transform>,
-	);
+	const output = renderToString(<Transform
+		transform={(string: string, index: number) => `[${index}: ${string}]`}
+	>
+		{/* prettier-ignore */}
+		<Text>hello{' '}world{'\n'}goodbye{' '}world</Text>
+	</Transform>);
 
 	t.is(output, '[0: hello world]\n[1: goodbye world]');
 });
 
 test('squash multiple nested text nodes', t => {
-	const output = renderToString(
-		<Transform
-			transform={(string: string, index: number) => `[${index}: ${string}]`}
-		>
-			<Text>
-				<Transform
-					transform={(string: string, index: number) => `{${index}: ${string}}`}
-				>
-					hello
-					<Text> world</Text>
-				</Transform>
-			</Text>
-		</Transform>,
-	);
+	const output = renderToString(<Transform
+		transform={(string: string, index: number) => `[${index}: ${string}]`}
+	>
+		<Text>
+			<Transform
+				transform={(string: string, index: number) => `{${index}: ${string}}`}
+			>
+				hello
+				<Text> world</Text>
+			</Transform>
+		</Text>
+	</Transform>);
 
 	t.is(output, '[0: {0: hello world}]');
 });
 
 test('squash empty `<Text>` nodes', t => {
-	const output = renderToString(
-		<Transform transform={(string: string) => `[${string}]`}>
-			<Text>
-				<Transform transform={(string: string) => `{${string}}`}>
-					<Text>{[]}</Text>
-				</Transform>
-			</Text>
-		</Transform>,
-	);
+	const output = renderToString(<Transform transform={(string: string) => `[${string}]`}>
+		<Text>
+			<Transform transform={(string: string) => `{${string}}`}>
+				<Text>{[]}</Text>
+			</Transform>
+		</Text>
+	</Transform>);
 
 	t.is(output, '');
 });
@@ -463,17 +409,15 @@ test('hooks', t => {
 });
 
 test('static output', t => {
-	const output = renderToString(
-		<Box>
-			<Static items={['A', 'B', 'C']} style={{paddingBottom: 1}}>
-				{letter => <Text key={letter}>{letter}</Text>}
-			</Static>
+	const output = renderToString(<Box>
+		<Static items={['A', 'B', 'C']} style={{paddingBottom: 1}}>
+			{letter => <Text key={letter}>{letter}</Text>}
+		</Static>
 
-			<Box marginTop={1}>
-				<Text>X</Text>
-			</Box>
-		</Box>,
-	);
+		<Box marginTop={1}>
+			<Text>X</Text>
+		</Box>
+	</Box>);
 
 	t.is(output, 'A\nB\nC\n\n\nX');
 });
@@ -505,11 +449,13 @@ test('static output stops accumulating after Static unmounts (#904)', t => {
 	function App({show}: {readonly show: boolean}) {
 		return (
 			<Box>
-				{show ? (
-					<Static items={items}>
-						{item => <Text key={item}>{item}</Text>}
-					</Static>
-				) : null}
+				{show
+					? (
+						<Static items={items}>
+							{item => <Text key={item}>{item}</Text>}
+						</Static>
+					)
+					: null}
 				<Text>Dynamic</Text>
 			</Box>
 		);
@@ -573,7 +519,7 @@ test('render only new items in static output on final render', t => {
 
 // See https://github.com/chalk/wrap-ansi/issues/27
 test('ensure wrap-ansi doesn’t trim leading whitespace', t => {
-	const output = renderToString(<Text color="red">{' ERROR '}</Text>);
+	const output = renderToString(<Text color='red'>{' ERROR '}</Text>);
 
 	t.is(output, chalk.red(' ERROR '));
 });
@@ -582,7 +528,7 @@ test('replace child node with text', t => {
 	const stdout = createStdout();
 
 	function Dynamic({replace}: {readonly replace?: boolean}) {
-		return <Text>{replace ? 'x' : <Text color="green">test</Text>}</Text>;
+		return <Text>{replace ? 'x' : <Text color='green'>test</Text>}</Text>;
 	}
 
 	const {rerender} = render(<Dynamic />, {
@@ -836,12 +782,16 @@ test('render different component based on whether stdin is a TTY or not', t => {
 
 		return (
 			<>
-				{isRawModeSupported && renderFirstInput ? (
-					<Input setRawMode={setRawMode} />
-				) : null}
-				{isRawModeSupported && renderSecondInput ? (
-					<Input setRawMode={setRawMode} />
-				) : null}
+				{isRawModeSupported && renderFirstInput
+					? (
+						<Input setRawMode={setRawMode} />
+					)
+					: null}
+				{isRawModeSupported && renderSecondInput
+					? (
+						<Input setRawMode={setRawMode} />
+					)
+					: null}
 			</>
 		);
 	}
@@ -865,7 +815,7 @@ test('render different component based on whether stdin is a TTY or not', t => {
 
 test('render only last frame when run in CI', async t => {
 	const output = await run('ci', {
-		// eslint-disable-next-line @typescript-eslint/naming-convention
+
 		env: {CI: 'true'},
 		columns: 0,
 	});
@@ -879,7 +829,7 @@ test('render only last frame when run in CI', async t => {
 
 test('render all frames if CI environment variable equals false', async t => {
 	const output = await run('ci', {
-		// eslint-disable-next-line @typescript-eslint/naming-convention
+
 		env: {CI: 'false'},
 		columns: 0,
 	});
@@ -891,7 +841,7 @@ test('render all frames if CI environment variable equals false', async t => {
 
 test('debug mode in CI does not replay final frame during unmount teardown', async t => {
 	const output = await run('ci-debug', {
-		// eslint-disable-next-line @typescript-eslint/naming-convention
+
 		env: {CI: 'true'},
 		columns: 0,
 	});
@@ -904,7 +854,7 @@ test('debug mode in CI does not replay final frame during unmount teardown', asy
 
 test('debug mode in CI keeps final newline separation after waitUntilExit', async t => {
 	const output = await run('ci-debug-after-exit', {
-		// eslint-disable-next-line @typescript-eslint/naming-convention
+
 		env: {CI: 'true'},
 		columns: 0,
 	});
@@ -959,8 +909,7 @@ test('render only last frame when stdout is not a TTY', async t => {
 
 	// Verify no erase/cursor ANSI sequences were emitted
 	const hasEraseSequence = allWrites.some(w =>
-		w.includes(ansiEscapes.eraseLines(1)),
-	);
+		w.includes(ansiEscapes.eraseLines(1)));
 	t.false(hasEraseSequence);
 
 	// Verify the final frame is written
@@ -1057,8 +1006,7 @@ test('interactive option overrides TTY detection', async t => {
 
 	// Verify no erase/cursor ANSI sequences were emitted
 	const hasEraseSequence = allWrites.some(w =>
-		w.includes(ansiEscapes.eraseLines(1)),
-	);
+		w.includes(ansiEscapes.eraseLines(1)));
 	t.false(hasEraseSequence);
 
 	// Verify only the final frame is written
@@ -1081,11 +1029,9 @@ test('alternate screen - enters on mount and exits on unmount', async t => {
 	const allWrites = stdout.getWrites();
 
 	const enterIndex = allWrites.findIndex(w =>
-		w.includes(ansiEscapes.enterAlternativeScreen),
-	);
+		w.includes(ansiEscapes.enterAlternativeScreen));
 	const exitIndex = allWrites.findLastIndex(w =>
-		w.includes(ansiEscapes.exitAlternativeScreen),
-	);
+		w.includes(ansiEscapes.exitAlternativeScreen));
 
 	t.not(enterIndex, -1, 'Should write enterAlternativeScreen on mount');
 	t.not(exitIndex, -1, 'Should write exitAlternativeScreen on unmount');
@@ -1120,10 +1066,8 @@ test.serial(
 		});
 
 		function Test() {
-			useEffect(() => {
-				return () => {
-					console.log('primary cleanup');
-				};
+			useEffect(() => () => {
+				console.log('primary cleanup');
 			}, []);
 
 			return <Text>Hello</Text>;
@@ -1178,13 +1122,12 @@ test.serial(
 
 		const allWrites = stdout.getWrites();
 		const exitIndex = allWrites.findLastIndex(write =>
-			write.includes(ansiEscapes.exitAlternativeScreen),
-		);
+			write.includes(ansiEscapes.exitAlternativeScreen));
 		const replayedErrorOutput = allWrites.slice(exitIndex + 1).some(write => {
 			const plainWrite = stripAnsi(write);
 			return (
-				plainWrite.includes('Error: Done') ||
-				plainWrite.includes('Done\n    at')
+				plainWrite.includes('Error: Done')
+				|| plainWrite.includes('Done\n    at')
 			);
 		});
 
@@ -1221,15 +1164,14 @@ test.serial(
 
 		const allWrites = stdout.getWrites();
 		const exitIndex = allWrites.findLastIndex(write =>
-			write.includes(ansiEscapes.exitAlternativeScreen),
-		);
+			write.includes(ansiEscapes.exitAlternativeScreen));
 		const replayedOutput = stripAnsi(allWrites.slice(exitIndex + 1).join(''));
 
 		t.not(exitIndex, -1, 'Should exit the alternate screen on unmount');
 		t.false(
-			replayedOutput.includes('normal ERROR banner') ||
-				replayedOutput.includes('Error: Done') ||
-				replayedOutput.includes('Done\n    at'),
+			replayedOutput.includes('normal ERROR banner')
+			|| replayedOutput.includes('Error: Done')
+			|| replayedOutput.includes('Done\n    at'),
 			'Should not replay alternate-screen teardown output onto the primary screen',
 		);
 	},
@@ -1259,10 +1201,8 @@ test.serial(
 		});
 
 		function Test() {
-			useEffect(() => {
-				return () => {
-					console.log('cleanup log');
-				};
+			useEffect(() => () => {
+				console.log('cleanup log');
 			}, []);
 
 			return <Text>Hello</Text>;
@@ -1309,8 +1249,7 @@ test.serial(
 
 		const allWrites = stdout.getWrites();
 		const exitIndex = allWrites.findLastIndex(write =>
-			write.includes(ansiEscapes.exitAlternativeScreen),
-		);
+			write.includes(ansiEscapes.exitAlternativeScreen));
 
 		t.not(exitIndex, -1, 'Should exit the alternate screen during cleanup()');
 	},
@@ -1376,11 +1315,7 @@ test('render warns when stdout is reused before unmount', async t => {
 		stdout,
 	});
 
-	t.true(
-		processStderrWriteStub.calledOnceWithExactly(
-			'Warning: render() was called again for the same stdout before the previous Ink instance was unmounted. Reusing stdout across multiple render() calls is unsupported. Call unmount() first.\n',
-		),
-	);
+	t.true(processStderrWriteStub.calledOnceWithExactly('Warning: render() was called again for the same stdout before the previous Ink instance was unmounted. Reusing stdout across multiple render() calls is unsupported. Call unmount() first.\n'));
 
 	unmount();
 	await waitUntilExit();
@@ -1448,11 +1383,9 @@ test('alternate screen - content is rendered between enter and exit', async t =>
 	const allWrites = stdout.getWrites();
 
 	const enterIndex = allWrites.findIndex(w =>
-		w.includes(ansiEscapes.enterAlternativeScreen),
-	);
+		w.includes(ansiEscapes.enterAlternativeScreen));
 	const exitIndex = allWrites.findLastIndex(w =>
-		w.includes(ansiEscapes.exitAlternativeScreen),
-	);
+		w.includes(ansiEscapes.exitAlternativeScreen));
 
 	t.not(enterIndex, -1);
 	t.not(exitIndex, -1);
@@ -1582,8 +1515,8 @@ test('reset prop when it’s removed from the element', t => {
 	function Dynamic({remove}: {readonly remove?: boolean}) {
 		return (
 			<Box
-				flexDirection="column"
-				justifyContent="flex-end"
+				flexDirection='column'
+				justifyContent='flex-end'
 				height={remove ? undefined : 4}
 			>
 				<Text>x</Text>
@@ -1603,55 +1536,45 @@ test('reset prop when it’s removed from the element', t => {
 });
 
 test('newline', t => {
-	const output = renderToString(
-		<Text>
-			Hello
-			<Newline />
-			World
-		</Text>,
-	);
+	const output = renderToString(<Text>
+		Hello
+		<Newline />
+		World
+	</Text>);
 	t.is(output, 'Hello\nWorld');
 });
 
 test('multiple newlines', t => {
-	const output = renderToString(
-		<Text>
-			Hello
-			<Newline count={2} />
-			World
-		</Text>,
-	);
+	const output = renderToString(<Text>
+		Hello
+		<Newline count={2} />
+		World
+	</Text>);
 	t.is(output, 'Hello\n\nWorld');
 });
 
 test('horizontal spacer', t => {
-	const output = renderToString(
-		<Box width={20}>
-			<Text>Left</Text>
-			<Spacer />
-			<Text>Right</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={20}>
+		<Text>Left</Text>
+		<Spacer />
+		<Text>Right</Text>
+	</Box>);
 
 	t.is(output, 'Left           Right');
 });
 
 test('vertical spacer', t => {
-	const output = renderToString(
-		<Box flexDirection="column" height={6}>
-			<Text>Top</Text>
-			<Spacer />
-			<Text>Bottom</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box flexDirection='column' height={6}>
+		<Text>Top</Text>
+		<Spacer />
+		<Text>Bottom</Text>
+	</Box>);
 
 	t.is(output, 'Top\n\n\n\n\nBottom');
 });
 
 test('link ansi escapes are closed properly', t => {
-	const output = renderToString(
-		<Text>{ansiEscapes.link('Example', 'https://example.com')}</Text>,
-	);
+	const output = renderToString(<Text>{ansiEscapes.link('Example', 'https://example.com')}</Text>);
 
 	t.is(output, ']8;;https://example.comExample]8;;');
 });
@@ -1663,110 +1586,90 @@ test('text - concurrent', async t => {
 });
 
 test('multiple text nodes - concurrent', async t => {
-	const output = await renderToStringAsync(
-		<Text>
-			{'Hello'}
-			{' World'}
-		</Text>,
-	);
+	const output = await renderToStringAsync(<Text>
+		{'Hello'}
+		{' World'}
+	</Text>);
 	t.is(output, 'Hello World');
 });
 
 test('wrap text - concurrent', async t => {
-	const output = await renderToStringAsync(
-		<Box width={7}>
-			<Text wrap="wrap">Hello World</Text>
-		</Box>,
-	);
+	const output = await renderToStringAsync(<Box width={7}>
+		<Text wrap='wrap'>Hello World</Text>
+	</Box>);
 	t.is(output, 'Hello\nWorld');
 });
 
 test('truncate text in the end - concurrent', async t => {
-	const output = await renderToStringAsync(
-		<Box width={7}>
-			<Text wrap="truncate">Hello World</Text>
-		</Box>,
-	);
+	const output = await renderToStringAsync(<Box width={7}>
+		<Text wrap='truncate'>Hello World</Text>
+	</Box>);
 	t.is(output, 'Hello …');
 });
 
 test('transform children - concurrent', async t => {
-	const output = await renderToStringAsync(
-		<Transform
-			transform={(string: string, index: number) => `[${index}: ${string}]`}
-		>
-			<Text>
-				<Transform
-					transform={(string: string, index: number) => `{${index}: ${string}}`}
-				>
-					<Text>test</Text>
-				</Transform>
-			</Text>
-		</Transform>,
-	);
+	const output = await renderToStringAsync(<Transform
+		transform={(string: string, index: number) => `[${index}: ${string}]`}
+	>
+		<Text>
+			<Transform
+				transform={(string: string, index: number) => `{${index}: ${string}}`}
+			>
+				<Text>test</Text>
+			</Transform>
+		</Text>
+	</Transform>);
 	t.is(output, '[0: {0: test}]');
 });
 
 test('static output - concurrent', async t => {
-	const output = await renderToStringAsync(
-		<Box>
-			<Static items={['A', 'B', 'C']} style={{paddingBottom: 1}}>
-				{letter => <Text key={letter}>{letter}</Text>}
-			</Static>
+	const output = await renderToStringAsync(<Box>
+		<Static items={['A', 'B', 'C']} style={{paddingBottom: 1}}>
+			{letter => <Text key={letter}>{letter}</Text>}
+		</Static>
 
-			<Box marginTop={1}>
-				<Text>X</Text>
-			</Box>
-		</Box>,
-	);
+		<Box marginTop={1}>
+			<Text>X</Text>
+		</Box>
+	</Box>);
 	t.is(output, 'A\nB\nC\n\n\nX');
 });
 
 test('remeasure text dimensions on text change - concurrent', async t => {
-	const {getOutput, rerenderAsync} = await renderAsync(
-		<Box>
-			<Text>Hello</Text>
-		</Box>,
-	);
+	const {getOutput, rerenderAsync} = await renderAsync(<Box>
+		<Text>Hello</Text>
+	</Box>);
 	t.is(getOutput(), 'Hello');
 
-	await rerenderAsync(
-		<Box>
-			<Text>Hello World</Text>
-		</Box>,
-	);
+	await rerenderAsync(<Box>
+		<Text>Hello World</Text>
+	</Box>);
 	t.is(getOutput(), 'Hello World');
 });
 
 test('newline - concurrent', async t => {
-	const output = await renderToStringAsync(
-		<Text>
-			Hello
-			<Newline />
-			World
-		</Text>,
-	);
+	const output = await renderToStringAsync(<Text>
+		Hello
+		<Newline />
+		World
+	</Text>);
 	t.is(output, 'Hello\nWorld');
 });
 
 test('horizontal spacer - concurrent', async t => {
-	const output = await renderToStringAsync(
-		<Box width={20}>
-			<Text>Left</Text>
-			<Spacer />
-			<Text>Right</Text>
-		</Box>,
-	);
+	const output = await renderToStringAsync(<Box width={20}>
+		<Text>Left</Text>
+		<Spacer />
+		<Text>Right</Text>
+	</Box>);
 	t.is(output, 'Left           Right');
 });
 
 test('vertical spacer - concurrent', async t => {
-	const output = await renderToStringAsync(
-		<Box flexDirection="column" height={6}>
-			<Text>Top</Text>
-			<Spacer />
-			<Text>Bottom</Text>
-		</Box>,
-	);
+	const output = await renderToStringAsync(<Box flexDirection='column' height={6}>
+		<Text>Top</Text>
+		<Spacer />
+		<Text>Bottom</Text>
+	</Box>);
 	t.is(output, 'Top\n\n\n\n\nBottom');
 });

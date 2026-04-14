@@ -3,35 +3,35 @@ import {render, Box, Text} from '../../src/index.js';
 
 function BorderBackgrounds() {
 	return (
-		<Box flexDirection="column" gap={1}>
+		<Box flexDirection='column' gap={1}>
 			<Box
-				borderStyle="round"
-				borderColor="white"
-				borderBackgroundColor="blue"
+				borderStyle='round'
+				borderColor='white'
+				borderBackgroundColor='blue'
 				padding={1}
 			>
 				<Text>Box with blue background on white border</Text>
 			</Box>
 
 			<Box
-				borderStyle="single"
-				borderColor="black"
-				borderBackgroundColor="yellow"
+				borderStyle='single'
+				borderColor='black'
+				borderBackgroundColor='yellow'
 				padding={1}
 			>
 				<Text>Box with yellow background on black border</Text>
 			</Box>
 
 			<Box
-				borderStyle="double"
-				borderTopColor="red"
-				borderTopBackgroundColor="green"
-				borderBottomColor="blue"
-				borderBottomBackgroundColor="yellow"
-				borderLeftColor="cyan"
-				borderLeftBackgroundColor="magenta"
-				borderRightColor="white"
-				borderRightBackgroundColor="red"
+				borderStyle='double'
+				borderTopColor='red'
+				borderTopBackgroundColor='green'
+				borderBottomColor='blue'
+				borderBottomBackgroundColor='yellow'
+				borderLeftColor='cyan'
+				borderLeftBackgroundColor='magenta'
+				borderRightColor='white'
+				borderRightBackgroundColor='red'
 				padding={1}
 			>
 				<Text>Box with different colors per side</Text>
@@ -39,18 +39,18 @@ function BorderBackgrounds() {
 
 			<Box
 				borderDimColor
-				borderBackgroundColor="rgb(128, 0, 128)"
-				borderStyle="classic"
-				borderColor="white"
+				borderBackgroundColor='rgb(128, 0, 128)'
+				borderStyle='classic'
+				borderColor='white'
 				padding={1}
 			>
 				<Text>Box with dimmed RGB purple background on border</Text>
 			</Box>
 
 			<Box
-				borderStyle="bold"
-				borderColor="#FF00FF"
-				borderBackgroundColor="#00FF00"
+				borderStyle='bold'
+				borderColor='#FF00FF'
+				borderBackgroundColor='#00FF00'
 				padding={1}
 			>
 				<Text>Box with hex color backgrounds</Text>

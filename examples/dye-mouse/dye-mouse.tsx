@@ -7,17 +7,21 @@ import {
 	type ClickEvent,
 } from '../../src/index.js';
 
-function Button({label, onClick, hovered}: {
-	label: string;
-	onClick: (e: ClickEvent) => void;
-	hovered: boolean;
+function Button({
+	label,
+	onClick,
+	hovered,
+}: {
+	readonly label: string;
+	readonly onClick: (e: ClickEvent) => void;
+	readonly hovered: boolean;
 }) {
 	return (
 		<Box
-			onClick={onClick}
 			paddingX={2}
-			borderStyle="round"
+			borderStyle='round'
 			borderColor={hovered ? 'cyan' : 'gray'}
+			onClick={onClick}
 		>
 			<Text color={hovered ? 'cyan' : 'white'}>{label}</Text>
 		</Box>
@@ -30,42 +34,62 @@ function App() {
 
 	return (
 		<AlternateScreen mouseTracking>
-			<Box flexDirection="column" padding={1} gap={1}>
+			<Box flexDirection='column' padding={1} gap={1}>
 				<Text bold>Click the buttons below</Text>
-				<Text color="gray">Count: {count}</Text>
+				<Text color='gray'>Count: {count}</Text>
 				<Box gap={1}>
 					<Box
-						onMouseEnter={() => setHovered('inc')}
-						onMouseLeave={() => setHovered(undefined)}
+						onMouseEnter={() => {
+							setHovered('inc');
+						}}
+						onMouseLeave={() => {
+							setHovered(undefined);
+						}}
 					>
 						<Button
-							label="+ Increment"
+							label='+ Increment'
 							hovered={hovered === 'inc'}
-							onClick={() => setCount(c => c + 1)}
+							onClick={() => {
+								setCount(c => c + 1);
+							}}
 						/>
 					</Box>
 					<Box
-						onMouseEnter={() => setHovered('dec')}
-						onMouseLeave={() => setHovered(undefined)}
+						onMouseEnter={() => {
+							setHovered('dec');
+						}}
+						onMouseLeave={() => {
+							setHovered(undefined);
+						}}
 					>
 						<Button
-							label="- Decrement"
+							label='- Decrement'
 							hovered={hovered === 'dec'}
-							onClick={() => setCount(c => c - 1)}
+							onClick={() => {
+								setCount(c => c - 1);
+							}}
 						/>
 					</Box>
 					<Box
-						onMouseEnter={() => setHovered('reset')}
-						onMouseLeave={() => setHovered(undefined)}
+						onMouseEnter={() => {
+							setHovered('reset');
+						}}
+						onMouseLeave={() => {
+							setHovered(undefined);
+						}}
 					>
 						<Button
-							label="Reset"
+							label='Reset'
 							hovered={hovered === 'reset'}
-							onClick={() => setCount(0)}
+							onClick={() => {
+								setCount(0);
+							}}
 						/>
 					</Box>
 				</Box>
-				<Text color="gray" dimColor>Press Ctrl+C to exit</Text>
+				<Text dimColor color='gray'>
+					Press Ctrl+C to exit
+				</Text>
 			</Box>
 		</AlternateScreen>
 	);

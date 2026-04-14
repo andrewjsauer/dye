@@ -61,7 +61,9 @@ export function recordNodeRect(
 	width: number,
 	height: number,
 ): void {
-	nodeCache.set(node, {x, y, width, height});
+	nodeCache.set(node, {
+		x, y, width, height,
+	});
 	trackedNodes.add(node);
 }
 
@@ -92,10 +94,10 @@ function hitTestNode(
 
 	// Check if the point is within this node's rect
 	if (
-		col < rect.x ||
-		col >= rect.x + rect.width ||
-		row < rect.y ||
-		row >= rect.y + rect.height
+		col < rect.x
+		|| col >= rect.x + rect.width
+		|| row < rect.y
+		|| row >= rect.y + rect.height
 	) {
 		return undefined;
 	}

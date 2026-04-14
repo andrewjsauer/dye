@@ -2,7 +2,11 @@ import test from 'ava';
 import {parseMouse, MOUSE_ENABLE, MOUSE_DISABLE} from '../src/mouse.js';
 import {ClickEvent} from '../src/events/click-event.js';
 import {DyeEvent} from '../src/events/event.js';
-import {dispatchClick, dispatchHover, resetHoverState} from '../src/events/dispatch.js';
+import {
+	dispatchClick,
+	dispatchHover,
+	resetHoverState,
+} from '../src/events/dispatch.js';
 import {createNode} from '../src/dom.js';
 import {recordNodeRect, clearNodeCache} from '../src/node-cache.js';
 
@@ -11,7 +15,7 @@ import {recordNodeRect, clearNodeCache} from '../src/node-cache.js';
 // ---------------------------------------------------------------------------
 
 test('parseMouse - left press', t => {
-	const result = parseMouse('\x1b[<0;5;10M');
+	const result = parseMouse('\u001B[<0;5;10M');
 	t.truthy(result);
 	t.is(result!.button, 'left');
 	t.is(result!.action, 'press');
@@ -23,48 +27,48 @@ test('parseMouse - left press', t => {
 });
 
 test('parseMouse - left release', t => {
-	const result = parseMouse('\x1b[<0;5;10m');
+	const result = parseMouse('\u001B[<0;5;10m');
 	t.truthy(result);
 	t.is(result!.button, 'left');
 	t.is(result!.action, 'release');
 });
 
 test('parseMouse - middle press', t => {
-	const result = parseMouse('\x1b[<1;1;1M');
+	const result = parseMouse('\u001B[<1;1;1M');
 	t.truthy(result);
 	t.is(result!.button, 'middle');
 	t.is(result!.action, 'press');
 });
 
 test('parseMouse - right press', t => {
-	const result = parseMouse('\x1b[<2;1;1M');
+	const result = parseMouse('\u001B[<2;1;1M');
 	t.truthy(result);
 	t.is(result!.button, 'right');
 	t.is(result!.action, 'press');
 });
 
 test('parseMouse - wheel up', t => {
-	const result = parseMouse('\x1b[<64;10;20M');
+	const result = parseMouse('\u001B[<64;10;20M');
 	t.truthy(result);
 	t.is(result!.action, 'wheel-up');
 	t.is(result!.button, 'none');
 });
 
 test('parseMouse - wheel down', t => {
-	const result = parseMouse('\x1b[<65;10;20M');
+	const result = parseMouse('\u001B[<65;10;20M');
 	t.truthy(result);
 	t.is(result!.action, 'wheel-down');
 });
 
 test('parseMouse - drag with left button', t => {
-	const result = parseMouse('\x1b[<32;15;25M');
+	const result = parseMouse('\u001B[<32;15;25M');
 	t.truthy(result);
 	t.is(result!.action, 'drag');
 	t.is(result!.button, 'left');
 });
 
 test('parseMouse - shift modifier', t => {
-	const result = parseMouse('\x1b[<4;1;1M');
+	const result = parseMouse('\u001B[<4;1;1M');
 	t.truthy(result);
 	t.true(result!.shift);
 	t.false(result!.alt);
@@ -72,20 +76,20 @@ test('parseMouse - shift modifier', t => {
 });
 
 test('parseMouse - alt modifier', t => {
-	const result = parseMouse('\x1b[<8;1;1M');
+	const result = parseMouse('\u001B[<8;1;1M');
 	t.truthy(result);
 	t.true(result!.alt);
 });
 
 test('parseMouse - ctrl modifier', t => {
-	const result = parseMouse('\x1b[<16;1;1M');
+	const result = parseMouse('\u001B[<16;1;1M');
 	t.truthy(result);
 	t.true(result!.ctrl);
 });
 
 test('parseMouse - combined modifiers', t => {
-	// shift (4) + alt (8) + ctrl (16) = 28
-	const result = parseMouse('\x1b[<28;1;1M');
+	// Shift (4) + alt (8) + ctrl (16) = 28
+	const result = parseMouse('\u001B[<28;1;1M');
 	t.truthy(result);
 	t.true(result!.shift);
 	t.true(result!.alt);
@@ -94,12 +98,12 @@ test('parseMouse - combined modifiers', t => {
 
 test('parseMouse - returns undefined for non-mouse input', t => {
 	t.is(parseMouse('hello'), undefined);
-	t.is(parseMouse('\x1b[A'), undefined); // arrow key
+	t.is(parseMouse('\u001B[A'), undefined); // Arrow key
 	t.is(parseMouse(''), undefined);
 });
 
 test('parseMouse - large coordinates', t => {
-	const result = parseMouse('\x1b[<0;300;200M');
+	const result = parseMouse('\u001B[<0;300;200M');
 	t.truthy(result);
 	t.is(result!.col, 299);
 	t.is(result!.row, 199);
@@ -110,15 +114,15 @@ test('parseMouse - large coordinates', t => {
 // ---------------------------------------------------------------------------
 
 test('MOUSE_ENABLE contains expected DEC private modes', t => {
-	t.true(MOUSE_ENABLE.includes('\x1b[?1000h'));
-	t.true(MOUSE_ENABLE.includes('\x1b[?1002h'));
-	t.true(MOUSE_ENABLE.includes('\x1b[?1006h'));
+	t.true(MOUSE_ENABLE.includes('\u001B[?1000h'));
+	t.true(MOUSE_ENABLE.includes('\u001B[?1002h'));
+	t.true(MOUSE_ENABLE.includes('\u001B[?1006h'));
 });
 
 test('MOUSE_DISABLE contains expected DEC private modes', t => {
-	t.true(MOUSE_DISABLE.includes('\x1b[?1000l'));
-	t.true(MOUSE_DISABLE.includes('\x1b[?1002l'));
-	t.true(MOUSE_DISABLE.includes('\x1b[?1006l'));
+	t.true(MOUSE_DISABLE.includes('\u001B[?1000l'));
+	t.true(MOUSE_DISABLE.includes('\u001B[?1002l'));
+	t.true(MOUSE_DISABLE.includes('\u001B[?1006l'));
 });
 
 // ---------------------------------------------------------------------------
@@ -147,13 +151,15 @@ test('ClickEvent - stores coordinates', t => {
 	t.is(event.row, 5);
 	t.is(event.localCol, 10);
 	t.is(event.localRow, 5);
-	t.is(event.button, 'left'); // default
+	t.is(event.button, 'left'); // Default
 	t.is(event.type, 'click');
 });
 
 test('ClickEvent - updateLocalCoords', t => {
 	const event = new ClickEvent({col: 10, row: 5});
-	event.updateLocalCoords({x: 3, y: 2, width: 20, height: 10});
+	event.updateLocalCoords({
+		x: 3, y: 2, width: 20, height: 10,
+	});
 	t.is(event.localCol, 7); // 10 - 3
 	t.is(event.localRow, 3); // 5 - 2
 });
@@ -174,7 +180,7 @@ test('dispatchClick - fires onClick on hit node', t => {
 
 	let clicked = false;
 	box._eventHandlers = {
-		onClick: () => {
+		onClick() {
 			clicked = true;
 		},
 	};
@@ -201,7 +207,7 @@ test('dispatchClick - bubbles to parent', t => {
 
 	let parentClicked = false;
 	parent._eventHandlers = {
-		onClick: () => {
+		onClick() {
 			parentClicked = true;
 		},
 	};
@@ -228,12 +234,12 @@ test('dispatchClick - stopImmediatePropagation prevents parent', t => {
 
 	let parentClicked = false;
 	child._eventHandlers = {
-		onClick: (event: ClickEvent) => {
+		onClick(event: ClickEvent) {
 			event.stopImmediatePropagation();
 		},
 	};
 	parent._eventHandlers = {
-		onClick: () => {
+		onClick() {
 			parentClicked = true;
 		},
 	};
@@ -265,7 +271,7 @@ test('dispatchClick - updates localCol/localRow per node', t => {
 	let localCol = -1;
 	let localRow = -1;
 	box._eventHandlers = {
-		onClick: (event: ClickEvent) => {
+		onClick(event: ClickEvent) {
 			localCol = event.localCol;
 			localRow = event.localRow;
 		},
@@ -295,10 +301,10 @@ test('dispatchHover - fires onMouseEnter and onMouseLeave', t => {
 	let entered = false;
 	let left = false;
 	box._eventHandlers = {
-		onMouseEnter: () => {
+		onMouseEnter() {
 			entered = true;
 		},
-		onMouseLeave: () => {
+		onMouseLeave() {
 			left = true;
 		},
 	};
@@ -328,12 +334,12 @@ test('dispatchHover - no redundant events on same node', t => {
 
 	let enterCount = 0;
 	box._eventHandlers = {
-		onMouseEnter: () => {
+		onMouseEnter() {
 			enterCount++;
 		},
 	};
 
 	dispatchHover(root, 5, 5);
-	dispatchHover(root, 10, 8); // still in same box
-	t.is(enterCount, 1); // only entered once
+	dispatchHover(root, 10, 8); // Still in same box
+	t.is(enterCount, 1); // Only entered once
 });

@@ -11,11 +11,9 @@ import createStdout from './helpers/create-stdout.js';
 import {renderAsync} from './helpers/test-renderer.js';
 
 const renderText = (text: string): string =>
-	renderToString(
-		<Box>
-			<Text>{text}</Text>
-		</Box>,
-	);
+	renderToString(<Box>
+		<Text>{text}</Text>
+	</Box>);
 
 test('<Text> with undefined children', t => {
 	const output = renderToString(<Text />);
@@ -28,7 +26,7 @@ test('<Text> with null children', t => {
 });
 
 test('text with standard color', t => {
-	const output = renderToString(<Text color="green">Test</Text>);
+	const output = renderToString(<Text color='green'>Test</Text>);
 	t.is(output, chalk.green('Test'));
 });
 
@@ -39,63 +37,55 @@ test('text with dim+bold', t => {
 		chalk.level = originalLevel;
 	});
 
-	const output = renderToString(
-		<Text dimColor bold>
-			Test
-		</Text>,
-	);
+	const output = renderToString(<Text dimColor bold>
+		Test
+	</Text>);
 
 	t.is(stripAnsi(output), 'Test');
 	t.not(output, 'Test'); // Ensure ANSI codes are present
 });
 
 test('text with dimmed color', t => {
-	const output = renderToString(
-		<Text dimColor color="green">
-			Test
-		</Text>,
-	);
+	const output = renderToString(<Text dimColor color='green'>
+		Test
+	</Text>);
 
 	t.is(output, chalk.green.dim('Test'));
 });
 
 test('text with hex color', t => {
-	const output = renderToString(<Text color="#FF8800">Test</Text>);
+	const output = renderToString(<Text color='#FF8800'>Test</Text>);
 	t.is(output, chalk.hex('#FF8800')('Test'));
 });
 
 test('text with rgb color', t => {
-	const output = renderToString(<Text color="rgb(255, 136, 0)">Test</Text>);
+	const output = renderToString(<Text color='rgb(255, 136, 0)'>Test</Text>);
 	t.is(output, chalk.rgb(255, 136, 0)('Test'));
 });
 
 test('text with ansi256 color', t => {
-	const output = renderToString(<Text color="ansi256(194)">Test</Text>);
+	const output = renderToString(<Text color='ansi256(194)'>Test</Text>);
 	t.is(output, chalk.ansi256(194)('Test'));
 });
 
 test('text with standard background color', t => {
-	const output = renderToString(<Text backgroundColor="green">Test</Text>);
+	const output = renderToString(<Text backgroundColor='green'>Test</Text>);
 	t.is(output, chalk.bgGreen('Test'));
 });
 
 test('text with hex background color', t => {
-	const output = renderToString(<Text backgroundColor="#FF8800">Test</Text>);
+	const output = renderToString(<Text backgroundColor='#FF8800'>Test</Text>);
 	t.is(output, chalk.bgHex('#FF8800')('Test'));
 });
 
 test('text with rgb background color', t => {
-	const output = renderToString(
-		<Text backgroundColor="rgb(255, 136, 0)">Test</Text>,
-	);
+	const output = renderToString(<Text backgroundColor='rgb(255, 136, 0)'>Test</Text>);
 
 	t.is(output, chalk.bgRgb(255, 136, 0)('Test'));
 });
 
 test('text with ansi256 background color', t => {
-	const output = renderToString(
-		<Text backgroundColor="ansi256(194)">Test</Text>,
-	);
+	const output = renderToString(<Text backgroundColor='ansi256(194)'>Test</Text>);
 
 	t.is(output, chalk.bgAnsi256(194)('Test'));
 });
@@ -175,14 +165,12 @@ test('text with content "constructor" wraps correctly', t => {
 test('strip ANSI cursor movement sequences from text', t => {
 	// \x1b[1A = cursor up, \x1b[2K = clear line, \x1b[1B = cursor down
 	// \x1b[32m = green (SGR, preserved), \x1b[0m = reset (SGR, preserved)
-	const input =
-		'\u001B[1A\u001B[2KStarting client ... \u001B[32mdone\u001B[0m\u001B[1B';
+	const input
+		= '\u001B[1A\u001B[2KStarting client ... \u001B[32mdone\u001B[0m\u001B[1B';
 
-	const output = renderToString(
-		<Box>
-			<Text>{input}</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box>
+		<Text>{input}</Text>
+	</Box>);
 
 	t.false(output.includes('\u001B[1A'));
 	t.false(output.includes('\u001B[2K'));
@@ -191,11 +179,9 @@ test('strip ANSI cursor movement sequences from text', t => {
 });
 
 test('strip ANSI cursor position and erase sequences from text', t => {
-	const output = renderToString(
-		<Box>
-			<Text>{'Hello\u001B[5;10HWorld\u001B[2J!'}</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box>
+		<Text>{'Hello\u001B[5;10HWorld\u001B[2J!'}</Text>
+	</Box>);
 
 	t.false(output.includes('\u001B[5;10H'));
 	t.false(output.includes('\u001B[2J'));
@@ -203,29 +189,23 @@ test('strip ANSI cursor position and erase sequences from text', t => {
 });
 
 test('preserve SGR color sequences in text', t => {
-	const output = renderToString(
-		<Box>
-			<Text>{'\u001B[32mgreen\u001B[0m normal'}</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box>
+		<Text>{'\u001B[32mgreen\u001B[0m normal'}</Text>
+	</Box>);
 
 	t.true(output.includes('\u001B['));
 	t.is(stripAnsi(output), 'green normal');
 });
 
 test('preserve OSC hyperlink sequences in text', t => {
-	const output = renderText(
-		'\u001B]8;;https://example.com\u0007link\u001B]8;;\u0007',
-	);
+	const output = renderText('\u001B]8;;https://example.com\u0007link\u001B]8;;\u0007');
 
 	t.true(output.includes('\u001B]8;;'));
 	t.is(stripAnsi(output), 'link');
 });
 
 test('preserve OSC hyperlink sequences with ST terminator in text', t => {
-	const output = renderText(
-		'\u001B]8;;https://example.com\u001B\\link\u001B]8;;\u001B\\',
-	);
+	const output = renderText('\u001B]8;;https://example.com\u001B\\link\u001B]8;;\u001B\\');
 
 	t.true(output.includes('\u001B]8;;'));
 	t.true(output.includes('\u001B\\'));
@@ -283,12 +263,10 @@ test('strip complete ESC control sequences with intermediates', t => {
 });
 
 test('strip tmux DCS passthrough wrappers without leaking payload', t => {
-	const wrappedHyperlinkStart =
-		'\u001BPtmux;\u001B\u001B]8;;https://example.com\u0007\u001B\\';
+	const wrappedHyperlinkStart
+		= '\u001BPtmux;\u001B\u001B]8;;https://example.com\u0007\u001B\\';
 	const wrappedHyperlinkEnd = '\u001BPtmux;\u001B\u001B]8;;\u0007\u001B\\';
-	const output = renderText(
-		`${wrappedHyperlinkStart}link${wrappedHyperlinkEnd}`,
-	);
+	const output = renderText(`${wrappedHyperlinkStart}link${wrappedHyperlinkEnd}`);
 
 	t.false(output.includes('tmux;'));
 	t.false(output.includes('\u001BP'));
@@ -297,13 +275,11 @@ test('strip tmux DCS passthrough wrappers without leaking payload', t => {
 });
 
 test('strip tmux DCS passthrough wrappers with ST-terminated OSC payload', t => {
-	const wrappedHyperlinkStart =
-		'\u001BPtmux;\u001B\u001B]8;;https://example.com\u001B\u001B\\\u001B\\';
-	const wrappedHyperlinkEnd =
-		'\u001BPtmux;\u001B\u001B]8;;\u001B\u001B\\\u001B\\';
-	const output = renderText(
-		`${wrappedHyperlinkStart}link${wrappedHyperlinkEnd}`,
-	);
+	const wrappedHyperlinkStart
+		= '\u001BPtmux;\u001B\u001B]8;;https://example.com\u001B\u001B\\\u001B\\';
+	const wrappedHyperlinkEnd
+		= '\u001BPtmux;\u001B\u001B]8;;\u001B\u001B\\\u001B\\';
+	const output = renderText(`${wrappedHyperlinkStart}link${wrappedHyperlinkEnd}`);
 
 	t.false(output.includes('tmux;'));
 	t.false(output.includes('\u001B\\'));
@@ -318,9 +294,7 @@ test('strip C1 DCS control strings as complete units', t => {
 });
 
 test('strip PM and APC control strings as complete units', t => {
-	const output = renderText(
-		'A\u001B^pm-payload\u001B\\B\u001B_apc-payload\u001B\\C',
-	);
+	const output = renderText('A\u001B^pm-payload\u001B\\B\u001B_apc-payload\u001B\\C');
 
 	t.false(output.includes('pm-payload'));
 	t.false(output.includes('apc-payload'));
@@ -443,7 +417,7 @@ test('<Text> with null children - concurrent', async t => {
 });
 
 test('text with standard color - concurrent', async t => {
-	const output = await renderToStringAsync(<Text color="green">Test</Text>);
+	const output = await renderToStringAsync(<Text color='green'>Test</Text>);
 	t.is(output, chalk.green('Test'));
 });
 
@@ -454,18 +428,16 @@ test('text with dim+bold - concurrent', async t => {
 		chalk.level = originalLevel;
 	});
 
-	const output = await renderToStringAsync(
-		<Text dimColor bold>
-			Test
-		</Text>,
-	);
+	const output = await renderToStringAsync(<Text dimColor bold>
+		Test
+	</Text>);
 
 	t.is(stripAnsi(output), 'Test');
 	t.not(output, 'Test'); // Ensure ANSI codes are present
 });
 
 test('text with hex color - concurrent', async t => {
-	const output = await renderToStringAsync(<Text color="#FF8800">Test</Text>);
+	const output = await renderToStringAsync(<Text color='#FF8800'>Test</Text>);
 	t.is(output, chalk.hex('#FF8800')('Test'));
 });
 

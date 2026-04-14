@@ -86,13 +86,13 @@ test('StylePool - same codes return same id', t => {
 
 test('StylePool - visible-on-space bit set for background', t => {
 	const pool = new StylePool();
-	const id = pool.intern([42]); // green background
+	const id = pool.intern([42]); // Green background
 	t.true(pool.isVisibleOnSpace(id));
 });
 
 test('StylePool - visible-on-space bit not set for foreground-only', t => {
 	const pool = new StylePool();
-	const id = pool.intern([31]); // red foreground
+	const id = pool.intern([31]); // Red foreground
 	t.false(pool.isVisibleOnSpace(id));
 });
 
@@ -100,14 +100,14 @@ test('StylePool - transition from default to styled', t => {
 	const pool = new StylePool();
 	const boldId = pool.intern([1]);
 	const result = pool.transition(0, boldId);
-	t.is(result, '\x1b[1m');
+	t.is(result, '\u001B[1m');
 });
 
 test('StylePool - transition from styled to default', t => {
 	const pool = new StylePool();
 	const boldId = pool.intern([1]);
 	const result = pool.transition(boldId, 0);
-	t.is(result, '\x1b[0m');
+	t.is(result, '\u001B[0m');
 });
 
 test('StylePool - transition between same id returns empty', t => {
@@ -164,7 +164,9 @@ test('Screen - setCellAt tracks damage', t => {
 	const screen = createScreen(10, 5, stylePool);
 	t.is(screen.damage, undefined);
 	setCellAt(screen, 3, 2, 1, 0, 0, CellWidth.Narrow);
-	t.deepEqual(screen.damage, {x: 3, y: 2, width: 1, height: 1});
+	t.deepEqual(screen.damage, {
+		x: 3, y: 2, width: 1, height: 1,
+	});
 });
 
 test('Screen - getCell unpacks all fields', t => {
@@ -278,9 +280,9 @@ test('diff - style change produces style transition', t => {
 	setCellAt(next, 0, 0, aId, boldId, 0, CellWidth.Narrow);
 	const diff = diffScreens(prev, next, {stylePool});
 	const str = diffToString(optimize(diff));
-	t.true(str.includes('\x1b[1m')); // Bold SGR
+	t.true(str.includes('\u001B[1m')); // Bold SGR
 	t.true(str.includes('A'));
-	t.true(str.includes('\x1b[0m')); // Reset at end
+	t.true(str.includes('\u001B[0m')); // Reset at end
 });
 
 test('diff - full diff mode scans everything', t => {
@@ -329,17 +331,12 @@ test('optimizer - merges consecutive cursorMove', t => {
 });
 
 test('optimizer - removes no-op cursorMove', t => {
-	const result = optimize([
-		{type: 'cursorMove', x: 0, y: 0},
-	]);
+	const result = optimize([{type: 'cursorMove', x: 0, y: 0}]);
 	t.is(result.length, 0);
 });
 
 test('optimizer - cancels cursorHide + cursorShow pair', t => {
-	const result = optimize([
-		{type: 'cursorHide'},
-		{type: 'cursorShow'},
-	]);
+	const result = optimize([{type: 'cursorHide'}, {type: 'cursorShow'}]);
 	t.is(result.length, 0);
 });
 
@@ -352,9 +349,7 @@ test('optimizer - deduplicates consecutive hyperlinks', t => {
 });
 
 test('optimizer - removes clear with count 0', t => {
-	const result = optimize([
-		{type: 'clear', count: 0},
-	]);
+	const result = optimize([{type: 'clear', count: 0}]);
 	t.is(result.length, 0);
 });
 
@@ -401,7 +396,7 @@ test('StylePool - transition between two non-default styles', t => {
 	const redId = pool.intern([31]);
 	const result = pool.transition(boldId, redId);
 	// Should reset then apply new style
-	t.is(result, '\x1b[0m\x1b[31m');
+	t.is(result, '\u001B[0m\u001B[31m');
 });
 
 test('StylePool - transition caches result', t => {
@@ -426,10 +421,10 @@ test('diff - hyperlink transition produces OSC 8 patches', t => {
 	const diff = diffScreens(prev, next, {stylePool});
 	const str = diffToString(optimize(diff));
 	// Should contain OSC 8 open and close
-	t.true(str.includes('\x1b]8;;https://example.com\x1b\\'));
+	t.true(str.includes('\u001B]8;;https://example.com\u001B\\'));
 	t.true(str.includes('A'));
 	// Should close hyperlink at end
-	t.true(str.includes('\x1b]8;;\x1b\\'));
+	t.true(str.includes('\u001B]8;;\u001B\\'));
 });
 
 // --- diff with different dimensions ---
@@ -489,9 +484,9 @@ test('Screen - screenToString skips SpacerTail cells for wide chars', t => {
 	setCellAt(screen, 1, 0, spacerId, 0, 0, CellWidth.SpacerTail);
 	const str = screenToString(screen);
 	// Should have the wide char once, not duplicated
-	t.is(str.split('中').length, 2); // one occurrence means 2 parts after split
+	t.is(str.split('中').length, 2); // One occurrence means 2 parts after split
 	// Should not contain the empty spacer as visible character
-	t.false(str.includes('  中')); // no leading double-space
+	t.false(str.includes('  中')); // No leading double-space
 });
 
 // --- optimizer cursorMove cancellation ---
@@ -508,20 +503,20 @@ test('optimizer - cancels cursorMove pair that sums to zero', t => {
 
 test('optimizer - concatenates adjacent styleStr patches', t => {
 	const result = optimize([
-		{type: 'styleStr', str: '\x1b[1m'},
-		{type: 'styleStr', str: '\x1b[31m'},
+		{type: 'styleStr', str: '\u001B[1m'},
+		{type: 'styleStr', str: '\u001B[31m'},
 	]);
 	t.is(result.length, 1);
-	t.deepEqual(result[0], {type: 'styleStr', str: '\x1b[1m\x1b[31m'});
+	t.deepEqual(result[0], {type: 'styleStr', str: '\u001B[1m\u001B[31m'});
 });
 
 test('optimizer - removes empty styleStr patches', t => {
 	const result = optimize([
 		{type: 'styleStr', str: ''},
-		{type: 'styleStr', str: '\x1b[1m'},
+		{type: 'styleStr', str: '\u001B[1m'},
 	]);
 	t.is(result.length, 1);
-	t.deepEqual(result[0], {type: 'styleStr', str: '\x1b[1m'});
+	t.deepEqual(result[0], {type: 'styleStr', str: '\u001B[1m'});
 });
 
 // --- optimizer cursorTo collapse ---
@@ -620,7 +615,9 @@ test('Output - Screen handles overlapping writes', t => {
 
 test('Output - Screen clipping works', t => {
 	const output = new Output({width: 10, height: 3});
-	output.clip({x1: 2, x2: 5, y1: 0, y2: 2});
+	output.clip({
+		x1: 2, x2: 5, y1: 0, y2: 2,
+	});
 	output.write(0, 0, 'ABCDEFGH', {transformers: []});
 	output.unclip();
 	output.get();

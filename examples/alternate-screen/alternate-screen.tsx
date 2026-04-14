@@ -1,4 +1,6 @@
-import React, {useReducer, useEffect, useRef, useCallback} from 'react';
+import React, {
+	useReducer, useEffect, useRef, useCallback,
+} from 'react';
 import {
 	render,
 	Text,
@@ -121,10 +123,10 @@ export function gameReducer(state: GameState, action: Action): GameState {
 
 	// Wall collision
 	if (
-		newHead.x < 0 ||
-		newHead.x >= boardWidth ||
-		newHead.y < 0 ||
-		newHead.y >= boardHeight
+		newHead.x < 0
+		|| newHead.x >= boardWidth
+		|| newHead.y < 0
+		|| newHead.y >= boardHeight
 	) {
 		return {...state, gameOver: true, won: false};
 	}
@@ -133,9 +135,7 @@ export function gameReducer(state: GameState, action: Action): GameState {
 	const collisionSegments = ateFood ? state.snake : state.snake.slice(0, -1);
 
 	if (
-		collisionSegments.some(
-			segment => segment.x === newHead.x && segment.y === newHead.y,
-		)
+		collisionSegments.some(segment => segment.x === newHead.x && segment.y === newHead.y)
 	) {
 		return {...state, gameOver: true, won: false};
 	}
@@ -248,15 +248,15 @@ function SnakeGame() {
 	const marginLeft = Math.max(Math.floor((columns - boardWidthChars) / 2), 0);
 
 	return (
-		<Box flexDirection="column" paddingY={1}>
-			<Box justifyContent="center">
+		<Box flexDirection='column' paddingY={1}>
+			<Box justifyContent='center'>
 				<Text bold color={titleColor}>
 					🦄 Unicorn Snake 🦄
 				</Text>
 			</Box>
 
-			<Box justifyContent="center" marginTop={1}>
-				<Text bold color="yellow">
+			<Box justifyContent='center' marginTop={1}>
+				<Text bold color='yellow'>
 					Score: {game.score}
 				</Text>
 			</Box>
@@ -265,20 +265,22 @@ function SnakeGame() {
 				<Text>{board}</Text>
 			</Box>
 
-			{game.gameOver ? (
-				<Box justifyContent="center" marginTop={1}>
-					<Text bold color="red">
-						{game.won ? 'You Win!' : 'Game Over!'}{' '}
-					</Text>
-					<Text dimColor>r: restart | q: quit</Text>
-				</Box>
-			) : (
-				<Box justifyContent="center" marginTop={1}>
-					<Text dimColor>
-						Arrow keys: move | Eat {foodCharacter} to grow | q: quit
-					</Text>
-				</Box>
-			)}
+			{game.gameOver
+				? (
+					<Box justifyContent='center' marginTop={1}>
+						<Text bold color='red'>
+							{game.won ? 'You Win!' : 'Game Over!'}{' '}
+						</Text>
+						<Text dimColor>r: restart | q: quit</Text>
+					</Box>
+				)
+				: (
+					<Box justifyContent='center' marginTop={1}>
+						<Text dimColor>
+							Arrow keys: move | Eat {foodCharacter} to grow | q: quit
+						</Text>
+					</Box>
+				)}
 		</Box>
 	);
 }

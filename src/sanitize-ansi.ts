@@ -20,10 +20,10 @@ const sanitizeAnsi = (text: string): string => {
 		}
 
 		if (
-			token.type === 'csi' &&
-			token.finalCharacter === 'm' &&
-			token.intermediateString === '' &&
-			sgrParametersRegex.test(token.parameterString)
+			token.type === 'csi'
+			&& token.finalCharacter === 'm'
+			&& token.intermediateString === ''
+			&& sgrParametersRegex.test(token.parameterString)
 		) {
 			output += token.value;
 		}

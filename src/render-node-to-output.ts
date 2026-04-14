@@ -50,15 +50,15 @@ export const renderNodeToScreenReaderOutput = (
 	if (node.nodeName === 'ink-text') {
 		output = squashTextNodes(node);
 	} else if (node.nodeName === 'ink-box' || node.nodeName === 'ink-root') {
-		const separator =
-			node.style.flexDirection === 'row' ||
-			node.style.flexDirection === 'row-reverse'
+		const separator
+			= node.style.flexDirection === 'row'
+				|| node.style.flexDirection === 'row-reverse'
 				? ' '
 				: '\n';
 
-		const childNodes =
-			node.style.flexDirection === 'row-reverse' ||
-			node.style.flexDirection === 'column-reverse'
+		const childNodes
+			= node.style.flexDirection === 'row-reverse'
+				|| node.style.flexDirection === 'column-reverse'
 				? [...node.childNodes].reverse()
 				: [...node.childNodes];
 
@@ -173,10 +173,10 @@ const renderNodeToOutput = (
 			renderBackground(x, y, node, output);
 			renderBorder(x, y, node, output);
 
-			const clipHorizontally =
-				node.style.overflowX === 'hidden' || node.style.overflow === 'hidden';
-			const clipVertically =
-				node.style.overflowY === 'hidden' || node.style.overflow === 'hidden';
+			const clipHorizontally
+				= node.style.overflowX === 'hidden' || node.style.overflow === 'hidden';
+			const clipVertically
+				= node.style.overflowY === 'hidden' || node.style.overflow === 'hidden';
 
 			if (clipHorizontally || clipVertically) {
 				const x1 = clipHorizontally
@@ -184,9 +184,9 @@ const renderNodeToOutput = (
 					: undefined;
 
 				const x2 = clipHorizontally
-					? x +
-						yogaNode.getComputedWidth() -
-						yogaNode.getComputedBorder(Yoga.EDGE_RIGHT)
+					? x
+					+ yogaNode.getComputedWidth()
+					- yogaNode.getComputedBorder(Yoga.EDGE_RIGHT)
 					: undefined;
 
 				const y1 = clipVertically
@@ -194,12 +194,14 @@ const renderNodeToOutput = (
 					: undefined;
 
 				const y2 = clipVertically
-					? y +
-						yogaNode.getComputedHeight() -
-						yogaNode.getComputedBorder(Yoga.EDGE_BOTTOM)
+					? y
+					+ yogaNode.getComputedHeight()
+					- yogaNode.getComputedBorder(Yoga.EDGE_BOTTOM)
 					: undefined;
 
-				output.clip({x1, x2, y1, y2});
+				output.clip({
+					x1, x2, y1, y2,
+				});
 				clipped = true;
 			}
 		}

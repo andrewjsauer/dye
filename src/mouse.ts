@@ -16,7 +16,12 @@
  */
 
 export type MouseButton = 'left' | 'middle' | 'right' | 'none';
-export type MouseAction = 'press' | 'release' | 'drag' | 'wheel-up' | 'wheel-down';
+export type MouseAction =
+	| 'press'
+	| 'release'
+	| 'drag'
+	| 'wheel-up'
+	| 'wheel-down';
 
 export type ParsedMouse = {
 	readonly button: MouseButton;
@@ -35,7 +40,7 @@ export type ParsedMouse = {
  * Regex matching SGR mouse sequences.
  * CSI < button ; col ; row M/m
  */
-const SGR_MOUSE_RE = /^\x1b\[<(\d+);(\d+);(\d+)([Mm])$/;
+const SGR_MOUSE_RE = /^\u001B\[<(\d+);(\d+);(\d+)([Mm])$/;
 
 /**
  * Try to parse an SGR mouse sequence from a terminal input string.
@@ -43,7 +48,9 @@ const SGR_MOUSE_RE = /^\x1b\[<(\d+);(\d+);(\d+)([Mm])$/;
  */
 export function parseMouse(sequence: string): ParsedMouse | undefined {
 	const match = SGR_MOUSE_RE.exec(sequence);
-	if (!match) return undefined;
+	if (!match) {
+		return undefined;
+	}
 
 	const rawButton = Number(match[1]);
 	const col = Number(match[2]) - 1; // Convert 1-indexed to 0-indexed
@@ -77,15 +84,28 @@ export function parseMouse(sequence: string): ParsedMouse | undefined {
 		button = buttonFromCode(baseButton);
 	}
 
-	return {button, action, col, row, shift, alt, ctrl, sequence};
+	return {
+		button, action, col, row, shift, alt, ctrl, sequence,
+	};
 }
 
 function buttonFromCode(code: number): MouseButton {
 	switch (code) {
-		case 0: return 'left';
-		case 1: return 'middle';
-		case 2: return 'right';
-		default: return 'none';
+		case 0: {
+			return 'left';
+		}
+
+		case 1: {
+			return 'middle';
+		}
+
+		case 2: {
+			return 'right';
+		}
+
+		default: {
+			return 'none';
+		}
 	}
 }
 
@@ -94,16 +114,11 @@ function buttonFromCode(code: number): MouseButton {
  * Enables basic tracking (1000), button-event/drag tracking (1002),
  * and SGR extended mode (1006) for coordinates > 223.
  */
-export const MOUSE_ENABLE =
-	'\x1b[?1000h' +
-	'\x1b[?1002h' +
-	'\x1b[?1006h';
+export const MOUSE_ENABLE = '\u001B[?1000h' + '\u001B[?1002h' + '\u001B[?1006h';
 
 /**
  * ANSI sequences to disable SGR mouse tracking.
  * Disables in reverse order of enable.
  */
-export const MOUSE_DISABLE =
-	'\x1b[?1006l' +
-	'\x1b[?1002l' +
-	'\x1b[?1000l';
+export const MOUSE_DISABLE
+	= '\u001B[?1006l' + '\u001B[?1002l' + '\u001B[?1000l';

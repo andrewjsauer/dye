@@ -29,10 +29,8 @@ test('catch and display error', t => {
 	const writes: string[] = (stdout.write as any)
 		.getCalls()
 		.map((c: any) => c.args[0] as string)
-		.filter(
-			(w: string) =>
-				!w.startsWith('\u001B[?25') && !w.startsWith('\u001B[?2026'),
-		);
+		.filter((w: string) =>
+			!w.startsWith('\u001B[?25') && !w.startsWith('\u001B[?2026'));
 	const lastContentWrite = writes.at(-1)!;
 
 	t.deepEqual(stripAnsi(lastContentWrite).split('\n').slice(0, 14), [
@@ -44,7 +42,7 @@ test('catch and display error', t => {
 		' 20:   const stdout = createStdout();',
 		' 21:',
 		' 22:   const Test = () => {',
-		" 23:     throw new Error('Oh no');",
+		' 23:     throw new Error(\'Oh no\');',
 		' 24:   };',
 		' 25:',
 		' 26:   render(<Test />, {stdout});',
@@ -107,10 +105,8 @@ test('ErrorBoundary catches and displays nested component errors', t => {
 	const writes: string[] = (stdout.write as any)
 		.getCalls()
 		.map((c: any) => c.args[0] as string)
-		.filter(
-			(w: string) =>
-				!w.startsWith('\u001B[?25') && !w.startsWith('\u001B[?2026'),
-		);
+		.filter((w: string) =>
+			!w.startsWith('\u001B[?25') && !w.startsWith('\u001B[?2026'));
 	const lastContentWrite = writes.at(-1)!;
 	const output = stripAnsi(lastContentWrite);
 	t.true(output.includes('ERROR'), 'Error label should be displayed');

@@ -59,9 +59,7 @@ test('tokenize OSC control string with ST terminator', t => {
 });
 
 test('tokenize tmux DCS passthrough as one control string token', t => {
-	const tokens = tokenizeAnsi(
-		'A\u001BPtmux;\u001B\u001B]8;;https://example.com\u001B\u001B\\\u001B\\B',
-	);
+	const tokens = tokenizeAnsi('A\u001BPtmux;\u001B\u001B]8;;https://example.com\u001B\u001B\\\u001B\\B');
 	const dcsToken = tokens[1];
 
 	t.deepEqual(

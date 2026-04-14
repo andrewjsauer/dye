@@ -23,7 +23,6 @@ export type ElementNames =
 
 export type NodeNames = ElementNames | TextName;
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export type DOMElement = {
 	nodeName: ElementNames;
 	attributes: Record<string, DOMNodeAttribute>;
@@ -75,7 +74,7 @@ export type DOMElement = {
 	 * Event handlers registered on this element (onClick, onMouseEnter, etc.).
 	 * Set by the reconciler when event handler props are provided.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 	_eventHandlers?: Record<string, ((...args: any[]) => void) | undefined>;
 } & InkNode;
 
@@ -84,7 +83,6 @@ export type TextNode = {
 	nodeValue: string;
 } & InkNode;
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export type DOMNode<T = {nodeName: NodeNames}> = T extends {
 	nodeName: infer U;
 }
@@ -93,7 +91,6 @@ export type DOMNode<T = {nodeName: NodeNames}> = T extends {
 		: DOMElement
 	: never;
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export type DOMNodeAttribute = boolean | string | number;
 
 export const createNode = (nodeName: ElementNames): DOMElement => {
@@ -104,7 +101,7 @@ export const createNode = (nodeName: ElementNames): DOMElement => {
 		childNodes: [],
 		parentNode: undefined,
 		yogaNode: nodeName === 'ink-virtual-text' ? undefined : Yoga.Node.create(),
-		// eslint-disable-next-line @typescript-eslint/naming-convention
+
 		internal_accessibility: {},
 	};
 
@@ -150,12 +147,7 @@ export const insertBeforeNode = (
 	newChildNode.parentNode = node;
 
 	const index = node.childNodes.indexOf(beforeChildNode);
-	if (index >= 0) {
-		node.childNodes.splice(index, 0, newChildNode);
-		if (newChildNode.yogaNode) {
-			node.yogaNode?.insertChild(newChildNode.yogaNode, index);
-		}
-	} else {
+	if (index === -1) {
 		node.childNodes.push(newChildNode);
 
 		if (newChildNode.yogaNode) {
@@ -163,6 +155,11 @@ export const insertBeforeNode = (
 				newChildNode.yogaNode,
 				node.yogaNode.getChildCount(),
 			);
+		}
+	} else {
+		node.childNodes.splice(index, 0, newChildNode);
+		if (newChildNode.yogaNode) {
+			node.yogaNode?.insertChild(newChildNode.yogaNode, index);
 		}
 	}
 
@@ -182,7 +179,7 @@ export const removeChildNode = (
 	removeNode.parentNode = undefined;
 
 	const index = node.childNodes.indexOf(removeNode);
-	if (index >= 0) {
+	if (index !== -1) {
 		node.childNodes.splice(index, 1);
 	}
 
@@ -227,8 +224,8 @@ const measureTextNode = function (
 	node: DOMNode,
 	width: number,
 ): {width: number; height: number} {
-	const text =
-		node.nodeName === '#text' ? node.nodeValue : squashTextNodes(node);
+	const text
+		= node.nodeName === '#text' ? node.nodeValue : squashTextNodes(node);
 
 	const dimensions = measureText(text);
 

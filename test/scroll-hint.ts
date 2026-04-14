@@ -62,13 +62,13 @@ test('applyScrollHint - scroll up emits DECSTBM + S sequence', t => {
 		{altScreen: true, viewportHeight: 5},
 	);
 	// Scroll region set: CSI 1;5 r
-	t.true(seq.includes('\x1b[1;5r'));
+	t.true(seq.includes('\u001B[1;5r'));
 	// Scroll up by 1: CSI 1 S
-	t.true(seq.includes('\x1b[1S'));
+	t.true(seq.includes('\u001B[1S'));
 	// Reset region: CSI r
-	t.true(seq.includes('\x1b[r'));
+	t.true(seq.includes('\u001B[r'));
 	// Cursor home: CSI H
-	t.true(seq.includes('\x1b[H'));
+	t.true(seq.includes('\u001B[H'));
 });
 
 test('applyScrollHint - scroll down emits DECSTBM + T sequence', t => {
@@ -79,9 +79,9 @@ test('applyScrollHint - scroll down emits DECSTBM + T sequence', t => {
 		{top: 0, bottom: 5, delta: -2},
 		{altScreen: true, viewportHeight: 5},
 	);
-	t.true(seq.includes('\x1b[1;5r'));
-	t.true(seq.includes('\x1b[2T')); // Scroll down by 2
-	t.true(seq.includes('\x1b[r'));
+	t.true(seq.includes('\u001B[1;5r'));
+	t.true(seq.includes('\u001B[2T')); // Scroll down by 2
+	t.true(seq.includes('\u001B[r'));
 });
 
 test('applyScrollHint - returns empty when delta >= region height', t => {
@@ -89,7 +89,7 @@ test('applyScrollHint - returns empty when delta >= region height', t => {
 	const screen = createScreen(10, 5, stylePool);
 	const seq = applyScrollHint(
 		screen,
-		{top: 0, bottom: 5, delta: 5}, // delta == region height (5)
+		{top: 0, bottom: 5, delta: 5}, // Delta == region height (5)
 		{altScreen: true, viewportHeight: 5},
 	);
 	t.is(seq, '');
@@ -104,7 +104,7 @@ test('applyScrollHint - mutates prev screen via shiftRows (scroll up)', t => {
 
 	applyScrollHint(
 		screen,
-		{top: 0, bottom: 5, delta: 1}, // scroll up by 1
+		{top: 0, bottom: 5, delta: 1}, // Scroll up by 1
 		{altScreen: true, viewportHeight: 5},
 	);
 
@@ -123,7 +123,7 @@ test('applyScrollHint - mutates prev screen via shiftRows (scroll down)', t => {
 
 	applyScrollHint(
 		screen,
-		{top: 0, bottom: 5, delta: -1}, // scroll down by 1
+		{top: 0, bottom: 5, delta: -1}, // Scroll down by 1
 		{altScreen: true, viewportHeight: 5},
 	);
 
@@ -138,11 +138,11 @@ test('applyScrollHint - clamps region to viewport', t => {
 	const screen = createScreen(5, 10, stylePool);
 	const seq = applyScrollHint(
 		screen,
-		{top: 0, bottom: 20, delta: 1}, // bottom exceeds viewport
+		{top: 0, bottom: 20, delta: 1}, // Bottom exceeds viewport
 		{altScreen: true, viewportHeight: 10},
 	);
 	// Should clamp bottom to 10
-	t.true(seq.includes('\x1b[1;10r'));
+	t.true(seq.includes('\u001B[1;10r'));
 });
 
 test('applyScrollHint - scroll sub-region', t => {
@@ -154,5 +154,5 @@ test('applyScrollHint - scroll sub-region', t => {
 		{altScreen: true, viewportHeight: 10},
 	);
 	// DECSTBM: top=3 (1-indexed from 2), bottom=7
-	t.true(seq.includes('\x1b[3;7r'));
+	t.true(seq.includes('\u001B[3;7r'));
 });

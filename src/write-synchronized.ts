@@ -9,8 +9,8 @@ export function shouldSynchronize(
 	interactive?: boolean,
 ): boolean {
 	return (
-		'isTTY' in stream &&
-		(stream as Writable & {isTTY: boolean}).isTTY &&
-		(interactive ?? !isInCi)
+		'isTTY' in stream
+		&& (stream as Writable & {isTTY: boolean}).isTTY
+		&& (interactive ?? !isInCi)
 	);
 }

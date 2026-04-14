@@ -19,7 +19,9 @@
 import {type Diff, type Patch} from './frame.js';
 
 export function optimize(diff: Diff): Diff {
-	if (diff.length === 0) return diff;
+	if (diff.length === 0) {
+		return diff;
+	}
 
 	const result: Patch[] = [];
 
@@ -28,10 +30,12 @@ export function optimize(diff: Diff): Diff {
 
 		switch (patch.type) {
 			case 'stdout': {
-				if (patch.content === '') continue;
+				if (patch.content === '') {
+					continue;
+				}
 
 				// Try to merge with previous stdout patch
-				const prev = result[result.length - 1];
+				const prev = result.at(-1);
 				if (prev?.type === 'stdout') {
 					result[result.length - 1] = {
 						type: 'stdout',
@@ -45,10 +49,12 @@ export function optimize(diff: Diff): Diff {
 			}
 
 			case 'cursorMove': {
-				if (patch.x === 0 && patch.y === 0) continue;
+				if (patch.x === 0 && patch.y === 0) {
+					continue;
+				}
 
 				// Merge with previous cursorMove
-				const prev = result[result.length - 1];
+				const prev = result.at(-1);
 				if (prev?.type === 'cursorMove') {
 					const merged = {
 						type: 'cursorMove' as const,
@@ -70,7 +76,7 @@ export function optimize(diff: Diff): Diff {
 
 			case 'cursorTo': {
 				// Collapse consecutive cursorTo: only last matters
-				const prev = result[result.length - 1];
+				const prev = result.at(-1);
 				if (prev?.type === 'cursorTo') {
 					result[result.length - 1] = patch;
 				} else {
@@ -81,10 +87,12 @@ export function optimize(diff: Diff): Diff {
 			}
 
 			case 'styleStr': {
-				if (patch.str === '') continue;
+				if (patch.str === '') {
+					continue;
+				}
 
 				// Concatenate adjacent styleStr patches
-				const prev = result[result.length - 1];
+				const prev = result.at(-1);
 				if (prev?.type === 'styleStr') {
 					result[result.length - 1] = {
 						type: 'styleStr',
@@ -99,7 +107,7 @@ export function optimize(diff: Diff): Diff {
 
 			case 'hyperlink': {
 				// Deduplicate consecutive hyperlink patches
-				const prev = result[result.length - 1];
+				const prev = result.at(-1);
 				if (prev?.type === 'hyperlink' && prev.uri === patch.uri) {
 					continue;
 				}
@@ -121,7 +129,10 @@ export function optimize(diff: Diff): Diff {
 			}
 
 			case 'clear': {
-				if (patch.count === 0) continue;
+				if (patch.count === 0) {
+					continue;
+				}
+
 				result.push(patch);
 				break;
 			}
@@ -153,9 +164,9 @@ export function diffToString(diff: Diff): string {
 			case 'clear': {
 				// CSI n M — delete n lines
 				for (let i = 0; i < patch.count; i++) {
-					result += '\x1b[2K'; // Clear entire line
+					result += '\u001B[2K'; // Clear entire line
 					if (i < patch.count - 1) {
-						result += '\x1b[1A'; // Move up
+						result += '\u001B[1A'; // Move up
 					}
 				}
 
@@ -163,26 +174,35 @@ export function diffToString(diff: Diff): string {
 			}
 
 			case 'cursorHide': {
-				result += '\x1b[?25l';
+				result += '\u001B[?25l';
 				break;
 			}
 
 			case 'cursorShow': {
-				result += '\x1b[?25h';
+				result += '\u001B[?25h';
 				break;
 			}
 
 			case 'cursorMove': {
-				if (patch.y > 0) result += `\x1b[${patch.y}B`; // CUD
-				else if (patch.y < 0) result += `\x1b[${-patch.y}A`; // CUU
+				if (patch.y > 0) {
+					result += `\u001B[${patch.y}B`;
+				} // CUD
+				else if (patch.y < 0) {
+					result += `\u001B[${-patch.y}A`;
+				} // CUU
 
-				if (patch.x > 0) result += `\x1b[${patch.x}C`; // CUF
-				else if (patch.x < 0) result += `\x1b[${-patch.x}D`; // CUB
+				if (patch.x > 0) {
+					result += `\u001B[${patch.x}C`;
+				} // CUF
+				else if (patch.x < 0) {
+					result += `\u001B[${-patch.x}D`;
+				} // CUB
+
 				break;
 			}
 
 			case 'cursorTo': {
-				result += `\x1b[${patch.col}G`; // CHA (1-based)
+				result += `\u001B[${patch.col}G`; // CHA (1-based)
 				break;
 			}
 
@@ -192,11 +212,9 @@ export function diffToString(diff: Diff): string {
 			}
 
 			case 'hyperlink': {
-				if (patch.uri) {
-					result += `\x1b]8;;${patch.uri}\x1b\\`;
-				} else {
-					result += '\x1b]8;;\x1b\\';
-				}
+				result += patch.uri
+					? `\u001B]8;;${patch.uri}\u001B\\`
+					: '\u001B]8;;\u001B\\';
 
 				break;
 			}

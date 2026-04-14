@@ -1,5 +1,7 @@
 import React from 'react';
-import {Box, Text, render, Static} from '../../src/index.js';
+import {
+	Box, Text, render, Static,
+} from '../../src/index.js';
 
 function Example() {
 	const [tests, setTests] = React.useState<
@@ -39,7 +41,7 @@ function Example() {
 			<Static items={tests}>
 				{test => (
 					<Box key={test.id}>
-						<Text color="green">✔ {test.title}</Text>
+						<Text color='green'>✔ {test.title}</Text>
 					</Box>
 				)}
 			</Static>

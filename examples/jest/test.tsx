@@ -29,14 +29,14 @@ type Properties = {
 function Test({status, path}: Properties) {
 	return (
 		<Box>
-			<Text color="black" backgroundColor={getBackgroundForStatus(status)}>
+			<Text color='black' backgroundColor={getBackgroundForStatus(status)}>
 				{` ${status.toUpperCase()} `}
 			</Text>
 
 			<Box marginLeft={1}>
 				<Text dimColor>{path.split('/')[0]}/</Text>
 
-				<Text bold color="white">
+				<Text bold color='white'>
 					{path.split('/')[1]}
 				</Text>
 			</Box>

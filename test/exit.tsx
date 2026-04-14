@@ -77,7 +77,7 @@ test.serial('don’t exit while raw mode is active', async t => {
 	await new Promise<void>((resolve, reject) => {
 		const env: Record<string, string> = {
 			...process.env,
-			// eslint-disable-next-line @typescript-eslint/naming-convention
+
 			NODE_NO_WARNINGS: '1',
 		};
 
@@ -133,7 +133,7 @@ test.serial('don’t exit while raw mode is active', async t => {
 test.serial('exit when DEV is set', async t => {
 	const output = await run('exit-normally', {
 		env: {
-			// eslint-disable-next-line @typescript-eslint/naming-convention
+
 			DEV: 'true',
 		},
 	});

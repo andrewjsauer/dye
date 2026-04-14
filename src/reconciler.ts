@@ -40,13 +40,12 @@ function isEventHandlerProp(key: string): boolean {
 }
 
 function setEventHandler(node: DOMElement, key: string, value: unknown): void {
-	if (!node._eventHandlers) {
-		node._eventHandlers = {};
-	}
+	node._eventHandlers ||= {};
 
-	node._eventHandlers[key] = typeof value === 'function'
-		? value as (...args: unknown[]) => void
-		: undefined;
+	node._eventHandlers[key]
+		= typeof value === 'function'
+			? (value as (...args: unknown[]) => void)
+			: undefined;
 }
 
 // We need to conditionally perform devtools connection to avoid
@@ -126,9 +125,9 @@ async function loadPackageJson() {
 
 	const parsedContent = JSON.parse(content) as
 		| {
-				name?: string;
-				version?: string;
-		  }
+			name?: string;
+			version?: string;
+		}
 		| undefined;
 
 	return {
@@ -146,9 +145,9 @@ if (process.env['DEV'] === 'true') {
 	try {
 		const loaded = await loadPackageJson();
 		packageInfo = {
-			// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+
 			name: loaded.name || packageInfo.name,
-			// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+
 			version: loaded.version || packageInfo.version,
 		};
 	} catch (error) {
@@ -217,11 +216,11 @@ export default createReconciler<
 	shouldSetTextContent: () => false,
 	createInstance(originalType, newProps, rootNode, hostContext) {
 		if (hostContext.isInsideText && originalType === 'ink-box') {
-			throw new Error(`<Box> can’t be nested inside <Text> component`);
+			throw new Error('<Box> can’t be nested inside <Text> component');
 		}
 
-		const type =
-			originalType === 'ink-text' && hostContext.isInsideText
+		const type
+			= originalType === 'ink-text' && hostContext.isInsideText
 				? 'ink-virtual-text'
 				: originalType;
 
@@ -270,9 +269,7 @@ export default createReconciler<
 	},
 	createTextInstance(text, _root, hostContext) {
 		if (!hostContext.isInsideText) {
-			throw new Error(
-				`Text string "${text}" must be rendered inside <Text> component`,
-			);
+			throw new Error(`Text string "${text}" must be rendered inside <Text> component`);
 		}
 
 		return createTextNode(text);
@@ -404,12 +401,10 @@ export default createReconciler<
 		// Return true to enable Suspense resource preloading
 		return true;
 	},
-	// eslint-disable-next-line @typescript-eslint/naming-convention
+
 	NotPendingTransition: undefined,
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	HostTransitionContext: createContext(
-		null,
-	) as unknown as ReactContext<unknown>,
+
+	HostTransitionContext: createContext(null) as unknown as ReactContext<unknown>,
 	resetFormInstance() {},
 	requestPostPaintCallback() {},
 	shouldAttemptEagerTransition() {

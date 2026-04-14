@@ -1,4 +1,6 @@
-import React, {useState, useRef, useEffect, useLayoutEffect} from 'react';
+import React, {
+	useState, useRef, useEffect, useLayoutEffect,
+} from 'react';
 import test from 'ava';
 import delay from 'delay';
 import stripAnsi from 'strip-ansi';
@@ -59,8 +61,8 @@ test('measure element after state update', async t => {
 		}, [items.length]);
 
 		return (
-			<Box flexDirection="column">
-				<Box ref={ref} flexDirection="column">
+			<Box flexDirection='column'>
+				<Box ref={ref} flexDirection='column'>
 					{items.map(item => (
 						<Text key={item}>{item}</Text>
 					))}
@@ -102,8 +104,8 @@ test('measure element after multiple state updates', async t => {
 		}, [items.length]);
 
 		return (
-			<Box flexDirection="column">
-				<Box ref={ref} flexDirection="column">
+			<Box flexDirection='column'>
+				<Box ref={ref} flexDirection='column'>
 					{items.map(item => (
 						<Text key={item}>{item}</Text>
 					))}
@@ -148,8 +150,8 @@ test('measure element in useLayoutEffect after state update', async t => {
 		}, [items.length]);
 
 		return (
-			<Box flexDirection="column">
-				<Box ref={ref} flexDirection="column">
+			<Box flexDirection='column'>
+				<Box ref={ref} flexDirection='column'>
 					{items.map(item => (
 						<Text key={item}>{item}</Text>
 					))}
@@ -201,10 +203,8 @@ test.serial('calculate layout while rendering is throttled', async t => {
 	const writes: string[] = (stdout.write as any)
 		.getCalls()
 		.map((c: any) => c.args[0] as string)
-		.filter(
-			(w: string) =>
-				!w.startsWith('\u001B[?25') && !w.startsWith('\u001B[?2026'),
-		);
+		.filter((w: string) =>
+			!w.startsWith('\u001B[?25') && !w.startsWith('\u001B[?2026'));
 	const lastContentWrite = writes.at(-1)!;
 
 	t.is(stripAnsi(lastContentWrite).trim(), 'Width: 100');

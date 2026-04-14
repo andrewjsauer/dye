@@ -87,10 +87,10 @@ test('buildCursorOnlySequence - builds full sequence with hide prefix when curso
 		visibleLineCount: 1,
 		cursorPosition: {x: 3, y: 0},
 	});
-	const expected =
-		hideCursorEscape +
-		buildReturnToBottom(2, {x: 0, y: 0}) +
-		buildCursorSuffix(1, {x: 3, y: 0});
+	const expected
+		= hideCursorEscape
+			+ buildReturnToBottom(2, {x: 0, y: 0})
+			+ buildCursorSuffix(1, {x: 3, y: 0});
 	t.is(result, expected);
 });
 

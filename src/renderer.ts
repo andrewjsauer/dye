@@ -66,7 +66,11 @@ const renderer = (node: DOMElement, isScreenReaderEnabled: boolean): Result => {
 			});
 		}
 
-		const {output: generatedOutput, height: outputHeight, screen} = output.get();
+		const {
+			output: generatedOutput,
+			height: outputHeight,
+			screen,
+		} = output.get();
 
 		return {
 			output: generatedOutput,

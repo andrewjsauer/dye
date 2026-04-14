@@ -1,6 +1,8 @@
 import process from 'node:process';
 import React, {useEffect} from 'react';
-import {Box, Text, render, useApp} from '../../src/index.js';
+import {
+	Box, Text, render, useApp,
+} from '../../src/index.js';
 
 function Fullscreen() {
 	const {exit} = useApp();
@@ -20,7 +22,7 @@ function Fullscreen() {
 	const rows = Number(process.argv[2]) || 5;
 
 	return (
-		<Box height={rows} flexDirection="column">
+		<Box height={rows} flexDirection='column'>
 			<Box flexGrow={1}>
 				<Text>Full-screen: top</Text>
 			</Box>

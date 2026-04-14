@@ -26,16 +26,16 @@ function Focus() {
 	});
 
 	return (
-		<Box flexDirection="column" padding={1}>
+		<Box flexDirection='column' padding={1}>
 			<Box marginBottom={1}>
 				<Text>
 					Press Tab to focus next element, Shift+Tab to focus previous element,
 					Esc to reset focus.
 				</Text>
 			</Box>
-			<Item id="1" label="Press 1 to focus" />
-			<Item id="2" label="Press 2 to focus" />
-			<Item id="3" label="Press 3 to focus" />
+			<Item id='1' label='Press 1 to focus' />
+			<Item id='2' label='Press 2 to focus' />
+			<Item id='3' label='Press 3 to focus' />
 		</Box>
 	);
 }
@@ -50,7 +50,7 @@ function Item({label, id}: ItemProperties) {
 
 	return (
 		<Text>
-			{label} {isFocused ? <Text color="green">(focused)</Text> : null}
+			{label} {isFocused ? <Text color='green'>(focused)</Text> : null}
 		</Text>
 	);
 }

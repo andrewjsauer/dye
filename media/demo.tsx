@@ -1,5 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import {render, Box, Text, useApp} from '../src/index.js';
+import {
+	render, Box, Text, useApp,
+} from '../src/index.js';
 
 function Counter() {
 	const [i, setI] = useState(0);
@@ -22,16 +24,16 @@ function Counter() {
 	}, [exit]);
 
 	return (
-		<Box flexDirection="column">
+		<Box flexDirection='column'>
 			<Box>
-				<Text color="blue">~/Projects/ink </Text>
+				<Text color='blue'>~/Projects/ink </Text>
 			</Box>
 			<Box>
-				<Text color="magenta">❯ </Text>
-				<Text color="green">node </Text>
+				<Text color='magenta'>❯ </Text>
+				<Text color='green'>node </Text>
 				<Text>media/example</Text>
 			</Box>
-			<Text color="green">{i} tests passed</Text>
+			<Text color='green'>{i} tests passed</Text>
 		</Box>
 	);
 }

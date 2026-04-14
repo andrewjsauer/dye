@@ -18,10 +18,10 @@ type Run = (
 export const run: Run = async (fixture, props) => {
 	const env: Record<string, string> = {
 		...(process.env as Record<string, string>),
-		// eslint-disable-next-line @typescript-eslint/naming-convention
+
 		CI: 'false',
 		...props?.env,
-		// eslint-disable-next-line @typescript-eslint/naming-convention
+
 		NODE_NO_WARNINGS: '1',
 	};
 

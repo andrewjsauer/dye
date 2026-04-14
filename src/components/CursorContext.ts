@@ -10,7 +10,6 @@ export type Props = {
 	readonly setCursorPosition: (position: CursorPosition | undefined) => void;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const CursorContext = createContext<Props>({
 	setCursorPosition() {},
 });

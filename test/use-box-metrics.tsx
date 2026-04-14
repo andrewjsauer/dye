@@ -41,7 +41,7 @@ test('returns correct position', async t => {
 		const ref = useRef<DOMElement>(null);
 		const {left, top} = useBoxMetrics(ref);
 		return (
-			<Box flexDirection="column">
+			<Box flexDirection='column'>
 				<Text>first line</Text>
 				<Box ref={ref} marginLeft={5}>
 					<Text>
@@ -102,7 +102,7 @@ test('uses latest tracked ref when terminal is resized', async t => {
 		};
 
 		return (
-			<Box flexDirection="column">
+			<Box flexDirection='column'>
 				<Box ref={firstRef}>
 					<Text>short</Text>
 				</Box>
@@ -147,8 +147,8 @@ test('updates when sibling content changes', async t => {
 		externalSetSiblingText = setSiblingText;
 
 		return (
-			<Box flexDirection="column">
-				<Box ref={ref} flexDirection="column">
+			<Box flexDirection='column'>
+				<Box ref={ref} flexDirection='column'>
 					<Text>{siblingText}</Text>
 				</Box>
 				<Text>Height: {height}</Text>
@@ -172,7 +172,7 @@ test('updates when sibling content changes but tracked component is memoized', a
 	const stdout = createStdout(100);
 	let externalSetSiblingText!: (text: string) => void;
 
-	const MemoizedTrackedBox = React.memo(function () {
+	const MemoizedTrackedBox = React.memo(() => {
 		const ref = useRef<DOMElement>(null);
 		const {top} = useBoxMetrics(ref);
 
@@ -188,7 +188,7 @@ test('updates when sibling content changes but tracked component is memoized', a
 		externalSetSiblingText = setSiblingText;
 
 		return (
-			<Box flexDirection="column">
+			<Box flexDirection='column'>
 				<Text>{siblingText}</Text>
 				<MemoizedTrackedBox />
 			</Box>
@@ -213,32 +213,34 @@ test('updates when tracked ref attaches after initial render and component is me
 	let externalSetSiblingText!: (text: string) => void;
 	let externalSetIsTrackedElementMounted!: (value: boolean) => void;
 
-	const MemoizedTrackedBox = React.memo(function ({
+	const MemoizedTrackedBox = React.memo(({
 		isTrackedElementMounted,
 	}: {
 		readonly isTrackedElementMounted: boolean;
-	}) {
+	}) => {
 		const ref = useRef<DOMElement>(null);
 		const {top} = useBoxMetrics(ref);
 
-		return isTrackedElementMounted ? (
-			<Box ref={ref}>
+		return isTrackedElementMounted
+			? (
+				<Box ref={ref}>
+					<Text>Top: {top}</Text>
+				</Box>
+			)
+			: (
 				<Text>Top: {top}</Text>
-			</Box>
-		) : (
-			<Text>Top: {top}</Text>
-		);
+			);
 	});
 
 	function Test() {
 		const [siblingText, setSiblingText] = useState('line 1');
-		const [isTrackedElementMounted, setIsTrackedElementMounted] =
-			useState(false);
+		const [isTrackedElementMounted, setIsTrackedElementMounted]
+			= useState(false);
 		externalSetSiblingText = setSiblingText;
 		externalSetIsTrackedElementMounted = setIsTrackedElementMounted;
 
 		return (
-			<Box flexDirection="column">
+			<Box flexDirection='column'>
 				<Text>{siblingText}</Text>
 				<MemoizedTrackedBox isTrackedElementMounted={isTrackedElementMounted} />
 			</Box>
@@ -389,15 +391,17 @@ test('hasMeasured resets when tracked ref switches to a detached element', async
 		};
 
 		return (
-			<Box flexDirection="column">
+			<Box flexDirection='column'>
 				<Box ref={firstRef}>
 					<Text>First</Text>
 				</Box>
-				{isSecondRefMounted ? (
-					<Box ref={secondRef}>
-						<Text>Second</Text>
-					</Box>
-				) : undefined}
+				{isSecondRefMounted
+					? (
+						<Box ref={secondRef}>
+							<Text>Second</Text>
+						</Box>
+					)
+					: undefined}
 				<Text>Has measured: {String(hasMeasured)}</Text>
 			</Box>
 		);
@@ -428,8 +432,8 @@ test('hasMeasured becomes true after the tracked element is measured', async t =
 
 	function Test() {
 		const ref = useRef<DOMElement>(null);
-		const [isTrackedElementMounted, setIsTrackedElementMounted] =
-			useState(false);
+		const [isTrackedElementMounted, setIsTrackedElementMounted]
+			= useState(false);
 		const {hasMeasured} = useBoxMetrics(ref);
 
 		mountTrackedElement = () => {
@@ -437,12 +441,14 @@ test('hasMeasured becomes true after the tracked element is measured', async t =
 		};
 
 		return (
-			<Box flexDirection="column">
-				{isTrackedElementMounted ? (
-					<Box ref={ref}>
-						<Text>Tracked</Text>
-					</Box>
-				) : undefined}
+			<Box flexDirection='column'>
+				{isTrackedElementMounted
+					? (
+						<Box ref={ref}>
+							<Text>Tracked</Text>
+						</Box>
+					)
+					: undefined}
 				<Text>Has measured: {String(hasMeasured)}</Text>
 			</Box>
 		);
@@ -467,8 +473,8 @@ test('resets metrics when tracked element unmounts', async t => {
 
 	function Test() {
 		const ref = useRef<DOMElement>(null);
-		const [isTrackedElementMounted, setIsTrackedElementMounted] =
-			useState(true);
+		const [isTrackedElementMounted, setIsTrackedElementMounted]
+			= useState(true);
 		const {width, height, left, top, hasMeasured} = useBoxMetrics(ref);
 
 		unmountTrackedElement = () => {
@@ -476,12 +482,14 @@ test('resets metrics when tracked element unmounts', async t => {
 		};
 
 		return (
-			<Box flexDirection="column">
-				{isTrackedElementMounted ? (
-					<Box ref={ref} width={10}>
-						<Text>1234567890</Text>
-					</Box>
-				) : undefined}
+			<Box flexDirection='column'>
+				{isTrackedElementMounted
+					? (
+						<Box ref={ref} width={10}>
+							<Text>1234567890</Text>
+						</Box>
+					)
+					: undefined}
 				<Text>
 					Metrics: {width},{height},{left},{top},{String(hasMeasured)}
 				</Text>

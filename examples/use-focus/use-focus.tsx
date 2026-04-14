@@ -1,18 +1,20 @@
 import React from 'react';
-import {Box, Text, render, useFocus} from '../../src/index.js';
+import {
+	Box, Text, render, useFocus,
+} from '../../src/index.js';
 
 function Focus() {
 	return (
-		<Box flexDirection="column" padding={1}>
+		<Box flexDirection='column' padding={1}>
 			<Box marginBottom={1}>
 				<Text>
 					Press Tab to focus next element, Shift+Tab to focus previous element,
 					Esc to reset focus.
 				</Text>
 			</Box>
-			<Item label="First" />
-			<Item label="Second" />
-			<Item label="Third" />
+			<Item label='First' />
+			<Item label='Second' />
+			<Item label='Third' />
 		</Box>
 	);
 }
@@ -21,7 +23,7 @@ function Item({label}: {readonly label: string}) {
 	const {isFocused} = useFocus();
 	return (
 		<Text>
-			{label} {isFocused ? <Text color="green">(focused)</Text> : null}
+			{label} {isFocused ? <Text color='green'>(focused)</Text> : null}
 		</Text>
 	);
 }

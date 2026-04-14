@@ -507,9 +507,7 @@ const applyFlexStyles = (node: YogaNode, style: Styles): void => {
 	}
 
 	if ('flexShrink' in style) {
-		node.setFlexShrink(
-			typeof style.flexShrink === 'number' ? style.flexShrink : 1,
-		);
+		node.setFlexShrink(typeof style.flexShrink === 'number' ? style.flexShrink : 1);
 	}
 
 	if ('flexWrap' in style) {
@@ -720,9 +718,7 @@ const applyDimensionStyles = (node: YogaNode, style: Styles): void => {
 
 const applyDisplayStyles = (node: YogaNode, style: Styles): void => {
 	if ('display' in style) {
-		node.setDisplay(
-			style.display === 'flex' ? Yoga.DISPLAY_FLEX : Yoga.DISPLAY_NONE,
-		);
+		node.setDisplay(style.display === 'flex' ? Yoga.DISPLAY_FLEX : Yoga.DISPLAY_NONE);
 	}
 };
 
@@ -731,12 +727,12 @@ const applyBorderStyles = (
 	style: Styles,
 	currentStyle: Styles,
 ): void => {
-	const hasBorderChanges =
-		'borderStyle' in style ||
-		'borderTop' in style ||
-		'borderBottom' in style ||
-		'borderLeft' in style ||
-		'borderRight' in style;
+	const hasBorderChanges
+		= 'borderStyle' in style
+			|| 'borderTop' in style
+			|| 'borderBottom' in style
+			|| 'borderLeft' in style
+			|| 'borderRight' in style;
 
 	if (!hasBorderChanges) {
 		return;

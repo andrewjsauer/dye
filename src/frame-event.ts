@@ -33,7 +33,7 @@ export type FrameEvent = {
 	readonly patchCount: number;
 	/** Number of cells that differed between frames. */
 	readonly changedCellCount: number;
-	/** performance.now() timestamp when the frame started. */
+	/** Performance.now() timestamp when the frame started. */
 	readonly timestamp: number;
 };
 

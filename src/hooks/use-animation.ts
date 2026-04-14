@@ -74,11 +74,11 @@ export default function useAnimation(options?: Options): AnimationResult {
 	const lastRenderTimeRef = useRef(0);
 	const previousOptionsRef = useRef({isActive, safeInterval, resetKey});
 	const previousOptions = previousOptionsRef.current;
-	const shouldReset =
-		isActive &&
-		(safeInterval !== previousOptions.safeInterval ||
-			!previousOptions.isActive ||
-			resetKey !== previousOptions.resetKey);
+	const shouldReset
+		= isActive
+			&& (safeInterval !== previousOptions.safeInterval
+				|| !previousOptions.isActive
+				|| resetKey !== previousOptions.resetKey);
 
 	const reset = useCallback(() => {
 		setResetKey(k => k + 1);
@@ -99,8 +99,8 @@ export default function useAnimation(options?: Options): AnimationResult {
 
 		const {startTime: subscriberStartTime, unsubscribe} = subscribe(
 			currentTime => {
-				const isThrottled =
-					renderThrottleMs > 0 && currentTime < nextRenderTimeRef.current;
+				const isThrottled
+					= renderThrottleMs > 0 && currentTime < nextRenderTimeRef.current;
 
 				if (isThrottled) {
 					// Coalesce intermediate ticks while Ink is inside the current

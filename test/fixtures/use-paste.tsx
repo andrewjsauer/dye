@@ -1,6 +1,8 @@
 import process from 'node:process';
 import React from 'react';
-import {render, useApp, useInput, usePaste} from '../../src/index.js';
+import {
+	render, useApp, useInput, usePaste,
+} from '../../src/index.js';
 
 function PasteDemo({test}: {readonly test: string | undefined}) {
 	const {exit} = useApp();
@@ -23,9 +25,7 @@ function PasteDemo({test}: {readonly test: string | undefined}) {
 
 	useInput(
 		input => {
-			throw new Error(
-				`useInput received input during paste: ${JSON.stringify(input)}`,
-			);
+			throw new Error(`useInput received input during paste: ${JSON.stringify(input)}`);
 		},
 		{isActive: test === 'noUseInput'},
 	);
@@ -64,9 +64,7 @@ function MultipleHooksDemo() {
 }
 
 const test = process.argv[2];
-const app = render(
-	test === 'multipleHooks' ? <MultipleHooksDemo /> : <PasteDemo test={test} />,
-);
+const app = render(test === 'multipleHooks' ? <MultipleHooksDemo /> : <PasteDemo test={test} />);
 
 await app.waitUntilExit();
 console.log('exited');

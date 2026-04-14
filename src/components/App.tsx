@@ -69,26 +69,19 @@ function App({
 	renderThrottleMs,
 }: Props): React.ReactNode {
 	const [isFocusEnabled, setIsFocusEnabled] = useState(true);
-	const [activeFocusId, setActiveFocusId] = useState<string | undefined>(
-		undefined,
-	);
+	const [activeFocusId, setActiveFocusId] = useState<string | undefined>(undefined);
 	// Focusables array is managed internally via setFocusables callback pattern
-	// eslint-disable-next-line react/hook-use-state
 	const [, setFocusables] = useState<Focusable[]>([]);
 	// Track focusables count for tab navigation check (avoids stale closure)
 	const focusablesCountRef = useRef(0);
-	const animationSubscribersRef = useRef(
-		new Map<(currentTime: number) => void, AnimationSubscriber>(),
-	);
-	const animationTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-		undefined,
-	);
+	const animationSubscribersRef = useRef(new Map<(currentTime: number) => void, AnimationSubscriber>());
+	const animationTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 	// Count how many components enabled raw mode to avoid disabling
 	// raw mode until all components don't need it anymore
 	const rawModeEnabledCount = useRef(0);
 	// Count how many components enabled bracketed paste mode
 	const bracketedPasteModeEnabledCount = useRef(0);
-	// eslint-disable-next-line @typescript-eslint/naming-convention
+
 	const internal_eventEmitter = useRef(new EventEmitter());
 	// Each useInput hook adds a listener, so the count can legitimately exceed the default limit of 10.
 	internal_eventEmitter.current.setMaxListeners(Infinity);
@@ -147,8 +140,8 @@ function App({
 				const elapsedFrames = Math.floor(elapsedTime / subscriber.interval) + 1;
 				// Advance from elapsed time rather than callback count so delayed
 				// ticks catch up instead of stretching the animation timeline.
-				subscriber.nextDueTime =
-					subscriber.startTime + elapsedFrames * subscriber.interval;
+				subscriber.nextDueTime
+					= subscriber.startTime + elapsedFrames * subscriber.interval;
 			}
 
 			scheduleAnimationTick();
@@ -190,10 +183,8 @@ function App({
 		[clearAnimationTimer, scheduleAnimationTick],
 	);
 
-	useEffect(() => {
-		return () => {
-			clearAnimationTimer();
-		};
+	useEffect(() => () => {
+		clearAnimationTimer();
 	}, [clearAnimationTimer]);
 
 	// Determines if TTY is supported on the provided stdin
@@ -296,15 +287,8 @@ function App({
 	const handleSetRawMode = useCallback(
 		(isEnabled: boolean): void => {
 			if (!isRawModeSupported) {
-				if (stdin === process.stdin) {
-					throw new Error(
-						'Raw mode is not supported on the current process.stdin, which Ink uses as input stream by default.\nRead about how to prevent this error on https://github.com/vadimdemedes/ink/#israwmodesupported',
-					);
-				} else {
-					throw new Error(
-						'Raw mode is not supported on the stdin provided to Ink.\nRead about how to prevent this error on https://github.com/vadimdemedes/ink/#israwmodesupported',
-					);
-				}
+				const error = stdin === process.stdin ? new Error('Raw mode is not supported on the current process.stdin, which Ink uses as input stream by default.\nRead about how to prevent this error on https://github.com/vadimdemedes/ink/#israwmodesupported') : new Error('Raw mode is not supported on the stdin provided to Ink.\nRead about how to prevent this error on https://github.com/vadimdemedes/ink/#israwmodesupported');
+				throw error;
 			}
 
 			stdin.setEncoding('utf8');
@@ -367,9 +351,7 @@ function App({
 			currentFocusables: Focusable[],
 			currentActiveFocusId: string | undefined,
 		): string | undefined => {
-			const activeIndex = currentFocusables.findIndex(focusable => {
-				return focusable.id === currentActiveFocusId;
-			});
+			const activeIndex = currentFocusables.findIndex(focusable => focusable.id === currentActiveFocusId);
 
 			for (
 				let index = activeIndex + 1;
@@ -393,9 +375,7 @@ function App({
 			currentFocusables: Focusable[],
 			currentActiveFocusId: string | undefined,
 		): string | undefined => {
-			const activeIndex = currentFocusables.findIndex(focusable => {
-				return focusable.id === currentActiveFocusId;
-			});
+			const activeIndex = currentFocusables.findIndex(focusable => focusable.id === currentActiveFocusId);
 
 			for (let index = activeIndex - 1; index >= 0; index--) {
 				const focusable = currentFocusables[index];
@@ -413,9 +393,7 @@ function App({
 	const focusNext = useCallback((): void => {
 		setFocusables(currentFocusables => {
 			setActiveFocusId(currentActiveFocusId => {
-				const firstFocusableId = currentFocusables.find(
-					focusable => focusable.isActive,
-				)?.id;
+				const firstFocusableId = currentFocusables.find(focusable => focusable.isActive)?.id;
 				const nextFocusableId = findNextFocusable(
 					currentFocusables,
 					currentActiveFocusId,
@@ -430,9 +408,7 @@ function App({
 	const focusPrevious = useCallback((): void => {
 		setFocusables(currentFocusables => {
 			setActiveFocusId(currentActiveFocusId => {
-				const lastFocusableId = currentFocusables.findLast(
-					focusable => focusable.isActive,
-				)?.id;
+				const lastFocusableId = currentFocusables.findLast(focusable => focusable.isActive)?.id;
 				const previousFocusableId = findPreviousFocusable(
 					currentFocusables,
 					currentActiveFocusId,
@@ -447,7 +423,9 @@ function App({
 	// Handle tab navigation via effect that subscribes to input events
 	useEffect(() => {
 		const handleTabNavigation = (input: string): void => {
-			if (!isFocusEnabled || focusablesCountRef.current === 0) return;
+			if (!isFocusEnabled || focusablesCountRef.current === 0) {
+				return;
+			}
 
 			if (input === tab) {
 				focusNext();
@@ -476,9 +454,7 @@ function App({
 
 	const focus = useCallback((id: string): void => {
 		setFocusables(currentFocusables => {
-			const hasFocusableId = currentFocusables.some(
-				focusable => focusable?.id === id,
-			);
+			const hasFocusableId = currentFocusables.some(focusable => focusable?.id === id);
 
 			if (hasFocusableId) {
 				setActiveFocusId(id);
@@ -525,9 +501,7 @@ function App({
 		});
 
 		setFocusables(currentFocusables => {
-			const filtered = currentFocusables.filter(focusable => {
-				return focusable.id !== id;
-			});
+			const filtered = currentFocusables.filter(focusable => focusable.id !== id);
 			focusablesCountRef.current = filtered.length;
 
 			return filtered;
@@ -545,8 +519,7 @@ function App({
 					id,
 					isActive: true,
 				};
-			}),
-		);
+			}));
 	}, []);
 
 	const deactivateFocusable = useCallback((id: string): void => {
@@ -568,31 +541,28 @@ function App({
 					id,
 					isActive: false,
 				};
-			}),
-		);
+			}));
 	}, []);
 
 	// Handle cursor visibility, raw mode, and bracketed paste mode cleanup on unmount
-	useEffect(() => {
-		return () => {
-			const canWriteToStdout = !stdout.destroyed && !stdout.writableEnded;
+	useEffect(() => () => {
+		const canWriteToStdout = !stdout.destroyed && !stdout.writableEnded;
 
-			if (interactive && canWriteToStdout) {
-				cliCursor.show(stdout);
+		if (interactive && canWriteToStdout) {
+			cliCursor.show(stdout);
+		}
+
+		if (isRawModeSupported && rawModeEnabledCount.current > 0) {
+			disableRawMode();
+		}
+
+		if (bracketedPasteModeEnabledCount.current > 0) {
+			if (stdout.isTTY && canWriteToStdout) {
+				stdout.write('\u001B[?2004l');
 			}
 
-			if (isRawModeSupported && rawModeEnabledCount.current > 0) {
-				disableRawMode();
-			}
-
-			if (bracketedPasteModeEnabledCount.current > 0) {
-				if (stdout.isTTY && canWriteToStdout) {
-					stdout.write('\u001B[?2004l');
-				}
-
-				bracketedPasteModeEnabledCount.current = 0;
-			}
-		};
+			bracketedPasteModeEnabledCount.current = 0;
+		}
 	}, [stdout, isRawModeSupported, disableRawMode, interactive]);
 
 	// Memoize context values to prevent unnecessary re-renders
@@ -610,9 +580,9 @@ function App({
 			setRawMode: handleSetRawMode,
 			setBracketedPasteMode: handleSetBracketedPasteMode,
 			isRawModeSupported,
-			// eslint-disable-next-line @typescript-eslint/naming-convention
+
 			internal_exitOnCtrlC: exitOnCtrlC,
-			// eslint-disable-next-line @typescript-eslint/naming-convention
+
 			internal_eventEmitter: internal_eventEmitter.current,
 		}),
 		[

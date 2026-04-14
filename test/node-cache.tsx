@@ -1,9 +1,14 @@
 import test from 'ava';
 import React from 'react';
 import {Box, Text} from '../src/index.js';
-import {renderToString} from './helpers/render-to-string.js';
-import {getNodeRect, hitTest, clearNodeCache, recordNodeRect} from '../src/node-cache.js';
+import {
+	getNodeRect,
+	hitTest,
+	clearNodeCache,
+	recordNodeRect,
+} from '../src/node-cache.js';
 import {type DOMElement, createNode} from '../src/dom.js';
+import {renderToString} from './helpers/render-to-string.js';
 
 // ---------------------------------------------------------------------------
 // Unit tests for node-cache (standalone, no render pipeline)
@@ -14,7 +19,9 @@ test('recordNodeRect stores rect and getNodeRect retrieves it', t => {
 	const node = createNode('ink-box');
 	recordNodeRect(node, 5, 10, 20, 15);
 	const rect = getNodeRect(node);
-	t.deepEqual(rect, {x: 5, y: 10, width: 20, height: 15});
+	t.deepEqual(rect, {
+		x: 5, y: 10, width: 20, height: 15,
+	});
 });
 
 test('getNodeRect returns undefined for unrecorded nodes', t => {
@@ -38,7 +45,9 @@ test('recordNodeRect overwrites previous rect', t => {
 	recordNodeRect(node, 0, 0, 10, 10);
 	recordNodeRect(node, 5, 5, 20, 20);
 	const rect = getNodeRect(node);
-	t.deepEqual(rect, {x: 5, y: 5, width: 20, height: 20});
+	t.deepEqual(rect, {
+		x: 5, y: 5, width: 20, height: 20,
+	});
 });
 
 // ---------------------------------------------------------------------------
@@ -95,7 +104,7 @@ test('hitTest returns last child when siblings overlap (topmost wins)', t => {
 
 	recordNodeRect(root, 0, 0, 80, 24);
 	recordNodeRect(child1, 0, 0, 20, 10);
-	recordNodeRect(child2, 5, 0, 20, 10); // overlaps with child1
+	recordNodeRect(child2, 5, 0, 20, 10); // Overlaps with child1
 
 	// Point in the overlap region: child2 is last (topmost)
 	t.is(hitTest(root, 10, 5), child2);
@@ -115,7 +124,7 @@ test('hitTest skips nodes without cached rects (display:none)', t => {
 
 	recordNodeRect(root, 0, 0, 80, 24);
 	recordNodeRect(visible, 0, 0, 20, 10);
-	// hidden has no recorded rect (simulating display: none)
+	// Hidden has no recorded rect (simulating display: none)
 
 	t.is(hitTest(root, 5, 5), visible);
 	// Point outside visible but inside root — should return root, not hidden
@@ -128,10 +137,14 @@ test('hitTest skips nodes without cached rects (display:none)', t => {
 
 test('render populates node cache for root node', t => {
 	// Render a simple component — the cache is populated during rendering
-	renderToString(<Box width={20} height={3}><Text>Hello</Text></Box>);
+	renderToString(<Box width={20} height={3}>
+		<Text>Hello</Text>
+	</Box>);
 
 	// We can't easily get a reference to the DOMElement from the public API,
 	// but we can verify the render doesn't crash and the output is correct
-	const output = renderToString(<Box width={20} height={3}><Text>Hello</Text></Box>);
+	const output = renderToString(<Box width={20} height={3}>
+		<Text>Hello</Text>
+	</Box>);
 	t.true(output.includes('Hello'));
 });

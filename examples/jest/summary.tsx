@@ -10,18 +10,18 @@ type Properties = {
 
 function Summary({isFinished, passed, failed, time}: Properties) {
 	return (
-		<Box flexDirection="column" marginTop={1}>
+		<Box flexDirection='column' marginTop={1}>
 			<Box>
 				<Box width={14}>
 					<Text bold>Test Suites:</Text>
 				</Box>
 				{failed > 0 && (
-					<Text bold color="red">
+					<Text bold color='red'>
 						{failed} failed,{' '}
 					</Text>
 				)}
 				{passed > 0 && (
-					<Text bold color="green">
+					<Text bold color='green'>
 						{passed} passed,{' '}
 					</Text>
 				)}
@@ -36,11 +36,13 @@ function Summary({isFinished, passed, failed, time}: Properties) {
 				<Text>{time}</Text>
 			</Box>
 
-			{isFinished ? (
-				<Box>
-					<Text dimColor>Ran all test suites.</Text>
-				</Box>
-			) : null}
+			{isFinished
+				? (
+					<Box>
+						<Text dimColor>Ran all test suites.</Text>
+					</Box>
+				)
+				: null}
 		</Box>
 	);
 }

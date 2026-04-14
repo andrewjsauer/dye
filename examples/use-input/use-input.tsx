@@ -1,5 +1,7 @@
 import React from 'react';
-import {render, useInput, useApp, Box, Text} from '../../src/index.js';
+import {
+	render, useInput, useApp, Box, Text,
+} from '../../src/index.js';
 
 function Robot() {
 	const {exit} = useApp();
@@ -29,7 +31,7 @@ function Robot() {
 	});
 
 	return (
-		<Box flexDirection="column">
+		<Box flexDirection='column'>
 			<Text>Use arrow keys to move the face. Press “q” to exit.</Text>
 			<Box height={12} paddingLeft={x} paddingTop={y}>
 				<Text>^_^</Text>

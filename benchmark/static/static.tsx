@@ -1,5 +1,7 @@
 import React from 'react';
-import {render, Box, Text, Static} from '../../src/index.js';
+import {
+	render, Box, Text, Static,
+} from '../../src/index.js';
 
 function App() {
 	const [items, setItems] = React.useState<
@@ -35,19 +37,18 @@ function App() {
 	}, []);
 
 	return (
-		<Box flexDirection="column">
+		<Box flexDirection='column'>
 			<Static items={items}>
 				{(item, index) => (
-					<Box key={item.id} padding={1} flexDirection="column">
-						<Text color="green">Item #{index}</Text>
+					<Box key={item.id} padding={1} flexDirection='column'>
+						<Text color='green'>Item #{index}</Text>
 						<Text>Item content</Text>
 					</Box>
 				)}
 			</Static>
 
-			<Box flexDirection="column" padding={1}>
-				<Text underline bold color="red">
-					{/* eslint-disable-next-line react/jsx-curly-brace-presence */}
+			<Box flexDirection='column' padding={1}>
+				<Text underline bold color='red'>
 					{'Hello World'}
 				</Text>
 
@@ -61,20 +62,20 @@ function App() {
 					</Text>
 				</Box>
 
-				<Box marginTop={1} flexDirection="column">
-					<Text backgroundColor="white" color="black">
+				<Box marginTop={1} flexDirection='column'>
+					<Text backgroundColor='white' color='black'>
 						Colors:
 					</Text>
 
-					<Box flexDirection="column" paddingLeft={1}>
+					<Box flexDirection='column' paddingLeft={1}>
 						<Text>
-							- <Text color="red">Red</Text>
+							- <Text color='red'>Red</Text>
 						</Text>
 						<Text>
-							- <Text color="blue">Blue</Text>
+							- <Text color='blue'>Blue</Text>
 						</Text>
 						<Text>
-							- <Text color="green">Green</Text>
+							- <Text color='green'>Green</Text>
 						</Text>
 					</Box>
 				</Box>

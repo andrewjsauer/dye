@@ -14,18 +14,14 @@ test('preserve SGR sequences', t => {
 });
 
 test('preserve OSC hyperlinks', t => {
-	const output = sanitizeAnsi(
-		'\u001B]8;;https://example.com\u001B\\link\u001B]8;;\u001B\\',
-	);
+	const output = sanitizeAnsi('\u001B]8;;https://example.com\u001B\\link\u001B]8;;\u001B\\');
 
 	t.true(output.includes('\u001B]8;;https://example.com'));
 	t.is(stripAnsi(output), 'link');
 });
 
 test('preserve OSC hyperlinks terminated by C1 ST', t => {
-	const output = sanitizeAnsi(
-		'\u001B]8;;https://example.com\u009Clink\u001B]8;;\u009C',
-	);
+	const output = sanitizeAnsi('\u001B]8;;https://example.com\u009Clink\u001B]8;;\u009C');
 
 	t.true(output.includes('\u001B]8;;https://example.com\u009C'));
 	t.is(stripAnsi(output), 'link');
@@ -86,13 +82,11 @@ test('strip private-parameter m-sequences that are not SGR', t => {
 });
 
 test('strip tmux DCS passthrough wrappers with escaped ST payload terminators', t => {
-	const wrappedHyperlinkStart =
-		'\u001BPtmux;\u001B\u001B]8;;https://example.com\u001B\u001B\\\u001B\\';
-	const wrappedHyperlinkEnd =
-		'\u001BPtmux;\u001B\u001B]8;;\u001B\u001B\\\u001B\\';
-	const output = sanitizeAnsi(
-		`${wrappedHyperlinkStart}link${wrappedHyperlinkEnd}`,
-	);
+	const wrappedHyperlinkStart
+		= '\u001BPtmux;\u001B\u001B]8;;https://example.com\u001B\u001B\\\u001B\\';
+	const wrappedHyperlinkEnd
+		= '\u001BPtmux;\u001B\u001B]8;;\u001B\u001B\\\u001B\\';
+	const output = sanitizeAnsi(`${wrappedHyperlinkStart}link${wrappedHyperlinkEnd}`);
 
 	t.false(output.includes('tmux;'));
 	t.false(output.includes('\u001BP'));

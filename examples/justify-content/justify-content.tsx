@@ -3,10 +3,10 @@ import {render, Box, Text} from '../../src/index.js';
 
 function JustifyContent() {
 	return (
-		<Box flexDirection="column">
+		<Box flexDirection='column'>
 			<Box>
 				<Text>[</Text>
-				<Box justifyContent="flex-start" width={20} height={1}>
+				<Box justifyContent='flex-start' width={20} height={1}>
 					<Text>X</Text>
 					<Text>Y</Text>
 				</Box>
@@ -14,7 +14,7 @@ function JustifyContent() {
 			</Box>
 			<Box>
 				<Text>[</Text>
-				<Box justifyContent="flex-end" width={20} height={1}>
+				<Box justifyContent='flex-end' width={20} height={1}>
 					<Text>X</Text>
 					<Text>Y</Text>
 				</Box>
@@ -22,7 +22,7 @@ function JustifyContent() {
 			</Box>
 			<Box>
 				<Text>[</Text>
-				<Box justifyContent="center" width={20} height={1}>
+				<Box justifyContent='center' width={20} height={1}>
 					<Text>X</Text>
 					<Text>Y</Text>
 				</Box>
@@ -30,7 +30,7 @@ function JustifyContent() {
 			</Box>
 			<Box>
 				<Text>[</Text>
-				<Box justifyContent="space-around" width={20} height={1}>
+				<Box justifyContent='space-around' width={20} height={1}>
 					<Text>X</Text>
 					<Text>Y</Text>
 				</Box>
@@ -38,7 +38,7 @@ function JustifyContent() {
 			</Box>
 			<Box>
 				<Text>[</Text>
-				<Box justifyContent="space-between" width={20} height={1}>
+				<Box justifyContent='space-between' width={20} height={1}>
 					<Text>X</Text>
 					<Text>Y</Text>
 				</Box>
@@ -46,7 +46,7 @@ function JustifyContent() {
 			</Box>
 			<Box>
 				<Text>[</Text>
-				<Box justifyContent="space-evenly" width={20} height={1}>
+				<Box justifyContent='space-evenly' width={20} height={1}>
 					<Text>X</Text>
 					<Text>Y</Text>
 				</Box>

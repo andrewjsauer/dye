@@ -29,17 +29,15 @@ test('render nested text components', t => {
 		return <Text>World</Text>;
 	}
 
-	const output = renderToString(
-		<Text>
-			Hello <World />
-		</Text>,
-	);
+	const output = renderToString(<Text>
+		Hello <World />
+	</Text>);
 
 	t.is(output, 'Hello World');
 });
 
 test('render empty fragment', t => {
-	const output = renderToString(<></>); // eslint-disable-line react/jsx-no-useless-fragment
+	const output = renderToString(<></>);
 	t.is(output, '');
 });
 
@@ -51,97 +49,81 @@ test('render null children', t => {
 // ── Layout ──────────────────────────────────────────────
 
 test('render box with padding', t => {
-	const output = renderToString(
-		<Box paddingLeft={2}>
-			<Text>Padded</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box paddingLeft={2}>
+		<Text>Padded</Text>
+	</Box>);
 
 	t.is(output, '  Padded');
 });
 
 test('render box with flex direction row', t => {
-	const output = renderToString(
-		<Box>
-			<Text>A</Text>
-			<Text>B</Text>
-			<Text>C</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box>
+		<Text>A</Text>
+		<Text>B</Text>
+		<Text>C</Text>
+	</Box>);
 
 	t.is(output, 'ABC');
 });
 
 test('render box with flex direction column', t => {
-	const output = renderToString(
-		<Box flexDirection="column">
-			<Text>Line 1</Text>
-			<Text>Line 2</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box flexDirection='column'>
+		<Text>Line 1</Text>
+		<Text>Line 2</Text>
+	</Box>);
 
 	t.is(output, 'Line 1\nLine 2');
 });
 
 test('render margin', t => {
-	const output = renderToString(
-		<Box marginLeft={2}>
-			<Text>Margined</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box marginLeft={2}>
+		<Text>Margined</Text>
+	</Box>);
 
 	t.is(output, '  Margined');
 });
 
 test('render gap between items', t => {
-	const output = renderToString(
-		<Box gap={1}>
-			<Text>A</Text>
-			<Text>B</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box gap={1}>
+		<Text>A</Text>
+		<Text>B</Text>
+	</Box>);
 
 	t.is(output, 'A B');
 });
 
 test('render box with fixed width and height', t => {
-	const output = renderToString(
-		<Box width={10} height={3}>
-			<Text>Hi</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={10} height={3}>
+		<Text>Hi</Text>
+	</Box>);
 
 	const lines = output.split('\n');
 	t.is(lines.length, 3);
 });
 
 test('render spacer pushes content apart', t => {
-	const output = renderToString(
-		<Box width={20}>
-			<Text>Left</Text>
-			<Spacer />
-			<Text>Right</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={20}>
+		<Text>Left</Text>
+		<Spacer />
+		<Text>Right</Text>
+	</Box>);
 
 	t.is(output, 'Left           Right');
 });
 
 test('render newline inserts blank line', t => {
-	const output = renderToString(
-		<Box flexDirection="column">
-			<Text>Above</Text>
-			<Newline />
-			<Text>Below</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box flexDirection='column'>
+		<Text>Above</Text>
+		<Newline />
+		<Text>Below</Text>
+	</Box>);
 
 	t.is(output, 'Above\n\n\nBelow');
 });
 
 test('render box with border', t => {
 	const output = renderToString(
-		<Box borderStyle="single" width={20}>
+		<Box borderStyle='single' width={20}>
 			<Text>Bordered</Text>
 		</Box>,
 		{columns: 20},
@@ -159,7 +141,7 @@ test('render box with border', t => {
 // ── Styling ─────────────────────────────────────────────
 
 test('render colored text', t => {
-	const output = renderToString(<Text color="green">Green</Text>);
+	const output = renderToString(<Text color='green'>Green</Text>);
 	t.is(output, chalk.green('Green'));
 });
 
@@ -171,21 +153,17 @@ test('render bold text', t => {
 // ── Text wrapping and columns ───────────────────────────
 
 test('render text with wrap', t => {
-	const output = renderToString(
-		<Box width={7}>
-			<Text wrap="wrap">Hello World</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={7}>
+		<Text wrap='wrap'>Hello World</Text>
+	</Box>);
 
 	t.is(output, 'Hello\nWorld');
 });
 
 test('render text with truncate', t => {
-	const output = renderToString(
-		<Box width={7}>
-			<Text wrap="truncate">Hello World</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={7}>
+		<Text wrap='truncate'>Hello World</Text>
+	</Box>);
 
 	t.is(output, 'Hello …');
 });
@@ -213,11 +191,9 @@ test('custom columns option', t => {
 // ── Components ──────────────────────────────────────────
 
 test('render Transform component', t => {
-	const output = renderToString(
-		<Transform transform={output => output.toUpperCase()}>
-			<Text>hello</Text>
-		</Transform>,
-	);
+	const output = renderToString(<Transform transform={output => output.toUpperCase()}>
+		<Text>hello</Text>
+	</Transform>);
 
 	t.is(output, 'HELLO');
 });
@@ -225,12 +201,10 @@ test('render Transform component', t => {
 test('render Static component with items', t => {
 	const items = ['A', 'B', 'C'];
 
-	const output = renderToString(
-		<Box flexDirection="column">
-			<Static items={items}>{item => <Text key={item}>{item}</Text>}</Static>
-			<Text>Dynamic</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box flexDirection='column'>
+		<Static items={items}>{item => <Text key={item}>{item}</Text>}</Static>
+		<Text>Dynamic</Text>
+	</Box>);
 
 	t.is(output, 'A\nB\nC\nDynamic');
 });
@@ -238,9 +212,7 @@ test('render Static component with items', t => {
 test('render static-only output has no trailing newline', t => {
 	const items = ['A', 'B'];
 
-	const output = renderToString(
-		<Static items={items}>{item => <Text key={item}>{item}</Text>}</Static>,
-	);
+	const output = renderToString(<Static items={items}>{item => <Text key={item}>{item}</Text>}</Static>);
 
 	t.is(output, 'A\nB');
 });
@@ -248,12 +220,10 @@ test('render static-only output has no trailing newline', t => {
 test('render static + dynamic output has exactly one newline between parts', t => {
 	const items = ['A', 'B'];
 
-	const output = renderToString(
-		<Box flexDirection="column">
-			<Static items={items}>{item => <Text key={item}>{item}</Text>}</Static>
-			<Text>Dynamic</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box flexDirection='column'>
+		<Static items={items}>{item => <Text key={item}>{item}</Text>}</Static>
+		<Text>Dynamic</Text>
+	</Box>);
 
 	t.is(output, 'A\nB\nDynamic');
 });
@@ -294,10 +264,8 @@ test('runs effect cleanup on teardown', t => {
 	let cleanupRan = false;
 
 	function App() {
-		useEffect(() => {
-			return () => {
-				cleanupRan = true;
-			};
+		useEffect(() => () => {
+			cleanupRan = true;
 		}, []);
 
 		return <Text>Cleanup test</Text>;
@@ -347,18 +315,16 @@ test('can be called multiple times independently', t => {
 // ── Deeply nested tree ──────────────────────────────────
 
 test('render deeply nested component tree', t => {
-	const output = renderToString(
-		<Box flexDirection="column">
-			<Box paddingLeft={1}>
-				<Box>
-					<Text bold>
-						{'Nested '}
-						<Text color="green">deep</Text>
-					</Text>
-				</Box>
+	const output = renderToString(<Box flexDirection='column'>
+		<Box paddingLeft={1}>
+			<Box>
+				<Text bold>
+					{'Nested '}
+					<Text color='green'>deep</Text>
+				</Text>
 			</Box>
-		</Box>,
-	);
+		</Box>
+	</Box>);
 
 	t.true(output.includes('Nested'));
 	t.true(output.includes('deep'));

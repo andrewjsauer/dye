@@ -16,14 +16,12 @@ function SelectInput() {
 	useInput((input, key) => {
 		if (key.upArrow) {
 			setSelectedIndex(previousIndex =>
-				previousIndex === 0 ? items.length - 1 : previousIndex - 1,
-			);
+				previousIndex === 0 ? items.length - 1 : previousIndex - 1);
 		}
 
 		if (key.downArrow) {
 			setSelectedIndex(previousIndex =>
-				previousIndex === items.length - 1 ? 0 : previousIndex + 1,
-			);
+				previousIndex === items.length - 1 ? 0 : previousIndex + 1);
 		}
 
 		if (isScreenReaderEnabled) {
@@ -35,7 +33,7 @@ function SelectInput() {
 	});
 
 	return (
-		<Box flexDirection="column" aria-role="list">
+		<Box flexDirection='column' aria-role='list'>
 			<Text>Select a color:</Text>
 			{items.map((item, index) => {
 				const isSelected = index === selectedIndex;
@@ -45,7 +43,7 @@ function SelectInput() {
 				return (
 					<Box
 						key={item}
-						aria-role="listitem"
+						aria-role='listitem'
 						aria-state={{selected: isSelected}}
 						aria-label={isScreenReaderEnabled ? screenReaderLabel : undefined}
 					>

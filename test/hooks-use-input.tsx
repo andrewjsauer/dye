@@ -50,7 +50,7 @@ test.serial('useInput - handle uppercase character', async t => {
 });
 
 test.serial(
-	'useInput - \\r should not count as an uppercase character',
+	String.raw`useInput - \r should not count as an uppercase character`,
 	async t => {
 		const ps = term('use-input', ['uppercase']);
 		ps.write('\r');

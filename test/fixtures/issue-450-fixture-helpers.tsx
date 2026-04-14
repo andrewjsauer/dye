@@ -1,6 +1,8 @@
 import process from 'node:process';
 import React, {useEffect, useState} from 'react';
-import {Box, Static, Text, render, useApp} from '../../src/index.js';
+import {
+	Box, Static, Text, render, useApp,
+} from '../../src/index.js';
 
 type RerenderFixtureOptions = {
 	readonly completionMarker?: string;
@@ -53,12 +55,14 @@ function Issue450RerenderFixtureComponent({
 
 	return (
 		<>
-			{includeStaticLine ? (
-				<Static items={['#450 static line']}>
-					{item => <Text key={item}>{item}</Text>}
-				</Static>
-			) : null}
-			<Box height={targetHeight} flexDirection="column">
+			{includeStaticLine
+				? (
+					<Static items={['#450 static line']}>
+						{item => <Text key={item}>{item}</Text>}
+					</Static>
+				)
+				: null}
+			<Box height={targetHeight} flexDirection='column'>
 				<Text>#450 top</Text>
 				<Box flexGrow={1}>
 					<Text>{`frame ${frameCount}`}</Text>
@@ -79,15 +83,13 @@ export const runIssue450RerenderFixture = ({
 	const rows = Number(process.argv[2]) || rowsFallback;
 	process.stdout.rows = rows;
 
-	render(
-		<Issue450RerenderFixtureComponent
-			completionMarker={completionMarker}
-			frameLimit={frameLimit}
-			includeStaticLine={includeStaticLine}
-			heightForFrame={heightForFrame}
-			rows={rows}
-		/>,
-	);
+	render(<Issue450RerenderFixtureComponent
+		completionMarker={completionMarker}
+		frameLimit={frameLimit}
+		includeStaticLine={includeStaticLine}
+		heightForFrame={heightForFrame}
+		rows={rows}
+	/>);
 };
 
 type InitialFixtureOptions = {
@@ -121,12 +123,10 @@ function Issue450InitialFixtureComponent({
 
 	const lines = [];
 	for (let lineNumber = 1; lineNumber <= lineCount; lineNumber++) {
-		lines.push(
-			<Text key={lineNumber}>{`${linePrefix} line ${lineNumber}`}</Text>,
-		);
+		lines.push(<Text key={lineNumber}>{`${linePrefix} line ${lineNumber}`}</Text>);
 	}
 
-	return <Box flexDirection="column">{lines}</Box>;
+	return <Box flexDirection='column'>{lines}</Box>;
 }
 
 export const runIssue450InitialFixture = ({
@@ -138,11 +138,9 @@ export const runIssue450InitialFixture = ({
 	const rows = Number(process.argv[2]) || rowsFallback;
 	process.stdout.rows = rows;
 
-	render(
-		<Issue450InitialFixtureComponent
-			renderedMarker={renderedMarker}
-			lineCount={lineCount}
-			linePrefix={linePrefix}
-		/>,
-	);
+	render(<Issue450InitialFixtureComponent
+		renderedMarker={renderedMarker}
+		lineCount={lineCount}
+		linePrefix={linePrefix}
+	/>);
 };

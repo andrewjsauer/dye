@@ -243,9 +243,7 @@ const render = (
 
 export default render;
 
-const getOptions = (
-	stdout: NodeJS.WriteStream | RenderOptions | undefined = {},
-): RenderOptions => {
+const getOptions = (stdout: NodeJS.WriteStream | RenderOptions | undefined = {}): RenderOptions => {
 	if (stdout instanceof Stream) {
 		return {
 			stdout,
@@ -273,9 +271,7 @@ const getInstance = (
 	// create two renderers that compete for the same output. Write the warning
 	// directly to native stderr so an existing alternate-screen renderer cannot
 	// swallow it via patchConsole.
-	process.stderr.write(
-		'Warning: render() was called again for the same stdout before the previous Ink instance was unmounted. Reusing stdout across multiple render() calls is unsupported. Call unmount() first.\n',
-	);
+	process.stderr.write('Warning: render() was called again for the same stdout before the previous Ink instance was unmounted. Reusing stdout across multiple render() calls is unsupported. Call unmount() first.\n');
 
 	return instance;
 };

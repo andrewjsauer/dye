@@ -83,9 +83,7 @@ function IncrementalRendering() {
 	const [progress2, setProgress2] = useState(0);
 	const [progress3, setProgress3] = useState(0);
 	const [randomValue, setRandomValue] = useState(0);
-	const [logLines, setLogLines] = useState(
-		Array.from({length: logLineCount}, (_, i) => generateLogLine(i, 0)),
-	);
+	const [logLines, setLogLines] = useState(Array.from({length: logLineCount}, (_, i) => generateLogLine(i, 0)));
 
 	// Update timestamp and counter every second to show live updates
 	useEffect(() => {
@@ -139,14 +137,12 @@ function IncrementalRendering() {
 	useInput((input, key) => {
 		if (key.upArrow) {
 			setSelectedIndex(previousIndex =>
-				previousIndex === 0 ? serviceCount - 1 : previousIndex - 1,
-			);
+				previousIndex === 0 ? serviceCount - 1 : previousIndex - 1);
 		}
 
 		if (key.downArrow) {
 			setSelectedIndex(previousIndex =>
-				previousIndex === serviceCount - 1 ? 0 : previousIndex + 1,
-			);
+				previousIndex === serviceCount - 1 ? 0 : previousIndex + 1);
 		}
 
 		if (input === 'q') {
@@ -161,48 +157,48 @@ function IncrementalRendering() {
 	};
 
 	return (
-		<Box flexDirection="column" height="100%">
-			<Box borderStyle="round" borderColor="cyan" paddingX={2} paddingY={1}>
-				<Box flexDirection="column">
-					<Text bold color="cyan">
+		<Box flexDirection='column' height='100%'>
+			<Box borderStyle='round' borderColor='cyan' paddingX={2} paddingY={1}>
+				<Box flexDirection='column'>
+					<Text bold color='cyan'>
 						Incremental Rendering Demo - incrementalRendering={String(true)}
 					</Text>
 					<Text dimColor>
 						Use ↑/↓ arrows to navigate • Press q to quit • FPS: {fps}
 					</Text>
 					<Text>
-						Time: <Text color="green">{timestamp}</Text> • Updates:{' '}
-						<Text color="yellow">{counter}</Text> • Random:{' '}
-						<Text color="cyan">{randomValue}</Text>
+						Time: <Text color='green'>{timestamp}</Text> • Updates:{' '}
+						<Text color='yellow'>{counter}</Text> • Random:{' '}
+						<Text color='cyan'>{randomValue}</Text>
 					</Text>
 					<Text>
-						Progress 1: <Text color="green">{progressBar(progress1)}</Text>{' '}
+						Progress 1: <Text color='green'>{progressBar(progress1)}</Text>{' '}
 						{progress1}%
 					</Text>
 					<Text>
-						Progress 2: <Text color="yellow">{progressBar(progress2)}</Text>{' '}
+						Progress 2: <Text color='yellow'>{progressBar(progress2)}</Text>{' '}
 						{progress2}%
 					</Text>
 					<Text>
-						Progress 3: <Text color="red">{progressBar(progress3)}</Text>{' '}
+						Progress 3: <Text color='red'>{progressBar(progress3)}</Text>{' '}
 						{progress3}%
 					</Text>
 				</Box>
 			</Box>
 
 			<Box
-				borderStyle="single"
-				borderColor="yellow"
+				borderStyle='single'
+				borderColor='yellow'
 				paddingX={2}
 				paddingY={1}
 				marginTop={1}
 			>
-				<Box flexDirection="column">
-					<Text bold color="yellow">
+				<Box flexDirection='column'>
+					<Text bold color='yellow'>
 						Live Logs (only 1-2 lines update per frame):
 					</Text>
 					{logLines.map(line => (
-						<Text key={line} color="green">
+						<Text key={line} color='green'>
 							{line}
 						</Text>
 					))}
@@ -210,15 +206,15 @@ function IncrementalRendering() {
 			</Box>
 
 			<Box
-				borderStyle="single"
-				borderColor="gray"
+				borderStyle='single'
+				borderColor='gray'
 				paddingX={2}
 				paddingY={1}
 				marginTop={1}
 				flexGrow={1}
-				flexDirection="column"
+				flexDirection='column'
 			>
-				<Text bold color="magenta">
+				<Text bold color='magenta'>
 					System Services Monitor ({serviceCount} of {rows.length} services):
 				</Text>
 				{rows.slice(0, serviceCount).map((row, index) => {
@@ -232,10 +228,10 @@ function IncrementalRendering() {
 				})}
 			</Box>
 
-			<Box borderStyle="round" borderColor="magenta" paddingX={2} marginTop={1}>
+			<Box borderStyle='round' borderColor='magenta' paddingX={2} marginTop={1}>
 				<Text>
 					Selected:{' '}
-					<Text bold color="magenta">
+					<Text bold color='magenta'>
 						{rows.slice(0, serviceCount)[selectedIndex]}
 					</Text>
 				</Text>

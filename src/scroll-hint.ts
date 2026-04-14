@@ -62,19 +62,28 @@ export function applyScrollHint(
 	hint: ScrollHint,
 	options: ScrollOptions,
 ): string {
-	if (!options.altScreen) return '';
-	if (hint.delta === 0) return '';
+	if (!options.altScreen) {
+		return '';
+	}
+
+	if (hint.delta === 0) {
+		return '';
+	}
 
 	const top = Math.max(0, hint.top);
 	const bottom = Math.min(options.viewportHeight, hint.bottom);
 
-	if (top >= bottom) return '';
+	if (top >= bottom) {
+		return '';
+	}
 
 	const regionHeight = bottom - top;
 	const absDelta = Math.abs(hint.delta);
 
 	// If delta >= region height, a full redraw is simpler than DECSTBM
-	if (absDelta >= regionHeight) return '';
+	if (absDelta >= regionHeight) {
+		return '';
+	}
 
 	// Mutate prev screen to simulate the hardware scroll
 	shiftRows(prevScreen, top, bottom, hint.delta);
@@ -83,12 +92,13 @@ export function applyScrollHint(
 	// DECSTBM is 1-indexed and inclusive on both ends
 	const top1 = top + 1;
 	const bottom1 = bottom; // CSI <top>;<bottom>r where bottom is inclusive
-	const setRegion = `\x1b[${top1};${bottom1}r`;
-	const scroll = hint.delta > 0
-		? `\x1b[${absDelta}S` // Scroll up (content moves up)
-		: `\x1b[${absDelta}T`; // Scroll down
-	const resetRegion = '\x1b[r';
-	const cursorHome = '\x1b[H';
+	const setRegion = `\u001B[${top1};${bottom1}r`;
+	const scroll
+		= hint.delta > 0
+			? `\u001B[${absDelta}S` // Scroll up (content moves up)
+			: `\u001B[${absDelta}T`; // Scroll down
+	const resetRegion = '\u001B[r';
+	const cursorHome = '\u001B[H';
 
 	return setRegion + scroll + resetRegion + cursorHome;
 }
@@ -104,6 +114,9 @@ export function computeScrollHint(
 	nextScrollTop: number,
 ): ScrollHint | undefined {
 	const delta = nextScrollTop - prevScrollTop;
-	if (delta === 0) return undefined;
+	if (delta === 0) {
+		return undefined;
+	}
+
 	return {top, bottom, delta};
 }

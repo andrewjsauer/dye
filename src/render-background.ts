@@ -16,14 +16,14 @@ const renderBackground = (
 	const height = node.yogaNode!.getComputedHeight();
 
 	// Calculate the actual content area considering borders
-	const leftBorderWidth =
-		node.style.borderStyle && node.style.borderLeft !== false ? 1 : 0;
-	const rightBorderWidth =
-		node.style.borderStyle && node.style.borderRight !== false ? 1 : 0;
-	const topBorderHeight =
-		node.style.borderStyle && node.style.borderTop !== false ? 1 : 0;
-	const bottomBorderHeight =
-		node.style.borderStyle && node.style.borderBottom !== false ? 1 : 0;
+	const leftBorderWidth
+		= node.style.borderStyle && node.style.borderLeft !== false ? 1 : 0;
+	const rightBorderWidth
+		= node.style.borderStyle && node.style.borderRight !== false ? 1 : 0;
+	const topBorderHeight
+		= node.style.borderStyle && node.style.borderTop !== false ? 1 : 0;
+	const bottomBorderHeight
+		= node.style.borderStyle && node.style.borderBottom !== false ? 1 : 0;
 
 	const contentWidth = width - leftBorderWidth - rightBorderWidth;
 	const contentHeight = height - topBorderHeight - bottomBorderHeight;

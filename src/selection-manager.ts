@@ -52,7 +52,10 @@ export class SelectionManager {
 	 * change so useSyncExternalStore can return a stable reference
 	 * between renders and consumers see (selection, text) together.
 	 */
-	private snapshot: SelectionSnapshot = {selection: undefined, selectedText: ''};
+	private snapshot: SelectionSnapshot = {
+		selection: undefined,
+		selectedText: '',
+	};
 
 	/** Update the screen reference. Called after each render. */
 	setScreen(screen: Screen | undefined): void {
@@ -96,7 +99,10 @@ export class SelectionManager {
 
 	/** Clear the current selection and notify listeners. */
 	clearSelection(): void {
-		if (this.selection === undefined) return;
+		if (this.selection === undefined) {
+			return;
+		}
+
 		this.selection = undefined;
 		this.dragging = false;
 		this.refreshSnapshot();
@@ -107,7 +113,11 @@ export class SelectionManager {
 	 * Handle a mouse press at (col, row). Starts or extends a selection
 	 * based on multi-click count.
 	 */
-	handleMousePress(col: number, row: number, now: number = performance.now()): void {
+	handleMousePress(
+		col: number,
+		row: number,
+		now: number = performance.now(),
+	): void {
 		const count = recordClick(this.tracker, col, row, now);
 		const mode: SelectionMode = clickCountToMode(count);
 
@@ -126,7 +136,10 @@ export class SelectionManager {
 
 	/** Extend the selection during a drag event. */
 	handleMouseDrag(col: number, row: number): void {
-		if (!this.dragging || !this.selection) return;
+		if (!this.dragging || !this.selection) {
+			return;
+		}
+
 		const focus: Point = {col, row};
 		this.selection = extendSelection(this.selection, focus, this.screen);
 		this.refreshSnapshot();
@@ -141,7 +154,10 @@ export class SelectionManager {
 	/** Copy the current selection to the system clipboard. */
 	async copy(): Promise<boolean> {
 		const text = this.getSelectedText();
-		if (!text) return false;
+		if (!text) {
+			return false;
+		}
+
 		try {
 			await copyToClipboard(text, {stdout: this.stdout});
 			return true;
@@ -159,9 +175,10 @@ export class SelectionManager {
 	}
 
 	private refreshSnapshot(): void {
-		const selectedText = this.selection && this.screen
-			? getSelectedText(this.screen, this.selection)
-			: '';
+		const selectedText
+			= this.selection && this.screen
+				? getSelectedText(this.screen, this.selection)
+				: '';
 		this.snapshot = {selection: this.selection, selectedText};
 	}
 

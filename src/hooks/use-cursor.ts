@@ -1,4 +1,6 @@
-import {useContext, useRef, useCallback, useInsertionEffect} from 'react';
+import {
+	useContext, useRef, useCallback, useInsertionEffect,
+} from 'react';
 import CursorContext from '../components/CursorContext.js';
 import {type CursorPosition} from '../log-update.js';
 

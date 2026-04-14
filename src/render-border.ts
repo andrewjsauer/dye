@@ -28,53 +28,53 @@ const renderBorder = (
 	if (node.style.borderStyle) {
 		const width = node.yogaNode!.getComputedWidth();
 		const height = node.yogaNode!.getComputedHeight();
-		const box =
-			typeof node.style.borderStyle === 'string'
+		const box
+			= typeof node.style.borderStyle === 'string'
 				? cliBoxes[node.style.borderStyle]
 				: node.style.borderStyle;
 
 		const topBorderColor = node.style.borderTopColor ?? node.style.borderColor;
-		const bottomBorderColor =
-			node.style.borderBottomColor ?? node.style.borderColor;
-		const leftBorderColor =
-			node.style.borderLeftColor ?? node.style.borderColor;
-		const rightBorderColor =
-			node.style.borderRightColor ?? node.style.borderColor;
+		const bottomBorderColor
+			= node.style.borderBottomColor ?? node.style.borderColor;
+		const leftBorderColor
+			= node.style.borderLeftColor ?? node.style.borderColor;
+		const rightBorderColor
+			= node.style.borderRightColor ?? node.style.borderColor;
 
-		const topBorderBackgroundColor =
-			node.style.borderTopBackgroundColor ?? node.style.borderBackgroundColor;
-		const bottomBorderBackgroundColor =
-			node.style.borderBottomBackgroundColor ??
-			node.style.borderBackgroundColor;
-		const leftBorderBackgroundColor =
-			node.style.borderLeftBackgroundColor ?? node.style.borderBackgroundColor;
-		const rightBorderBackgroundColor =
-			node.style.borderRightBackgroundColor ?? node.style.borderBackgroundColor;
+		const topBorderBackgroundColor
+			= node.style.borderTopBackgroundColor ?? node.style.borderBackgroundColor;
+		const bottomBorderBackgroundColor
+			= node.style.borderBottomBackgroundColor
+				?? node.style.borderBackgroundColor;
+		const leftBorderBackgroundColor
+			= node.style.borderLeftBackgroundColor ?? node.style.borderBackgroundColor;
+		const rightBorderBackgroundColor
+			= node.style.borderRightBackgroundColor ?? node.style.borderBackgroundColor;
 
-		const dimTopBorderColor =
-			node.style.borderTopDimColor ?? node.style.borderDimColor;
+		const dimTopBorderColor
+			= node.style.borderTopDimColor ?? node.style.borderDimColor;
 
-		const dimBottomBorderColor =
-			node.style.borderBottomDimColor ?? node.style.borderDimColor;
+		const dimBottomBorderColor
+			= node.style.borderBottomDimColor ?? node.style.borderDimColor;
 
-		const dimLeftBorderColor =
-			node.style.borderLeftDimColor ?? node.style.borderDimColor;
+		const dimLeftBorderColor
+			= node.style.borderLeftDimColor ?? node.style.borderDimColor;
 
-		const dimRightBorderColor =
-			node.style.borderRightDimColor ?? node.style.borderDimColor;
+		const dimRightBorderColor
+			= node.style.borderRightDimColor ?? node.style.borderDimColor;
 
 		const showTopBorder = node.style.borderTop !== false;
 		const showBottomBorder = node.style.borderBottom !== false;
 		const showLeftBorder = node.style.borderLeft !== false;
 		const showRightBorder = node.style.borderRight !== false;
 
-		const contentWidth =
-			width - (showLeftBorder ? 1 : 0) - (showRightBorder ? 1 : 0);
+		const contentWidth
+			= width - (showLeftBorder ? 1 : 0) - (showRightBorder ? 1 : 0);
 
 		let topBorder = showTopBorder
-			? (showLeftBorder ? box.topLeft : '') +
-				box.top.repeat(contentWidth) +
-				(showRightBorder ? box.topRight : '')
+			? (showLeftBorder ? box.topLeft : '')
+			+ box.top.repeat(contentWidth)
+			+ (showRightBorder ? box.topRight : '')
 			: undefined;
 
 		topBorder &&= stylePiece(
@@ -119,9 +119,9 @@ const renderBorder = (
 		}
 
 		let bottomBorder = showBottomBorder
-			? (showLeftBorder ? box.bottomLeft : '') +
-				box.bottom.repeat(contentWidth) +
-				(showRightBorder ? box.bottomRight : '')
+			? (showLeftBorder ? box.bottomLeft : '')
+			+ box.bottom.repeat(contentWidth)
+			+ (showRightBorder ? box.bottomRight : '')
 			: undefined;
 		bottomBorder &&= stylePiece(
 			bottomBorder,

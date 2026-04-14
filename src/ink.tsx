@@ -41,9 +41,9 @@ const yieldImmediate = async () =>
 		setImmediate(resolve);
 	});
 
-const kittyQueryEscapeByte = 0x1b;
-const kittyQueryOpenBracketByte = 0x5b;
-const kittyQueryQuestionMarkByte = 0x3f;
+const kittyQueryEscapeByte = 0x1B;
+const kittyQueryOpenBracketByte = 0x5B;
+const kittyQueryQuestionMarkByte = 0x3F;
 const kittyQueryLetterByte = 0x75;
 const zeroByte = 0x30;
 const nineByte = 0x39;
@@ -60,9 +60,9 @@ const matchKittyQueryResponse = (
 	startIndex: number,
 ): KittyQueryResponseMatch | undefined => {
 	if (
-		buffer[startIndex] !== kittyQueryEscapeByte ||
-		buffer[startIndex + 1] !== kittyQueryOpenBracketByte ||
-		buffer[startIndex + 2] !== kittyQueryQuestionMarkByte
+		buffer[startIndex] !== kittyQueryEscapeByte
+		|| buffer[startIndex + 1] !== kittyQueryOpenBracketByte
+		|| buffer[startIndex + 2] !== kittyQueryQuestionMarkByte
 	) {
 		return undefined;
 	}
@@ -99,9 +99,7 @@ const hasCompleteKittyQueryResponse = (buffer: number[]): boolean => {
 	return false;
 };
 
-const stripKittyQueryResponsesAndTrailingPartial = (
-	buffer: number[],
-): number[] => {
+const stripKittyQueryResponsesAndTrailingPartial = (buffer: number[]): number[] => {
 	const keptBytes: number[] = [];
 	let index = 0;
 	while (index < buffer.length) {
@@ -148,22 +146,20 @@ const shouldClearTerminalForFrame = ({
 
 	return (
 		// Overflowing frames still need full clear fallback.
-		wasOverflowing ||
-		(isOverflowing && hadPreviousFrame) ||
+		wasOverflowing
+		|| (isOverflowing && hadPreviousFrame)
 		// Clear when shrinking from fullscreen to non-fullscreen output.
-		isLeavingFullscreen ||
+		|| isLeavingFullscreen
 		// Preserve legacy unmount behavior for fullscreen frames: final teardown
 		// render should clear once to avoid leaving a scrolled viewport state.
-		shouldClearOnUnmount
+		|| shouldClearOnUnmount
 	);
 };
 
-const isErrorInput = (value: unknown): value is Error => {
-	return (
-		value instanceof Error ||
-		Object.prototype.toString.call(value) === '[object Error]'
-	);
-};
+const isErrorInput = (value: unknown): value is Error => (
+	value instanceof Error
+	|| Object.prototype.toString.call(value) === '[object Error]'
+);
 
 type MaybeWritableStream = NodeJS.WriteStream & {
 	writable?: boolean;
@@ -174,10 +170,10 @@ type MaybeWritableStream = NodeJS.WriteStream & {
 };
 
 const getWritableStreamState = (stdout: MaybeWritableStream) => {
-	const canWriteToStdout =
-		!stdout.destroyed && !stdout.writableEnded && (stdout.writable ?? true);
-	const hasWritableState =
-		stdout._writableState !== undefined || stdout.writableLength !== undefined;
+	const canWriteToStdout
+		= !stdout.destroyed && !stdout.writableEnded && (stdout.writable ?? true);
+	const hasWritableState
+		= stdout._writableState !== undefined || stdout.writableLength !== undefined;
 
 	return {
 		canWriteToStdout,
@@ -190,8 +186,8 @@ const settleThrottle = (
 	canWriteToStdout: boolean,
 ): void => {
 	if (
-		!throttled ||
-		typeof (throttled as {flush?: unknown}).flush !== 'function'
+		!throttled
+		|| typeof (throttled as {flush?: unknown}).flush !== 'function'
 	) {
 		return;
 	}
@@ -351,9 +347,9 @@ export default class Ink {
 		// SelectionManager needs stdout to emit OSC 52 clipboard writes.
 		this.selectionManager.setStdout(options.stdout);
 
-		this.isScreenReaderEnabled =
-			options.isScreenReaderEnabled ??
-			process.env['INK_SCREEN_READER'] === 'true';
+		this.isScreenReaderEnabled
+			= options.isScreenReaderEnabled
+				?? process.env['INK_SCREEN_READER'] === 'true';
 
 		// CI detection takes precedence: even a TTY stdout in CI defaults to non-interactive.
 		// Using Boolean(isTTY) (rather than an 'in' guard) correctly handles piped streams
@@ -367,8 +363,8 @@ export default class Ink {
 		// Treat non-positive maxFps as an internal fallback case, not a supported
 		// "disable throttling" mode. Keep animation scheduling on a normal cadence
 		// so future changes don't accidentally reintroduce zero-delay loops.
-		const renderThrottleMs =
-			maxFps > 0 ? Math.max(1, Math.ceil(1000 / maxFps)) : 0;
+		const renderThrottleMs
+			= maxFps > 0 ? Math.max(1, Math.ceil(1000 / maxFps)) : 0;
 		this.renderThrottleMs = unthrottled ? 0 : renderThrottleMs;
 
 		if (unthrottled) {
@@ -395,25 +391,25 @@ export default class Ink {
 		this.throttledLog = unthrottled
 			? this.log
 			: throttle(
-					(output: string) => {
-						const shouldWrite = this.log.willRender(output);
-						const sync = this.shouldSync();
-						if (sync && shouldWrite) {
-							this.options.stdout.write(bsu);
-						}
+				(output: string) => {
+					const shouldWrite = this.log.willRender(output);
+					const sync = this.shouldSync();
+					if (sync && shouldWrite) {
+						this.options.stdout.write(bsu);
+					}
 
-						this.log(output);
+					this.log(output);
 
-						if (sync && shouldWrite) {
-							this.options.stdout.write(esu);
-						}
-					},
-					undefined,
-					{
-						leading: true,
-						trailing: true,
-					},
-				);
+					if (sync && shouldWrite) {
+						this.options.stdout.write(esu);
+					}
+				},
+				undefined,
+				{
+					leading: true,
+					trailing: true,
+				},
+			);
 
 		// Ignore last render after unmounting a tree to prevent empty output before exit
 		this.isUnmounted = false;
@@ -633,8 +629,8 @@ export default class Ink {
 
 			if (hasStaticOutput) {
 				// We need to erase the main output before writing new static output
-				const erase =
-					this.lastOutputHeight > 0
+				const erase
+					= this.lastOutputHeight > 0
 						? ansiEscapes.eraseLines(this.lastOutputHeight)
 						: '';
 				this.options.stdout.write(erase + staticOutput);
@@ -661,8 +657,8 @@ export default class Ink {
 			if (hasStaticOutput) {
 				this.options.stdout.write(wrappedOutput);
 			} else {
-				const erase =
-					this.lastOutputHeight > 0
+				const erase
+					= this.lastOutputHeight > 0
 						? ansiEscapes.eraseLines(this.lastOutputHeight)
 						: '';
 				this.options.stdout.write(erase + wrappedOutput);
@@ -670,8 +666,8 @@ export default class Ink {
 
 			this.lastOutput = output;
 			this.lastOutputToRender = wrappedOutput;
-			this.lastOutputHeight =
-				wrappedOutput === '' ? 0 : wrappedOutput.split('\n').length;
+			this.lastOutputHeight
+				= wrappedOutput === '' ? 0 : wrappedOutput.split('\n').length;
 
 			if (sync) {
 				this.options.stdout.write(esu);
@@ -809,9 +805,9 @@ export default class Ink {
 			// If throttling is enabled and there is already a pending render, flushing above
 			// is sufficient. Also avoid calling onRender() again when static output already
 			// exists, as that can duplicate <Static> children output on exit (see issue #397).
-			const shouldRenderFinalFrame =
-				!this.throttledOnRender ||
-				(!this.hasPendingThrottledRender && this.fullStaticOutput === '');
+			const shouldRenderFinalFrame
+				= !this.throttledOnRender
+					|| (!this.hasPendingThrottledRender && this.fullStaticOutput === '');
 
 			if (shouldRenderFinalFrame) {
 				this.calculateLayout();
@@ -871,9 +867,7 @@ export default class Ink {
 					// In debug mode, each render already writes to stdout, so only a trailing
 					// newline is needed. In non-debug mode, write the last frame now (it was
 					// deferred during rendering).
-					this.options.stdout.write(
-						this.options.debug ? '\n' : this.lastOutput + '\n',
-					);
+					this.options.stdout.write(this.options.debug ? '\n' : this.lastOutput + '\n');
 				} else if (!this.options.debug) {
 					this.log.done();
 				}
@@ -1002,28 +996,41 @@ export default class Ink {
 	 * Routes to hit-test + dispatch for clicks, or hover tracking for motion.
 	 */
 	handleMouseEvent(mouse: ParsedMouse): void {
-		if (mouse.action === 'press') {
-			// Update selection manager first (may start a new selection)
-			if (mouse.button === 'left') {
-				this.selectionManager.handleMousePress(mouse.col, mouse.row);
+		switch (mouse.action) {
+			case 'press': {
+				// Update selection manager first (may start a new selection)
+				if (mouse.button === 'left') {
+					this.selectionManager.handleMousePress(mouse.col, mouse.row);
+				}
+
+				dispatchClick(this.rootNode, mouse.col, mouse.row, {
+					button: mouse.button === 'none' ? undefined : mouse.button,
+					shift: mouse.shift,
+					alt: mouse.alt,
+					ctrl: mouse.ctrl,
+				});
+
+				break;
 			}
 
-			dispatchClick(this.rootNode, mouse.col, mouse.row, {
-				button: mouse.button === 'none' ? undefined : mouse.button,
-				shift: mouse.shift,
-				alt: mouse.alt,
-				ctrl: mouse.ctrl,
-			});
-		} else if (mouse.action === 'drag') {
-			if (mouse.button === 'left') {
-				this.selectionManager.handleMouseDrag(mouse.col, mouse.row);
+			case 'drag': {
+				if (mouse.button === 'left') {
+					this.selectionManager.handleMouseDrag(mouse.col, mouse.row);
+				}
+
+				dispatchHover(this.rootNode, mouse.col, mouse.row);
+
+				break;
 			}
 
-			dispatchHover(this.rootNode, mouse.col, mouse.row);
-		} else if (mouse.action === 'release') {
-			if (mouse.button === 'left') {
-				this.selectionManager.handleMouseRelease();
+			case 'release': {
+				if (mouse.button === 'left') {
+					this.selectionManager.handleMouseRelease();
+				}
+
+				break;
 			}
+			// No default
 		}
 	}
 
@@ -1033,7 +1040,10 @@ export default class Ink {
 	 */
 	tryHandleMouseInput(input: string): boolean {
 		const mouse = parseMouse(input);
-		if (!mouse) return false;
+		if (!mouse) {
+			return false;
+		}
+
 		this.handleMouseEvent(mouse);
 		return true;
 	}
@@ -1091,9 +1101,9 @@ export default class Ink {
 		interactive: boolean,
 	): boolean {
 		return (
-			Boolean(alternateScreen) &&
-			interactive &&
-			Boolean(this.options.stdout.isTTY)
+			Boolean(alternateScreen)
+			&& interactive
+			&& Boolean(this.options.stdout.isTTY)
 		);
 	}
 
@@ -1122,9 +1132,9 @@ export default class Ink {
 			callbackNode?: unknown;
 		};
 		return (
-			(concurrentContainer.pendingLanes ?? 0) !== 0 &&
-			concurrentContainer.callbackNode !== undefined &&
-			concurrentContainer.callbackNode !== null
+			(concurrentContainer.pendingLanes ?? 0) !== 0
+			&& concurrentContainer.callbackNode !== undefined
+			&& concurrentContainer.callbackNode !== null
 		);
 	}
 
@@ -1168,9 +1178,7 @@ export default class Ink {
 				this.options.stdout.write(bsu);
 			}
 
-			this.options.stdout.write(
-				ansiEscapes.clearTerminal + this.fullStaticOutput + output,
-			);
+			this.options.stdout.write(ansiEscapes.clearTerminal + this.fullStaticOutput + output);
 			this.lastOutput = output;
 			this.lastOutputToRender = outputToRender;
 			this.lastOutputHeight = outputHeight;
@@ -1234,9 +1242,9 @@ export default class Ink {
 
 		// Auto mode: require interactive + TTY
 		if (
-			!this.interactive ||
-			!this.options.stdin.isTTY ||
-			!this.options.stdout.isTTY
+			!this.interactive
+			|| !this.options.stdin.isTTY
+			|| !this.options.stdout.isTTY
 		) {
 			return;
 		}
@@ -1261,8 +1269,8 @@ export default class Ink {
 			// Re-emit any buffered data that wasn't the protocol response,
 			// so it isn't lost from Ink's normal input pipeline.
 			// Clear responseBuffer afterwards to make cleanup idempotent.
-			const remaining =
-				stripKittyQueryResponsesAndTrailingPartial(responseBuffer);
+			const remaining
+				= stripKittyQueryResponsesAndTrailingPartial(responseBuffer);
 			responseBuffer = [];
 			if (remaining.length > 0) {
 				stdin.unshift(Uint8Array.from(remaining));

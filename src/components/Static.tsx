@@ -1,4 +1,6 @@
-import React, {useMemo, useState, useLayoutEffect, type ReactNode} from 'react';
+import React, {
+	useMemo, useState, useLayoutEffect, type ReactNode,
+} from 'react';
 import {type Styles} from '../styles.js';
 
 export type Props<T> = {
@@ -29,17 +31,13 @@ export default function Static<T>(props: Props<T>) {
 	const {items, children: render, style: customStyle} = props;
 	const [index, setIndex] = useState(0);
 
-	const itemsToRender: T[] = useMemo(() => {
-		return items.slice(index);
-	}, [items, index]);
+	const itemsToRender: T[] = useMemo(() => items.slice(index), [items, index]);
 
 	useLayoutEffect(() => {
 		setIndex(items.length);
 	}, [items.length]);
 
-	const children = itemsToRender.map((item, itemIndex): ReactNode => {
-		return render(item, index + itemIndex);
-	});
+	const children = itemsToRender.map((item, itemIndex): ReactNode => render(item, index + itemIndex));
 
 	const style: Styles = useMemo(
 		() => ({

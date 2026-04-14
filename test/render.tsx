@@ -19,7 +19,9 @@ import ansiEscapes from 'ansi-escapes';
 import stripAnsi from 'strip-ansi';
 import boxen from 'boxen';
 import delay from 'delay';
-import {render, Box, Text, useApp, useCursor, useInput} from '../src/index.js';
+import {
+	render, Box, Text, useApp, useCursor, useInput,
+} from '../src/index.js';
 import {type RenderMetrics} from '../src/ink.js';
 import {bsu, esu} from '../src/write-synchronized.js';
 import {createStdin, emitReadable} from './helpers/create-stdin.js';
@@ -46,7 +48,7 @@ const term = (fixture: string, args: string[] = []) => {
 
 	const env = {
 		...process.env,
-		// eslint-disable-next-line @typescript-eslint/naming-convention
+
 		NODE_NO_WARNINGS: '1',
 	};
 
@@ -102,8 +104,8 @@ const countOccurrences = (text: string, searchValue: string): number => {
 };
 
 const isWriteBarrierChunk = (chunk: string | Uint8Array): boolean =>
-	(typeof chunk === 'string' && chunk === '') ||
-	(chunk instanceof Uint8Array && chunk.length === 0);
+	(typeof chunk === 'string' && chunk === '')
+	|| (chunk instanceof Uint8Array && chunk.length === 0);
 
 const toRenderedChunk = (chunk: string | Uint8Array): string =>
 	stripAnsi(typeof chunk === 'string' ? chunk : textDecoder.decode(chunk));
@@ -187,7 +189,7 @@ const runNonTtyFixture = async (
 	let errorOutput = '';
 	const env = {
 		...process.env,
-		// eslint-disable-next-line @typescript-eslint/naming-convention
+
 		NODE_NO_WARNINGS: '1',
 	};
 	// Force non-CI code path while still using a non-TTY stdout stream.
@@ -223,9 +225,7 @@ const runNonTtyFixture = async (
 	});
 
 	if (exitCode !== 0) {
-		throw new Error(
-			`Non-TTY fixture exited with code ${exitCode}: ${errorOutput}`,
-		);
+		throw new Error(`Non-TTY fixture exited with code ${exitCode}: ${errorOutput}`);
 	}
 
 	return output;
@@ -247,8 +247,8 @@ const runIssue450FixtureWithCounts = async (
 	rows = 6,
 ): Promise<Issue450FixtureResult> => {
 	const output = await runIssue450Fixture(fixture, rows);
-	const {clearTerminalCount, eraseLineCount} =
-		getIssue450ControlSequenceCounts(output);
+	const {clearTerminalCount, eraseLineCount}
+		= getIssue450ControlSequenceCounts(output);
 
 	return {
 		output,
@@ -263,8 +263,8 @@ const getOutputBeforeMarker = (
 	marker: string,
 ): string => {
 	const markerIndex = output.indexOf(marker);
-	t.true(markerIndex >= 0, `Fixture marker "${marker}" should be present`);
-	return markerIndex >= 0 ? output.slice(0, markerIndex) : output;
+	t.true(markerIndex !== -1, `Fixture marker "${marker}" should be present`);
+	return markerIndex === -1 ? output : output.slice(0, markerIndex);
 };
 
 const runIssue450FixtureBeforeMarker = async (
@@ -395,8 +395,8 @@ test.serial('erase screen where state changes', async t => {
 	const eraseLinesPattern = ansiEscapes.eraseLines(1);
 	const lastEraseIndex = beforeCursorShow.lastIndexOf(eraseLinesPattern);
 
-	const lastFrame =
-		lastEraseIndex === -1
+	const lastFrame
+		= lastEraseIndex === -1
 			? beforeCursorShow
 			: beforeCursorShow.slice(lastEraseIndex + eraseLinesPattern.length);
 
@@ -472,8 +472,8 @@ test.serial(
 test.serial(
 	'#450: full-height rerenders should not repeatedly clear terminal',
 	async t => {
-		const {output, clearTerminalCount, eraseLineCount} =
-			await runIssue450FixtureWithCounts('issue-450-full-height-rerender');
+		const {output, clearTerminalCount, eraseLineCount}
+			= await runIssue450FixtureWithCounts('issue-450-full-height-rerender');
 
 		assertIssue450DynamicFrameOutput(t, output);
 		t.true(
@@ -526,8 +526,8 @@ test.serial(
 test.serial(
 	'#450 control: rows - 1 rerenders should avoid clearTerminal',
 	async t => {
-		const {output, clearTerminalCount, eraseLineCount} =
-			await runIssue450FixtureWithCounts('issue-450-height-minus-one-rerender');
+		const {output, clearTerminalCount, eraseLineCount}
+			= await runIssue450FixtureWithCounts('issue-450-height-minus-one-rerender');
 
 		assertIssue450DynamicFrameOutput(t, output);
 		t.is(clearTerminalCount, 0);
@@ -547,8 +547,8 @@ test.serial(
 			'issue-450-full-height-rerender-with-marker',
 			renderedMarker,
 		);
-		const {clearTerminalCount} =
-			getIssue450ControlSequenceCounts(outputBeforeMarker);
+		const {clearTerminalCount}
+			= getIssue450ControlSequenceCounts(outputBeforeMarker);
 
 		assertIssue450DynamicFrameOutput(t, outputBeforeMarker);
 		t.is(clearTerminalCount, 0);
@@ -564,8 +564,8 @@ test.serial(
 			'issue-450-grow-to-fullscreen-rerender',
 			renderedMarker,
 		);
-		const {clearTerminalCount} =
-			getIssue450ControlSequenceCounts(outputBeforeMarker);
+		const {clearTerminalCount}
+			= getIssue450ControlSequenceCounts(outputBeforeMarker);
 
 		assertIssue450DynamicFrameOutput(t, outputBeforeMarker);
 		t.is(clearTerminalCount, 0);
@@ -575,9 +575,7 @@ test.serial(
 test.serial(
 	'#450: shrink from full-height to rows - 1 should clear exactly once',
 	async t => {
-		const {output, clearTerminalCount} = await runIssue450FixtureWithCounts(
-			'issue-450-shrink-from-fullscreen-rerender',
-		);
+		const {output, clearTerminalCount} = await runIssue450FixtureWithCounts('issue-450-shrink-from-fullscreen-rerender');
 
 		assertIssue450DynamicFrameOutput(t, output);
 		t.is(clearTerminalCount, 1);
@@ -587,9 +585,7 @@ test.serial(
 test.serial(
 	'#450: shrink from overflow to rows - 1 should clear exactly once',
 	async t => {
-		const {output, clearTerminalCount} = await runIssue450FixtureWithCounts(
-			'issue-450-shrink-from-overflow-rerender',
-		);
+		const {output, clearTerminalCount} = await runIssue450FixtureWithCounts('issue-450-shrink-from-overflow-rerender');
 
 		assertIssue450DynamicFrameOutput(t, output);
 		t.is(clearTerminalCount, 1);
@@ -599,9 +595,7 @@ test.serial(
 test.serial(
 	'#450: <Static> with shrink from full-height should clear exactly once',
 	async t => {
-		const {output, clearTerminalCount} = await runIssue450FixtureWithCounts(
-			'issue-450-static-shrink-from-fullscreen-rerender',
-		);
+		const {output, clearTerminalCount} = await runIssue450FixtureWithCounts('issue-450-static-shrink-from-fullscreen-rerender');
 
 		t.true(output.includes('#450 static line'));
 		assertIssue450DynamicFrameOutput(t, output);
@@ -623,7 +617,7 @@ test.serial(
 			readonly frameCount: number;
 		}) {
 			return (
-				<Box height={rows} flexDirection="column">
+				<Box height={rows} flexDirection='column'>
 					<Text>#450 top</Text>
 					<Box flexGrow={1}>
 						<Text>{`frame ${frameCount}`}</Text>
@@ -641,9 +635,7 @@ test.serial(
 		rerender(<NonTtyRerenderTestComponent frameCount={1} />);
 		rerender(<NonTtyRerenderTestComponent frameCount={2} />);
 
-		const {clearTerminalCount} = getIssue450ControlSequenceCounts(
-			writes.join(''),
-		);
+		const {clearTerminalCount} = getIssue450ControlSequenceCounts(writes.join(''));
 		t.is(clearTerminalCount, 0);
 
 		unmount();
@@ -668,7 +660,7 @@ test.serial(
 				lines.push(<Text key={lineNumber}>{`line ${lineNumber}`}</Text>);
 			}
 
-			return <Box flexDirection="column">{lines}</Box>;
+			return <Box flexDirection='column'>{lines}</Box>;
 		}
 
 		const {rerender, unmount} = render(
@@ -678,9 +670,7 @@ test.serial(
 
 		rerender(<NonTtyOverflowTransitionTestComponent lineCount={4} />);
 
-		const {clearTerminalCount} = getIssue450ControlSequenceCounts(
-			writes.join(''),
-		);
+		const {clearTerminalCount} = getIssue450ControlSequenceCounts(writes.join(''));
 		t.is(clearTerminalCount, 0);
 
 		unmount();
@@ -697,7 +687,7 @@ test.serial(
 
 		function ResizeBoundaryTestComponent() {
 			return (
-				<Box height={rows} flexDirection="column">
+				<Box height={rows} flexDirection='column'>
 					<Text>#450 top</Text>
 					<Box flexGrow={1}>
 						<Text>#450 middle</Text>
@@ -714,9 +704,7 @@ test.serial(
 		stdout.emit('resize');
 		await delay(0);
 
-		const {clearTerminalCount} = getIssue450ControlSequenceCounts(
-			writes.join(''),
-		);
+		const {clearTerminalCount} = getIssue450ControlSequenceCounts(writes.join(''));
 		t.is(clearTerminalCount, 1);
 
 		unmount();
@@ -751,9 +739,7 @@ test.serial('useAnimation can drive non-interactive process exit', async t => {
 test.serial(
 	'useAnimation can drive explicitly non-interactive process exit',
 	async t => {
-		const output = await runNonTtyFixture(
-			'use-animation-interactive-false-exit',
-		);
+		const output = await runNonTtyFixture('use-animation-interactive-false-exit');
 
 		t.true(stripAnsi(output).includes('exited'));
 	},
@@ -762,10 +748,8 @@ test.serial(
 test.serial(
 	'#450: full-height rerenders with <Static> should not repeatedly clear terminal',
 	async t => {
-		const {output, clearTerminalCount, eraseLineCount} =
-			await runIssue450FixtureWithCounts(
-				'issue-450-full-height-with-static-rerender',
-			);
+		const {output, clearTerminalCount, eraseLineCount}
+			= await runIssue450FixtureWithCounts('issue-450-full-height-with-static-rerender');
 
 		t.true(
 			output.includes('#450 static line'),
@@ -800,9 +784,7 @@ test.serial(
 		const ps = term('console');
 		await ps.waitForExit();
 
-		const frames = ps.output.split(ansiEscapes.eraseLines(2)).map(line => {
-			return stripAnsi(line);
-		});
+		const frames = ps.output.split(ansiEscapes.eraseLines(2)).map(line => stripAnsi(line));
 
 		t.deepEqual(frames, [
 			'Hello World\r\n',
@@ -816,7 +798,7 @@ test.serial('rerender on resize', async t => {
 
 	function Test() {
 		return (
-			<Box borderStyle="round">
+			<Box borderStyle='round'>
 				<Text>Test</Text>
 			</Box>
 		);
@@ -861,7 +843,7 @@ test.serial('throttle renders to maxFps', t => {
 	try {
 		const stdout = createStdout();
 
-		const {unmount, rerender} = render(<ThrottleTestComponent text="Hello" />, {
+		const {unmount, rerender} = render(<ThrottleTestComponent text='Hello' />, {
 			stdout,
 			maxFps: 1, // 1 Hz => ~1000 ms window
 		});
@@ -871,7 +853,7 @@ test.serial('throttle renders to maxFps', t => {
 		t.is(stripAnsi(getContentWrites(stdout.write)[0]!), 'Hello\n');
 
 		// Trigger another render inside the throttle window
-		rerender(<ThrottleTestComponent text="World" />);
+		rerender(<ThrottleTestComponent text='World' />);
 		t.is(getContentWrites(stdout.write).length, 1);
 
 		// Advance 999 ms: still within window, no trailing call yet
@@ -908,7 +890,7 @@ test.serial('outputs renderTime when onRender is passed', async t => {
 		});
 
 		return (
-			<Box borderStyle="round">
+			<Box borderStyle='round'>
 				<Text>{text}</Text>
 				{children}
 			</Box>
@@ -927,11 +909,9 @@ test.serial('outputs renderTime when onRender is passed', async t => {
 
 	// Manual rerender
 	onRenderStub.resetHistory();
-	rerender(
-		<Test>
-			<Text>Updated</Text>
-		</Test>,
-	);
+	rerender(<Test>
+		<Text>Updated</Text>
+	</Test>);
 	await delay(100);
 	t.is(onRenderStub.callCount, 1);
 	t.true(renderTimes[1] >= 0);
@@ -954,14 +934,14 @@ test.serial('no throttled renders after unmount', t => {
 	try {
 		const stdout = createStdout();
 
-		const {unmount, rerender} = render(<ThrottleTestComponent text="Foo" />, {
+		const {unmount, rerender} = render(<ThrottleTestComponent text='Foo' />, {
 			stdout,
 		});
 
 		t.is(getContentWrites(stdout.write).length, 1);
 
-		rerender(<ThrottleTestComponent text="Bar" />);
-		rerender(<ThrottleTestComponent text="Baz" />);
+		rerender(<ThrottleTestComponent text='Bar' />);
+		rerender(<ThrottleTestComponent text='Baz' />);
 		unmount();
 
 		const contentCountAfterUnmount = getContentWrites(stdout.write).length;
@@ -979,7 +959,7 @@ test.serial('unmount forces pending throttled render', t => {
 	try {
 		const stdout = createStdout();
 
-		const {unmount, rerender} = render(<ThrottleTestComponent text="Hello" />, {
+		const {unmount, rerender} = render(<ThrottleTestComponent text='Hello' />, {
 			stdout,
 			maxFps: 1, // 1 Hz => ~1000 ms throttle window
 		});
@@ -989,7 +969,7 @@ test.serial('unmount forces pending throttled render', t => {
 		t.is(stripAnsi(getContentWrites(stdout.write)[0]!), 'Hello\n');
 
 		// Trigger another render inside the throttle window
-		rerender(<ThrottleTestComponent text="Final" />);
+		rerender(<ThrottleTestComponent text='Final' />);
 		// Not rendered yet due to throttling
 		t.is(getContentWrites(stdout.write).length, 1);
 
@@ -998,8 +978,7 @@ test.serial('unmount forces pending throttled render', t => {
 
 		// The final frame should have been rendered
 		const allContentWrites = getContentWrites(stdout.write).map((w: string) =>
-			stripAnsi(w),
-		);
+			stripAnsi(w));
 		t.true(allContentWrites.some((call: string) => call.includes('Final')));
 	} finally {
 		clock.uninstall();
@@ -1138,7 +1117,7 @@ test.serial(
 	async t => {
 		const stdout = createStdout();
 		const {unmount, rerender, waitUntilExit, waitUntilRenderFlush} = render(
-			<ThrottleTestComponent text="Hello" />,
+			<ThrottleTestComponent text='Hello' />,
 			{
 				stdout,
 				maxFps: 1,
@@ -1152,7 +1131,7 @@ test.serial(
 
 		t.is(getContentWrites(stdout.write).length, 1);
 
-		rerender(<ThrottleTestComponent text="World" />);
+		rerender(<ThrottleTestComponent text='World' />);
 		t.is(getContentWrites(stdout.write).length, 1);
 
 		await waitUntilRenderFlush();
@@ -1167,7 +1146,7 @@ test.serial(
 	async t => {
 		const stdout = createStdout();
 		const {unmount, rerender, waitUntilExit, waitUntilRenderFlush} = render(
-			<ThrottleTestComponent text="Hello" />,
+			<ThrottleTestComponent text='Hello' />,
 			{
 				stdout,
 				maxFps: 1,
@@ -1181,7 +1160,7 @@ test.serial(
 
 		t.is(getContentWrites(stdout.write).length, 1);
 
-		rerender(<ThrottleTestComponent text="World" />);
+		rerender(<ThrottleTestComponent text='World' />);
 		t.is(getContentWrites(stdout.write).length, 1);
 
 		(stdout as NodeJS.WriteStream & {writable?: boolean}).writable = false;
@@ -1199,8 +1178,8 @@ test.serial(
 		const stdout = createDelayedWriteCallbackStdout({
 			shouldDelay(chunk) {
 				return (
-					!isWriteBarrierChunk(chunk) &&
-					toRenderedChunk(chunk).includes('World')
+					!isWriteBarrierChunk(chunk)
+					&& toRenderedChunk(chunk).includes('World')
 				);
 			},
 			onDelayElapsed() {
@@ -1275,8 +1254,8 @@ test.serial(
 		const stdout = createDelayedWriteCallbackStdout({
 			shouldDelay(chunk) {
 				return (
-					!isWriteBarrierChunk(chunk) &&
-					toRenderedChunk(chunk).includes('World')
+					!isWriteBarrierChunk(chunk)
+					&& toRenderedChunk(chunk).includes('World')
 				);
 			},
 			onDelayElapsed() {
@@ -1358,8 +1337,8 @@ test.serial(
 		const stdout = createDelayedWriteCallbackStdout({
 			shouldDelay(chunk) {
 				return (
-					!isWriteBarrierChunk(chunk) &&
-					toRenderedChunk(chunk).includes('World')
+					!isWriteBarrierChunk(chunk)
+					&& toRenderedChunk(chunk).includes('World')
 				);
 			},
 			onDelayElapsed() {
@@ -1407,8 +1386,8 @@ test.serial(
 		const stdout = createDelayedWriteCallbackStdout({
 			shouldDelay(chunk) {
 				return (
-					!isWriteBarrierChunk(chunk) &&
-					toRenderedChunk(chunk).includes('World')
+					!isWriteBarrierChunk(chunk)
+					&& toRenderedChunk(chunk).includes('World')
 				);
 			},
 			onDelayElapsed() {
@@ -1743,7 +1722,7 @@ test.serial('exit rejects on cross-realm Error', async t => {
 	const stdout = new PassThrough() as unknown as NodeJS.WriteStream;
 	stdout.columns = 100;
 
-	const foreignError = vm.runInNewContext(`new Error('boom')`) as Error;
+	const foreignError = vm.runInNewContext('new Error(\'boom\')') as Error;
 
 	function Test() {
 		const {exit} = useApp();
@@ -1786,7 +1765,7 @@ test.serial(
 
 		stdout.columns = 100;
 
-		const foreignError = vm.runInNewContext(`new Error('boom')`) as Error;
+		const foreignError = vm.runInNewContext('new Error(\'boom\')') as Error;
 
 		function Test() {
 			const {exit} = useApp();
@@ -1828,12 +1807,8 @@ test.serial('unmount does not write to ended stdout stream', async t => {
 	await exitPromise;
 	await delay(0);
 
-	t.false(
-		writeErrors.some(
-			error =>
-				(error as NodeJS.ErrnoException).code === 'ERR_STREAM_WRITE_AFTER_END',
-		),
-	);
+	t.false(writeErrors.some(error =>
+		(error as NodeJS.ErrnoException).code === 'ERR_STREAM_WRITE_AFTER_END'));
 });
 
 test.serial(
@@ -1850,25 +1825,21 @@ test.serial(
 			});
 
 			const {rerender, unmount} = render(
-				<ThrottleTestComponent text="Hello" />,
+				<ThrottleTestComponent text='Hello' />,
 				{
 					stdout,
 					maxFps: 1,
 				},
 			);
 
-			rerender(<ThrottleTestComponent text="World" />);
+			rerender(<ThrottleTestComponent text='World' />);
 			stdout.end();
 			unmount();
 			clock.tick(1000);
 
-			t.false(
-				writeErrors.some(
-					error =>
-						(error as NodeJS.ErrnoException).code ===
-						'ERR_STREAM_WRITE_AFTER_END',
-				),
-			);
+			t.false(writeErrors.some(error =>
+				(error as NodeJS.ErrnoException).code
+				=== 'ERR_STREAM_WRITE_AFTER_END'));
 		} finally {
 			clock.uninstall();
 		}
@@ -1883,7 +1854,7 @@ test.serial(
 			const baselineStdout = new PassThrough() as unknown as NodeJS.WriteStream;
 			baselineStdout.columns = 100;
 
-			const baselineApp = render(<ThrottleTestComponent text="Hello" />, {
+			const baselineApp = render(<ThrottleTestComponent text='Hello' />, {
 				stdout: baselineStdout,
 				maxFps: 1,
 			});
@@ -1896,13 +1867,13 @@ test.serial(
 			stdout.columns = 100;
 
 			const {rerender, unmount} = render(
-				<ThrottleTestComponent text="Hello" />,
+				<ThrottleTestComponent text='Hello' />,
 				{
 					stdout,
 					maxFps: 1,
 				},
 			);
-			rerender(<ThrottleTestComponent text="World" />);
+			rerender(<ThrottleTestComponent text='World' />);
 			stdout.end();
 			unmount();
 
@@ -1919,9 +1890,7 @@ const createTtyStdout = (columns?: number) => {
 	return stdout;
 };
 
-const withFakeClock = (
-	run: (clock: ReturnType<typeof FakeTimers.install>) => void,
-) => {
+const withFakeClock = (run: (clock: ReturnType<typeof FakeTimers.install>) => void) => {
 	const clock = FakeTimers.install();
 	try {
 		run(clock);
@@ -1968,14 +1937,14 @@ const assertNoBsuEsuForUnchangedTrailingRerender = (
 test.serial('no bsu/esu when output is unchanged', t => {
 	assertNoBsuEsuForUnchangedTrailingRerender(
 		t,
-		<ThrottleTestComponent text="Hello" />,
+		<ThrottleTestComponent text='Hello' />,
 	);
 });
 
 test.serial('no bsu/esu when output and cursor are unchanged', t => {
 	assertNoBsuEsuForUnchangedTrailingRerender(
 		t,
-		<ThrottleCursorTestComponent text="Hello" />,
+		<ThrottleCursorTestComponent text='Hello' />,
 	);
 });
 
@@ -1983,7 +1952,7 @@ test.serial('bsu/esu wraps throttledLog trailing call', t => {
 	withFakeClock(clock => {
 		const stdout = createTtyStdout();
 		const writes = captureWrites(stdout);
-		const {unmount, rerender} = render(<ThrottleTestComponent text="Hello" />, {
+		const {unmount, rerender} = render(<ThrottleTestComponent text='Hello' />, {
 			stdout,
 			maxFps: 1,
 		});
@@ -1995,7 +1964,7 @@ test.serial('bsu/esu wraps throttledLog trailing call', t => {
 
 			// Trigger a rerender inside the throttle window (will be deferred as trailing)
 			writes.length = 0;
-			rerender(<ThrottleTestComponent text="World" />);
+			rerender(<ThrottleTestComponent text='World' />);
 
 			// No immediate write yet (throttled)
 			const midWrites = [...writes];

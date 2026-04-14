@@ -17,9 +17,9 @@ const kittyKey = (
 ): string => {
 	let seq = `\u001B[${codepoint}`;
 	if (
-		modifiers !== undefined ||
-		eventType !== undefined ||
-		textCodepoints !== undefined
+		modifiers !== undefined
+		|| eventType !== undefined
+		|| textCodepoints !== undefined
 	) {
 		seq += `;${modifiers ?? 1}`;
 	}
@@ -804,14 +804,14 @@ test.serial(
 		});
 
 		// Emit one UTF-8 emoji split across chunks during detection.
-		stdin.emit('data', new Uint8Array([0xf0, 0x9f]));
-		stdin.emit('data', new Uint8Array([0x92, 0xa9]));
+		stdin.emit('data', new Uint8Array([0xF0, 0x9F]));
+		stdin.emit('data', new Uint8Array([0x92, 0xA9]));
 
 		await new Promise(resolve => {
 			setTimeout(resolve, 250);
 		});
 
-		t.deepEqual(concatUint8Arrays(unshifted), [0xf0, 0x9f, 0x92, 0xa9]);
+		t.deepEqual(concatUint8Arrays(unshifted), [0xF0, 0x9F, 0x92, 0xA9]);
 		unmount();
 	},
 );
@@ -895,7 +895,7 @@ test.serial(
 		t.is(enableCount, 0);
 		t.deepEqual(
 			unshifted.map(chunk => [...chunk]),
-			[[0x1b, 0x5b, 0x3f]],
+			[[0x1B, 0x5B, 0x3F]],
 		);
 		unmount();
 	},
@@ -940,7 +940,7 @@ test.serial(
 		t.is(enableCount, 0);
 		t.deepEqual(
 			unshifted.map(chunk => [...chunk]),
-			[[0x1b, 0x5b, 0x3f, 0x75]],
+			[[0x1B, 0x5B, 0x3F, 0x75]],
 		);
 		unmount();
 	},
@@ -985,7 +985,7 @@ test.serial(
 		t.is(enableCount, 0);
 		t.deepEqual(
 			unshifted.map(chunk => [...chunk]),
-			[[0x1b, 0x5b, 0x3f, 0x31, 0x78]],
+			[[0x1B, 0x5B, 0x3F, 0x31, 0x78]],
 		);
 		unmount();
 	},

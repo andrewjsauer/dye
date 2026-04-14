@@ -3,7 +3,9 @@ import test from 'ava';
 import delay from 'delay';
 import stripAnsi from 'strip-ansi';
 import React from 'react';
-import {render, Box, Text, useWindowSize} from '../src/index.js';
+import {
+	render, Box, Text, useWindowSize,
+} from '../src/index.js';
 import createStdout, {type FakeStdout} from './helpers/create-stdout.js';
 
 const getWriteContents = (stdout: FakeStdout): string[] =>
@@ -155,7 +157,7 @@ test.serial('clear screen when terminal width decreases', async t => {
 
 	function Test() {
 		return (
-			<Box borderStyle="round">
+			<Box borderStyle='round'>
 				<Text>Hello World</Text>
 			</Box>
 		);
@@ -184,7 +186,7 @@ test.serial('no screen clear when terminal width increases', async t => {
 
 	function Test() {
 		return (
-			<Box borderStyle="round">
+			<Box borderStyle='round'>
 				<Text>Test</Text>
 			</Box>
 		);
@@ -215,7 +217,7 @@ test.serial(
 
 		function Test() {
 			return (
-				<Box borderStyle="round">
+				<Box borderStyle='round'>
 					<Text>Content</Text>
 				</Box>
 			);
@@ -250,7 +252,7 @@ test.serial('width decrease clears lastOutput to force rerender', async t => {
 
 	function Test() {
 		return (
-			<Box borderStyle="round">
+			<Box borderStyle='round'>
 				<Text>Test Content</Text>
 			</Box>
 		);
@@ -272,15 +274,11 @@ test.serial('width decrease clears lastOutput to force rerender', async t => {
 	t.true(afterResizeOutput.includes('Test Content'));
 
 	// Now try to rerender with a different component
-	rerender(
-		<Box borderStyle="round">
-			<Text>Updated Content</Text>
-		</Box>,
-	);
+	rerender(<Box borderStyle='round'>
+		<Text>Updated Content</Text>
+	</Box>);
 	await delay(100);
 
 	// Verify content was updated
-	t.true(
-		stripAnsi(getWriteContents(stdout).at(-1)!).includes('Updated Content'),
-	);
+	t.true(stripAnsi(getWriteContents(stdout).at(-1)!).includes('Updated Content'));
 });

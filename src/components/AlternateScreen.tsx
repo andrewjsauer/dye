@@ -10,9 +10,9 @@
  *   </AlternateScreen>
  */
 import React, {useEffect, useContext, type PropsWithChildren} from 'react';
+import {MOUSE_ENABLE, MOUSE_DISABLE} from '../mouse.js';
 import Box from './Box.js';
 import StdoutContext from './StdoutContext.js';
-import {MOUSE_ENABLE, MOUSE_DISABLE} from '../mouse.js';
 
 export type AlternateScreenProps = {
 	/**
@@ -24,12 +24,12 @@ export type AlternateScreenProps = {
 };
 
 // DEC 1049: alternate screen buffer
-const ENTER_ALT_SCREEN = '\x1b[?1049h';
-const EXIT_ALT_SCREEN = '\x1b[?1049l';
-const CLEAR_SCREEN = '\x1b[2J';
-const CURSOR_HOME = '\x1b[H';
-const HIDE_CURSOR = '\x1b[?25l';
-const SHOW_CURSOR = '\x1b[?25h';
+const ENTER_ALT_SCREEN = '\u001B[?1049h';
+const EXIT_ALT_SCREEN = '\u001B[?1049l';
+const CLEAR_SCREEN = '\u001B[2J';
+const CURSOR_HOME = '\u001B[H';
+const HIDE_CURSOR = '\u001B[?25l';
+const SHOW_CURSOR = '\u001B[?25h';
 
 /**
  * AlternateScreen component.
@@ -38,15 +38,16 @@ const SHOW_CURSOR = '\x1b[?25h';
  * On unmount: disables mouse, exits alt screen, restores main screen.
  * Children are rendered inside a Box that fills the terminal height.
  */
-const AlternateScreen = ({
+function AlternateScreen({
 	children,
 	mouseTracking = false,
-}: PropsWithChildren<AlternateScreenProps>) => {
+}: PropsWithChildren<AlternateScreenProps>) {
 	const {stdout} = useContext(StdoutContext);
 
 	useEffect(() => {
 		// Enter alternate screen
-		let enterSequence = ENTER_ALT_SCREEN + CLEAR_SCREEN + CURSOR_HOME + HIDE_CURSOR;
+		let enterSequence
+			= ENTER_ALT_SCREEN + CLEAR_SCREEN + CURSOR_HOME + HIDE_CURSOR;
 
 		if (mouseTracking) {
 			enterSequence += MOUSE_ENABLE;
@@ -68,11 +69,11 @@ const AlternateScreen = ({
 	}, [stdout, mouseTracking]);
 
 	return (
-		<Box flexDirection="column" flexGrow={1}>
+		<Box flexDirection='column' flexGrow={1}>
 			{children}
 		</Box>
 	);
-};
+}
 
 AlternateScreen.displayName = 'AlternateScreen';
 

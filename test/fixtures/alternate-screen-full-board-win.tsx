@@ -37,11 +37,9 @@ const nextState = gameReducer(
 	},
 );
 
-console.log(
-	JSON.stringify({
-		gameOver: nextState.gameOver,
-		won: nextState.won,
-		score: nextState.score,
-		snakeLength: nextState.snake.length,
-	}),
-);
+console.log(JSON.stringify({
+	gameOver: nextState.gameOver,
+	won: nextState.won,
+	score: nextState.score,
+	snakeLength: nextState.snake.length,
+}));

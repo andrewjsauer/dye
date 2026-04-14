@@ -7,13 +7,10 @@ const customGlobal = globalThis as any;
 // These things must exist before importing `react-devtools-core`
 // Using ||= intentionally to set falsy values, not just null/undefined
 
-// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 customGlobal.WebSocket ||= ws;
 
-// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 customGlobal.window ||= globalThis;
 
-// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 customGlobal.self ||= globalThis;
 
 // Filter out Ink's internal components from devtools for a cleaner view.

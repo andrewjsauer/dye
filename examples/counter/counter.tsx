@@ -6,7 +6,7 @@ function Counter() {
 
 	React.useEffect(() => {
 		const timer = setInterval(() => {
-			setCounter(prevCounter => prevCounter + 1); // eslint-disable-line unicorn/prevent-abbreviations
+			setCounter(prevCounter => prevCounter + 1);
 		}, 100);
 
 		return () => {
@@ -14,7 +14,7 @@ function Counter() {
 		};
 	}, []);
 
-	return <Text color="green">{counter} tests passed</Text>;
+	return <Text color='green'>{counter} tests passed</Text>;
 }
 
 render(<Counter />);

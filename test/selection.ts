@@ -1,10 +1,7 @@
 import test from 'ava';
 import {StylePool, CharPool} from '../src/pools.js';
 import {
-	createScreen,
-	setCellAt,
-	getCell,
-	CellWidth,
+	createScreen, setCellAt, getCell, CellWidth,
 } from '../src/screen.js';
 import {
 	createMultiClickTracker,
@@ -117,7 +114,11 @@ test('normalizeSelection - swaps when focus before anchor', t => {
 // Word boundary detection
 // ---------------------------------------------------------------------------
 
-function writeString(screen: ReturnType<typeof createScreen>, text: string, row = 0): void {
+function writeString(
+	screen: ReturnType<typeof createScreen>,
+	text: string,
+	row = 0,
+): void {
 	for (let i = 0; i < text.length && i < screen.width; i++) {
 		const charId = screen.charPool.intern(text[i]!);
 		setCellAt(screen, i, row, charId, 0, 0, CellWidth.Narrow);
@@ -229,7 +230,15 @@ test('applySelectionOverlay - skips cells already marked with SGR 7', t => {
 	const screen = createScreen(10, 1, stylePool, charPool);
 	// Pre-populate cell 0 with an inverse style
 	const preInverse = stylePool.intern([7]);
-	setCellAt(screen, 0, 0, charPool.intern('X'), preInverse, 0, CellWidth.Narrow);
+	setCellAt(
+		screen,
+		0,
+		0,
+		charPool.intern('X'),
+		preInverse,
+		0,
+		CellWidth.Narrow,
+	);
 
 	const sel = startSelection({col: 0, row: 0}, 'character');
 	const extended = extendSelection(sel, {col: 2, row: 0});
@@ -253,7 +262,7 @@ test('applySelectionOverlay - returns false on empty selection', t => {
 	};
 	const mutated = applySelectionOverlay(screen, sel);
 	// Single cell selection is valid — check the normal empty-backward case
-	t.true(mutated); // actually a single cell IS selected here
+	t.true(mutated); // Actually a single cell IS selected here
 });
 
 // ---------------------------------------------------------------------------
@@ -304,8 +313,8 @@ test('SelectionManager - double-click creates word selection', t => {
 	const mgr = new SelectionManager();
 	mgr.setScreen(screen);
 
-	mgr.handleMousePress(2, 0, 1000); // first click
-	mgr.handleMousePress(2, 0, 1100); // second click (word mode)
+	mgr.handleMousePress(2, 0, 1000); // First click
+	mgr.handleMousePress(2, 0, 1100); // Second click (word mode)
 	const sel = mgr.getSelection()!;
 	t.is(sel.mode, 'word');
 	t.deepEqual(sel.anchor, {col: 0, row: 0});
@@ -367,7 +376,7 @@ test('SelectionManager - subscribe/unsubscribe', t => {
 
 	unsub();
 	mgr.handleMousePress(5, 1);
-	t.is(callCount, 2); // no more calls after unsubscribe
+	t.is(callCount, 2); // No more calls after unsubscribe
 });
 
 // ---------------------------------------------------------------------------
@@ -467,7 +476,7 @@ test('selectWordAt - on whitespace returns zero-width selection', t => {
 	const stylePool = new StylePool();
 	const screen = createScreen(20, 1, stylePool);
 	writeString(screen, 'hello world');
-	const sel = selectWordAt(screen, 5, 0); // on space
+	const sel = selectWordAt(screen, 5, 0); // On space
 	t.is(sel.mode, 'word');
 	t.deepEqual(sel.anchor, {col: 5, row: 0});
 	t.deepEqual(sel.focus, {col: 5, row: 0});
@@ -539,18 +548,18 @@ test('selectionColRange - last row of multi-row selection', t => {
 test('osc52ClipboardSequence - encodes text as base64 with OSC 52 wrapper', t => {
 	const seq = osc52ClipboardSequence('hello');
 	// Format: ESC ] 52 ; c ; <base64> ESC \
-	t.is(seq, '\x1b]52;c;aGVsbG8=\x1b\\');
+	t.is(seq, '\u001B]52;c;aGVsbG8=\u001B\\');
 });
 
 test('osc52ClipboardSequence - empty string encodes correctly', t => {
 	const seq = osc52ClipboardSequence('');
-	t.is(seq, '\x1b]52;c;\x1b\\');
+	t.is(seq, '\u001B]52;c;\u001B\\');
 });
 
 test('osc52ClipboardSequence - utf-8 multibyte content', t => {
 	const seq = osc52ClipboardSequence('中文');
 	// '中文' in UTF-8 is e4b8ad e69687 → base64 '5Lit5paH'
-	t.is(seq, '\x1b]52;c;5Lit5paH\x1b\\');
+	t.is(seq, '\u001B]52;c;5Lit5paH\u001B\\');
 });
 
 test('copyToClipboard - writes OSC 52 to TTY stdout', async t => {
@@ -565,8 +574,8 @@ test('copyToClipboard - writes OSC 52 to TTY stdout', async t => {
 
 	await copyToClipboard('test', {stdout: fakeStdout});
 	t.is(writes.length, 1);
-	t.true(writes[0]!.startsWith('\x1b]52;c;'));
-	t.true(writes[0]!.endsWith('\x1b\\'));
+	t.true(writes[0]!.startsWith('\u001B]52;c;'));
+	t.true(writes[0]!.endsWith('\u001B\\'));
 });
 
 test('copyToClipboard - large text skips OSC 52 and falls back', async t => {
@@ -580,7 +589,7 @@ test('copyToClipboard - large text skips OSC 52 and falls back', async t => {
 	} as unknown as NodeJS.WriteStream;
 
 	// Build a string whose base64 length exceeds OSC52_MAX_BASE64_BYTES (8000)
-	const huge = 'x'.repeat(20000);
+	const huge = 'x'.repeat(20_000);
 	await copyToClipboard(huge, {stdout: fakeStdout}).catch(() => {});
 	// OSC 52 should not have been written — the shell-out path is taken
 	t.is(writes.length, 0);

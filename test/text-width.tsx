@@ -6,22 +6,20 @@ import {Box, Text} from '../src/index.js';
 import {renderToString} from './helpers/render-to-string.js';
 
 test('wide characters do not add extra space inside fixed-width Box', t => {
-	const output = renderToString(
-		<Box flexDirection="column">
-			<Box>
-				<Box width={2}>
-					<Text>🍔</Text>
-				</Box>
-				<Text>|</Text>
+	const output = renderToString(<Box flexDirection='column'>
+		<Box>
+			<Box width={2}>
+				<Text>🍔</Text>
 			</Box>
-			<Box>
-				<Box width={2}>
-					<Text>⏳</Text>
-				</Box>
-				<Text>|</Text>
+			<Text>|</Text>
+		</Box>
+		<Box>
+			<Box width={2}>
+				<Text>⏳</Text>
 			</Box>
-		</Box>,
-	);
+			<Text>|</Text>
+		</Box>
+	</Box>);
 
 	const lines = output.split('\n');
 	t.is(lines.length, 2);
@@ -30,35 +28,31 @@ test('wide characters do not add extra space inside fixed-width Box', t => {
 });
 
 test('CJK characters occupy correct width in fixed-width Box', t => {
-	const output = renderToString(
-		<Box>
-			<Box width={4}>
-				<Text>你好</Text>
-			</Box>
-			<Text>|</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box>
+		<Box width={4}>
+			<Text>你好</Text>
+		</Box>
+		<Text>|</Text>
+	</Box>);
 
 	t.is(output, '你好|');
 });
 
 test('mixed ASCII and wide characters align correctly', t => {
-	const output = renderToString(
-		<Box flexDirection="column">
-			<Box>
-				<Box width={6}>
-					<Text>ab🍔cd</Text>
-				</Box>
-				<Text>|</Text>
+	const output = renderToString(<Box flexDirection='column'>
+		<Box>
+			<Box width={6}>
+				<Text>ab🍔cd</Text>
 			</Box>
-			<Box>
-				<Box width={6}>
-					<Text>abcdef</Text>
-				</Box>
-				<Text>|</Text>
+			<Text>|</Text>
+		</Box>
+		<Box>
+			<Box width={6}>
+				<Text>abcdef</Text>
 			</Box>
-		</Box>,
-	);
+			<Text>|</Text>
+		</Box>
+	</Box>);
 
 	const lines = output.split('\n');
 	t.is(lines.length, 2);
@@ -67,72 +61,60 @@ test('mixed ASCII and wide characters align correctly', t => {
 });
 
 test('ANSI styled text does not affect layout width', t => {
-	const output = renderToString(
-		<Box>
-			<Box width={5}>
-				<Text color="red">hello</Text>
-			</Box>
-			<Text>|</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box>
+		<Box width={5}>
+			<Text color='red'>hello</Text>
+		</Box>
+		<Text>|</Text>
+	</Box>);
 
 	const stripped = stripAnsi(output);
 	t.is(stripped, 'hello|');
 });
 
 test('empty Text does not affect sibling layout', t => {
-	const output = renderToString(
-		<Box>
-			<Text />
-			<Text>hello</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box>
+		<Text />
+		<Text>hello</Text>
+	</Box>);
 
 	t.is(output, 'hello');
 });
 
 test('truncate CJK text at end', t => {
-	const output = renderToString(
-		<Box width={20}>
-			<Text wrap="truncate">あいうえおかきくけこ|end</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={20}>
+		<Text wrap='truncate'>あいうえおかきくけこ|end</Text>
+	</Box>);
 
 	const stripped = stripAnsi(output);
 	t.true(stringWidth(stripped) <= 20);
 });
 
 test('truncate CJK text in the middle', t => {
-	const output = renderToString(
-		<Box width={20}>
-			<Text wrap="truncate-middle">あいうえおかきくけこ|end</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={20}>
+		<Text wrap='truncate-middle'>あいうえおかきくけこ|end</Text>
+	</Box>);
 
 	const stripped = stripAnsi(output);
 	t.true(stringWidth(stripped) <= 20);
 });
 
 test('truncate CJK text at start', t => {
-	const output = renderToString(
-		<Box width={20}>
-			<Text wrap="truncate-start">あいうえおかきくけこ|end</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box width={20}>
+		<Text wrap='truncate-start'>あいうえおかきくけこ|end</Text>
+	</Box>);
 
 	const stripped = stripAnsi(output);
 	t.true(stringWidth(stripped) <= 20);
 });
 
 test('truncate CJK text does not exceed Box width', t => {
-	const output = renderToString(
-		<Box>
-			<Box width={20}>
-				<Text wrap="truncate">あいうえおかきくけこ|end</Text>
-			</Box>
-			<Text>|</Text>
-		</Box>,
-	);
+	const output = renderToString(<Box>
+		<Box width={20}>
+			<Text wrap='truncate'>あいうえおかきくけこ|end</Text>
+		</Box>
+		<Text>|</Text>
+	</Box>);
 
 	const lines = output.split('\n');
 	t.is(lines.length, 1);
@@ -148,7 +130,7 @@ test('overlay on 2nd cell of CJK character clears the full character', t => {
 	const output = renderToString(
 		<Box width={20} height={1}>
 			<Text>あいうえおかきくけこ</Text>
-			<Box position="absolute" left={9}>
+			<Box position='absolute' left={9}>
 				<Text>XYZ</Text>
 			</Box>
 		</Box>,
@@ -166,7 +148,7 @@ test('overlay on 1st cell of CJK character clears trailing placeholder', t => {
 	const output = renderToString(
 		<Box width={20} height={1}>
 			<Text>あいうえおかきくけこ</Text>
-			<Box position="absolute" left={10}>
+			<Box position='absolute' left={10}>
 				<Text>X</Text>
 			</Box>
 		</Box>,
@@ -185,7 +167,7 @@ test('CJK overlay on 2nd cell of CJK clears both sides', t => {
 	const output = renderToString(
 		<Box width={20} height={1}>
 			<Text>あいうえおかきくけこ</Text>
-			<Box position="absolute" left={5}>
+			<Box position='absolute' left={5}>
 				<Text>漢字テスト</Text>
 			</Box>
 		</Box>,
@@ -202,9 +184,9 @@ test('clipped empty write does not corrupt existing wide characters', t => {
 	// must not run, otherwise it would destroy a wide character that
 	// isn't actually being overwritten.
 	const output = renderToString(
-		<Box width={4} height={1} overflowX="hidden">
+		<Box width={4} height={1} overflowX='hidden'>
 			<Text>あい</Text>
-			<Box position="absolute" left={-1} width={1}>
+			<Box position='absolute' left={-1} width={1}>
 				<Text>Z</Text>
 			</Box>
 		</Box>,

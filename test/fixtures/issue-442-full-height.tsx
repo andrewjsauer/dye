@@ -1,6 +1,8 @@
 import process from 'node:process';
 import React, {useEffect} from 'react';
-import {Box, Text, render, useApp} from '../../src/index.js';
+import {
+	Box, Text, render, useApp,
+} from '../../src/index.js';
 
 function App() {
 	const {exit} = useApp();
@@ -19,7 +21,7 @@ function App() {
 	const columns = process.stdout.columns || 100;
 
 	return (
-		<Box width={columns} height={rows} flexDirection="column">
+		<Box width={columns} height={rows} flexDirection='column'>
 			<Box flexGrow={1}>
 				<Text>#442 top</Text>
 			</Box>
