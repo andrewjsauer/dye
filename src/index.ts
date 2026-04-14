@@ -95,6 +95,9 @@ export type {
 	Point,
 	MultiClickTracker,
 } from './selection.js';
+// Hardware scroll
+export {applyScrollHint, computeScrollHint} from './scroll-hint.js';
+export type {ScrollHint, ScrollOptions} from './scroll-hint.js';
 export {diffScreens} from './diff.js';
 export type {DiffOptions} from './diff.js';
 export {optimize, diffToString} from './optimizer.js';
