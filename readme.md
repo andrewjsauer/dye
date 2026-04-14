@@ -15,6 +15,7 @@ render(
       <Text color="cyan" bold>Hello from Dye</Text>
     </Box>
   </AlternateScreen>,
+  {alternateScreen: true},
 );
 ```
 

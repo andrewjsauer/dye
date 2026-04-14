@@ -1,13 +1,18 @@
 /**
- * AlternateScreen — React component that enters the terminal's alternate
- * screen buffer (DEC 1049) on mount and restores the main screen on unmount.
+ * AlternateScreen — React component that enables SGR mouse tracking for the
+ * lifetime of the component.
  *
- * Optionally enables mouse tracking (SGR protocol) when mouseTracking is true.
+ * For alt-screen buffer management, pass `{alternateScreen: true}` to render().
+ * Ink writes the DEC 1049 enter sequence *before* any render output, which is
+ * the only ordering that avoids clearing your own content.
  *
  * Usage:
- *   <AlternateScreen mouseTracking>
- *     <Box>Your full-screen app here</Box>
- *   </AlternateScreen>
+ *   render(<AlternateScreen mouseTracking><App /></AlternateScreen>, {
+ *     alternateScreen: true,
+ *   });
+ *
+ * Or, if you only want mouse tracking without alt-screen:
+ *   render(<AlternateScreen mouseTracking><App /></AlternateScreen>);
  */
 import React, {useEffect, useContext, type PropsWithChildren} from 'react';
 import {MOUSE_ENABLE, MOUSE_DISABLE} from '../mouse.js';
@@ -16,28 +21,14 @@ import StdoutContext from './StdoutContext.js';
 
 export type AlternateScreenProps = {
 	/**
-	 * Enable SGR mouse tracking in the alternate screen.
-	 * When true, mouse click, drag, and motion events are reported.
+	 * Enable SGR mouse tracking (modes 1000/1002/1006) while this component
+	 * is mounted. When true, mouse click, drag, and motion events are reported
+	 * to the component tree via onClick / onMouseEnter / onMouseLeave handlers.
 	 * @default false
 	 */
 	readonly mouseTracking?: boolean;
 };
 
-// DEC 1049: alternate screen buffer
-const ENTER_ALT_SCREEN = '\u001B[?1049h';
-const EXIT_ALT_SCREEN = '\u001B[?1049l';
-const CLEAR_SCREEN = '\u001B[2J';
-const CURSOR_HOME = '\u001B[H';
-const HIDE_CURSOR = '\u001B[?25l';
-const SHOW_CURSOR = '\u001B[?25h';
-
-/**
- * AlternateScreen component.
- *
- * On mount: enters alt screen, clears, homes cursor, optionally enables mouse.
- * On unmount: disables mouse, exits alt screen, restores main screen.
- * Children are rendered inside a Box that fills the terminal height.
- */
 function AlternateScreen({
 	children,
 	mouseTracking = false,
@@ -45,26 +36,11 @@ function AlternateScreen({
 	const {stdout} = useContext(StdoutContext);
 
 	useEffect(() => {
-		// Enter alternate screen
-		let enterSequence
-			= ENTER_ALT_SCREEN + CLEAR_SCREEN + CURSOR_HOME + HIDE_CURSOR;
+		if (!mouseTracking) return;
 
-		if (mouseTracking) {
-			enterSequence += MOUSE_ENABLE;
-		}
-
-		stdout.write(enterSequence);
-
-		// Cleanup: exit alternate screen
+		stdout.write(MOUSE_ENABLE);
 		return () => {
-			let exitSequence = '';
-
-			if (mouseTracking) {
-				exitSequence += MOUSE_DISABLE;
-			}
-
-			exitSequence += SHOW_CURSOR + EXIT_ALT_SCREEN;
-			stdout.write(exitSequence);
+			stdout.write(MOUSE_DISABLE);
 		};
 	}, [stdout, mouseTracking]);
 

@@ -106,4 +106,4 @@ function App() {
 	);
 }
 
-render(<App />);
+render(<App />, {alternateScreen: true});
