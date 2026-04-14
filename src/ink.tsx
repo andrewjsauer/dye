@@ -705,6 +705,7 @@ export default class Ink {
 						setCursorPosition={this.setCursorPosition}
 						onExit={this.handleAppExit}
 						onWaitUntilRenderFlush={this.waitUntilRenderFlush}
+						onRawInput={this.tryHandleMouseInput}
 					>
 						{node}
 					</App>

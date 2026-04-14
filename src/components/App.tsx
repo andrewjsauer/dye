@@ -44,6 +44,13 @@ type Props = {
 	readonly setCursorPosition: (position: CursorPosition | undefined) => void;
 	readonly interactive: boolean;
 	readonly renderThrottleMs: number;
+	/**
+	 * Called for every parsed input sequence before it's broadcast to
+	 * useInput hooks. If it returns true, the input is considered consumed
+	 * (e.g., SGR mouse event routed to onClick handlers) and will not be
+	 * forwarded to keyboard input listeners.
+	 */
+	readonly onRawInput?: (input: string) => boolean;
 };
 
 type Focusable = {
@@ -67,6 +74,7 @@ function App({
 	setCursorPosition,
 	interactive,
 	renderThrottleMs,
+	onRawInput,
 }: Props): React.ReactNode {
 	const [isFocusEnabled, setIsFocusEnabled] = useState(true);
 	const [activeFocusId, setActiveFocusId] = useState<string | undefined>(undefined);
@@ -238,10 +246,18 @@ function App({
 
 	const emitInput = useCallback(
 		(input: string): void => {
+			// Give the host a chance to consume this input before broadcasting
+			// to useInput listeners. SGR mouse events are consumed here so
+			// they're dispatched to onClick / hover handlers instead of leaking
+			// into keyboard hooks as garbage escape sequences.
+			if (onRawInput?.(input)) {
+				return;
+			}
+
 			handleInput(input);
 			internal_eventEmitter.current.emit('input', input);
 		},
-		[handleInput],
+		[handleInput, onRawInput],
 	);
 
 	const schedulePendingInputFlush = useCallback((): void => {
