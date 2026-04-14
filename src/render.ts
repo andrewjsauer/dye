@@ -2,6 +2,7 @@ import {Stream} from 'node:stream';
 import process from 'node:process';
 import type {ReactNode} from 'react';
 import Ink, {type Options as InkOptions, type RenderMetrics} from './ink.js';
+import {type FrameEvent} from './frame-event.js';
 import instances from './instances.js';
 import {type KittyKeyboardOptions} from './kitty-keyboard.js';
 
@@ -56,6 +57,12 @@ export type RenderOptions = {
 	To run code after output is flushed, use `waitUntilRenderFlush()`.
 	*/
 	onRender?: (metrics: RenderMetrics) => void;
+
+	/**
+	Runs after each frame render with detailed per-phase timing and patch statistics.
+	Use for performance profiling. See {@link FrameEvent}.
+	*/
+	onFrame?: (event: FrameEvent) => void;
 
 	/**
 	Enable screen reader support. See https://github.com/vadimdemedes/ink/blob/master/readme.md#screen-reader-support

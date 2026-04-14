@@ -95,6 +95,9 @@ export type {
 // Hardware scroll
 export {applyScrollHint, computeScrollHint} from './scroll-hint.js';
 export type {ScrollHint, ScrollOptions} from './scroll-hint.js';
+// Performance instrumentation
+export {FrameTimer} from './frame-event.js';
+export type {FrameEvent, FramePhases} from './frame-event.js';
 export {diffScreens} from './diff.js';
 export type {DiffOptions} from './diff.js';
 export {optimize, diffToString} from './optimizer.js';

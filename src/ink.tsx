@@ -19,6 +19,7 @@ import {dispatchClick, dispatchHover} from './events/dispatch.js';
 import {SelectionManager} from './selection-manager.js';
 import SelectionContext from './components/SelectionContext.js';
 import {applySelectionOverlay} from './selection-overlay.js';
+import {FrameTimer, type FrameEvent} from './frame-event.js';
 import * as dom from './dom.js';
 import {hideCursorEscape, showCursorEscape} from './cursor-helpers.js';
 import logUpdate, {type LogUpdate, type CursorPosition} from './log-update.js';
@@ -225,6 +226,11 @@ export type Options = {
 	exitOnCtrlC: boolean;
 	patchConsole: boolean;
 	onRender?: (metrics: RenderMetrics) => void;
+	/**
+	Called after each frame is rendered with detailed per-phase timing
+	and patch statistics. Use for performance profiling.
+	*/
+	onFrame?: (event: FrameEvent) => void;
 	isScreenReaderEnabled?: boolean;
 	waitUntilExit?: () => Promise<unknown>;
 	maxFps?: number;
@@ -319,6 +325,12 @@ export default class Ink {
 	 * Updated by handleMouseEvent, exposed via useSelection hook.
 	 */
 	private readonly selectionManager: SelectionManager = new SelectionManager();
+
+	/**
+	 * FrameTimer for the current render cycle. Set at the start of onRender
+	 * when onFrame is configured; finalized and emitted after the write phase.
+	 */
+	private pendingFrameTimer: FrameTimer | undefined;
 	private readonly container: FiberRoot;
 	private readonly rootNode: dom.DOMElement;
 	// This variable is used only in debug mode to store full static output
@@ -537,6 +549,14 @@ export default class Ink {
 	};
 
 	onRender: () => void = () => {
+		try {
+			this.doRender();
+		} finally {
+			this.finalizeFrameEvent();
+		}
+	};
+
+	private doRender(): void {
 		this.hasPendingThrottledRender = false;
 
 		if (this.isUnmounted) {
@@ -548,11 +568,16 @@ export default class Ink {
 			this.nextRenderCommit = undefined;
 		}
 
+		const frameTimer = this.options.onFrame ? new FrameTimer() : undefined;
 		const startTime = performance.now();
 		const {output, outputHeight, staticOutput, screen} = render(
 			this.rootNode,
 			this.isScreenReaderEnabled,
 		);
+		// Everything inside render() is reconcile + layout + render-to-screen.
+		// We can't easily split these three phases without instrumenting the
+		// renderer internals, so we attribute the whole block to `render`.
+		frameTimer?.mark('render');
 
 		// Track the current screen buffer for downstream features
 		if (screen) {
@@ -566,6 +591,7 @@ export default class Ink {
 			}
 		}
 
+		this.pendingFrameTimer = frameTimer;
 		this.options.onRender?.({renderTime: performance.now() - startTime});
 
 		// If <Static> output isn't empty, it means new children have been added to it
@@ -658,7 +684,24 @@ export default class Ink {
 			outputHeight,
 			hasStaticOutput ? staticOutput : '',
 		);
-	};
+	}
+
+	/**
+	 * Finalize the pending FrameTimer and emit the FrameEvent via onFrame.
+	 * Called at the end of each onRender invocation. No-op when onFrame is
+	 * not configured.
+	 */
+	private finalizeFrameEvent(): void {
+		const timer = this.pendingFrameTimer;
+		if (!timer) return;
+		this.pendingFrameTimer = undefined;
+		timer.mark('write');
+		try {
+			this.options.onFrame?.(timer.finish());
+		} catch {
+			// Never let an onFrame error break the render loop
+		}
+	}
 
 	render(node: ReactNode): void {
 		const tree = (
