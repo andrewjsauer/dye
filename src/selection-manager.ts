@@ -45,6 +45,7 @@ export class SelectionManager {
 	private readonly tracker: MultiClickTracker = createMultiClickTracker();
 	private readonly listeners = new Set<Listener>();
 	private screen: Screen | undefined;
+	private stdout: NodeJS.WriteStream | undefined;
 	private dragging = false;
 	/**
 	 * Frozen snapshot of the current state. Recomputed on every state
@@ -59,6 +60,14 @@ export class SelectionManager {
 		// Screen changes can affect selectedText even when selection itself hasn't
 		// moved (e.g., content under the selection was re-rendered).
 		this.refreshSnapshot();
+	}
+
+	/**
+	 * Set the stdout stream used for OSC 52 clipboard writes.
+	 * Called by the Ink render root so copy() can emit escapes to the right TTY.
+	 */
+	setStdout(stdout: NodeJS.WriteStream | undefined): void {
+		this.stdout = stdout;
 	}
 
 	/** Get the current selection state (may be undefined). */
@@ -134,7 +143,7 @@ export class SelectionManager {
 		const text = this.getSelectedText();
 		if (!text) return false;
 		try {
-			await copyToClipboard(text);
+			await copyToClipboard(text, {stdout: this.stdout});
 			return true;
 		} catch {
 			return false;

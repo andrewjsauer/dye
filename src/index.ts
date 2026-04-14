@@ -86,11 +86,13 @@ export {
 	selectLineAt,
 	getSelectedText,
 	copyToClipboard,
+	osc52ClipboardSequence,
 } from './selection.js';
 export type {
 	SelectionState,
 	SelectionMode,
 	Point,
+	ClipboardOptions,
 } from './selection.js';
 // Hardware scroll
 export {applyScrollHint, computeScrollHint} from './scroll-hint.js';

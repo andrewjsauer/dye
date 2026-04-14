@@ -13,6 +13,7 @@
  * wide characters and row boundaries.
  */
 
+import process from 'node:process';
 import {execFile} from 'node:child_process';
 import {platform} from 'node:process';
 import {
@@ -317,16 +318,34 @@ export function getSelectedText(
 // ---------------------------------------------------------------------------
 
 /**
- * Copy text to the system clipboard using the platform-appropriate command.
- * Returns a promise that resolves when the copy completes.
+ * Build the OSC 52 escape sequence that writes `text` to the terminal's
+ * clipboard. Most modern terminals (WezTerm, Kitty, iTerm2, Ghostty,
+ * Alacritty, foot) and tmux (with set-clipboard on) support this.
  *
- * Platforms:
- * - macOS: pbcopy
- * - Linux: xclip (X11), falling back to wl-copy (Wayland)
- * - Windows: clip.exe
+ * This is the preferred clipboard mechanism for TUI apps because it works
+ * transparently over SSH and inside tmux, where pbcopy/xclip cannot reach
+ * the user's actual clipboard.
  *
- * The command name is selected from a fixed allowlist — only hard-coded
- * strings reach execFile. No caller input influences the command or args.
+ * Format: ESC ] 52 ; c ; <base64(text)> BEL
+ * - `c` selects the clipboard (vs primary selection `p`)
+ * - Content must be base64-encoded (no length limit in the spec, but some
+ *   terminals cap at 64KB or 100KB of base64 data)
+ */
+export function osc52ClipboardSequence(text: string): string {
+	const encoded = Buffer.from(text, 'utf8').toString('base64');
+	return `\x1b]52;c;${encoded}\x1b\\`;
+}
+
+/**
+ * OSC 52 length limits. xterm's default is 8192 bytes of base64 data
+ * (tunable via `disallowedWindowOps`), which encodes ~6144 bytes of text.
+ * We cap slightly below that to leave headroom across terminal emulators.
+ */
+const OSC52_MAX_BASE64_BYTES = 8000;
+
+/**
+ * Shell-out fallback command allowlist. Only used when OSC 52 is
+ * unavailable or the caller explicitly opts out.
  */
 const CLIPBOARD_ALLOWLIST = new Set(['pbcopy', 'clip', 'xclip', 'wl-copy']);
 
@@ -335,7 +354,6 @@ function runClipboardCommand(
 	args: string[],
 	text: string,
 ): Promise<void> {
-	// Defence in depth: prevent a future refactor from passing non-literal commands
 	if (!CLIPBOARD_ALLOWLIST.has(command)) {
 		return Promise.reject(new Error(`Clipboard command not allowed: ${command}`));
 	}
@@ -356,7 +374,7 @@ function runClipboardCommand(
 	});
 }
 
-export function copyToClipboard(text: string): Promise<void> {
+function runShellOutFallback(text: string): Promise<void> {
 	if (platform === 'darwin') {
 		return runClipboardCommand('pbcopy', [], text);
 	}
@@ -365,7 +383,45 @@ export function copyToClipboard(text: string): Promise<void> {
 		return runClipboardCommand('clip', [], text);
 	}
 
-	// Linux/other: try xclip first, fall back to wl-copy on Wayland
 	return runClipboardCommand('xclip', ['-selection', 'clipboard'], text)
 		.catch(() => runClipboardCommand('wl-copy', [], text));
+}
+
+export type ClipboardOptions = {
+	/**
+	 * Stream to emit OSC 52 to. Defaults to process.stdout.
+	 * Set to null to skip OSC 52 entirely (use the shell-out path).
+	 */
+	readonly stdout?: NodeJS.WriteStream | null;
+};
+
+/**
+ * Copy `text` to the system clipboard.
+ *
+ * Strategy:
+ * 1. Emit OSC 52 to the terminal when possible — works over SSH and in tmux,
+ *    handled natively by modern terminal emulators.
+ * 2. Fall back to platform shell-out (pbcopy/xclip/wl-copy/clip) when OSC 52
+ *    is disabled or the text exceeds the terminal's limit.
+ *
+ * Users can disable OSC 52 by passing `{stdout: null}` to force shell-out.
+ */
+export function copyToClipboard(
+	text: string,
+	options: ClipboardOptions = {},
+): Promise<void> {
+	const stdout = options.stdout === undefined ? process.stdout : options.stdout;
+	const encodedLength = Math.ceil(text.length * 4 / 3); // approximate base64 length
+
+	// OSC 52 path — preferred when a TTY is available and content fits
+	if (stdout?.isTTY && encodedLength <= OSC52_MAX_BASE64_BYTES) {
+		try {
+			stdout.write(osc52ClipboardSequence(text));
+			return Promise.resolve();
+		} catch {
+			// Fall through to shell-out
+		}
+	}
+
+	return runShellOutFallback(text);
 }

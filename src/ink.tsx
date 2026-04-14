@@ -348,6 +348,8 @@ export default class Ink {
 		this.options = options;
 		this.rootNode = dom.createNode('ink-root');
 		this.rootNode.onComputeLayout = this.calculateLayout;
+		// SelectionManager needs stdout to emit OSC 52 clipboard writes.
+		this.selectionManager.setStdout(options.stdout);
 
 		this.isScreenReaderEnabled =
 			options.isScreenReaderEnabled ??

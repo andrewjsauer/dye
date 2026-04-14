@@ -19,6 +19,8 @@ import {
 	snapToWordStart,
 	snapToWordEnd,
 	selectionColRange,
+	osc52ClipboardSequence,
+	copyToClipboard,
 } from '../src/selection.js';
 import {applySelectionOverlay} from '../src/selection-overlay.js';
 import {SelectionManager} from '../src/selection-manager.js';
@@ -528,4 +530,73 @@ test('selectionColRange - last row of multi-row selection', t => {
 		20,
 	);
 	t.deepEqual(range, [0, 3]);
+});
+
+// ---------------------------------------------------------------------------
+// OSC 52 clipboard
+// ---------------------------------------------------------------------------
+
+test('osc52ClipboardSequence - encodes text as base64 with OSC 52 wrapper', t => {
+	const seq = osc52ClipboardSequence('hello');
+	// Format: ESC ] 52 ; c ; <base64> ESC \
+	t.is(seq, '\x1b]52;c;aGVsbG8=\x1b\\');
+});
+
+test('osc52ClipboardSequence - empty string encodes correctly', t => {
+	const seq = osc52ClipboardSequence('');
+	t.is(seq, '\x1b]52;c;\x1b\\');
+});
+
+test('osc52ClipboardSequence - utf-8 multibyte content', t => {
+	const seq = osc52ClipboardSequence('中文');
+	// '中文' in UTF-8 is e4b8ad e69687 → base64 '5Lit5paH'
+	t.is(seq, '\x1b]52;c;5Lit5paH\x1b\\');
+});
+
+test('copyToClipboard - writes OSC 52 to TTY stdout', async t => {
+	const writes: string[] = [];
+	const fakeStdout = {
+		isTTY: true,
+		write(chunk: string) {
+			writes.push(chunk);
+			return true;
+		},
+	} as unknown as NodeJS.WriteStream;
+
+	await copyToClipboard('test', {stdout: fakeStdout});
+	t.is(writes.length, 1);
+	t.true(writes[0]!.startsWith('\x1b]52;c;'));
+	t.true(writes[0]!.endsWith('\x1b\\'));
+});
+
+test('copyToClipboard - large text skips OSC 52 and falls back', async t => {
+	const writes: string[] = [];
+	const fakeStdout = {
+		isTTY: true,
+		write(chunk: string) {
+			writes.push(chunk);
+			return true;
+		},
+	} as unknown as NodeJS.WriteStream;
+
+	// Build a string whose base64 length exceeds OSC52_MAX_BASE64_BYTES (8000)
+	const huge = 'x'.repeat(20000);
+	await copyToClipboard(huge, {stdout: fakeStdout}).catch(() => {});
+	// OSC 52 should not have been written — the shell-out path is taken
+	t.is(writes.length, 0);
+});
+
+test('copyToClipboard - stdout: null forces shell-out (no OSC 52)', async t => {
+	const writes: string[] = [];
+	const fakeStdout = {
+		isTTY: true,
+		write(chunk: string) {
+			writes.push(chunk);
+			return true;
+		},
+	} as unknown as NodeJS.WriteStream;
+
+	// Even with a TTY available, stdout: null bypasses OSC 52
+	await copyToClipboard('hello', {stdout: null}).catch(() => {});
+	t.is(writes.length, 0);
 });

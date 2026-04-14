@@ -162,6 +162,8 @@ Dye ships 9 units of work; a few are foundation that consumers can use directly 
 
 `~` = foundation shipped in v0.1; wired to default output path in v0.2.
 
+For a file-by-file breakdown of what was added, replaced, or deliberately left out, see [docs/DIFF-FROM-INK.md](docs/DIFF-FROM-INK.md).
+
 
 ## Examples
 
