@@ -16,6 +16,9 @@ import render from './renderer.js';
 import {type Screen} from './screen.js';
 import {parseMouse, type ParsedMouse} from './mouse.js';
 import {dispatchClick, dispatchHover} from './events/dispatch.js';
+import {SelectionManager} from './selection-manager.js';
+import SelectionContext from './components/SelectionContext.js';
+import {applySelectionOverlay} from './selection-overlay.js';
 import * as dom from './dom.js';
 import {hideCursorEscape, showCursorEscape} from './cursor-helpers.js';
 import logUpdate, {type LogUpdate, type CursorPosition} from './log-update.js';
@@ -310,6 +313,12 @@ export default class Ink {
 	 * returns a Screen (normal mode, not screen reader).
 	 */
 	private currentScreen: Screen | undefined;
+
+	/**
+	 * SelectionManager owns the text selection state for this Ink instance.
+	 * Updated by handleMouseEvent, exposed via useSelection hook.
+	 */
+	private readonly selectionManager: SelectionManager = new SelectionManager();
 	private readonly container: FiberRoot;
 	private readonly rootNode: dom.DOMElement;
 	// This variable is used only in debug mode to store full static output
@@ -548,6 +557,13 @@ export default class Ink {
 		// Track the current screen buffer for downstream features
 		if (screen) {
 			this.currentScreen = screen;
+			this.selectionManager.setScreen(screen);
+
+			// Apply selection overlay if there's an active selection
+			const sel = this.selectionManager.getSelection();
+			if (sel) {
+				applySelectionOverlay(screen, sel);
+			}
 		}
 
 		this.options.onRender?.({renderTime: performance.now() - startTime});
@@ -649,21 +665,23 @@ export default class Ink {
 			<AccessibilityContext.Provider
 				value={{isScreenReaderEnabled: this.isScreenReaderEnabled}}
 			>
-				<App
-					stdin={this.options.stdin}
-					stdout={this.options.stdout}
-					stderr={this.options.stderr}
-					exitOnCtrlC={this.options.exitOnCtrlC}
-					interactive={this.interactive}
-					renderThrottleMs={this.renderThrottleMs}
-					writeToStdout={this.writeToStdout}
-					writeToStderr={this.writeToStderr}
-					setCursorPosition={this.setCursorPosition}
-					onExit={this.handleAppExit}
-					onWaitUntilRenderFlush={this.waitUntilRenderFlush}
-				>
-					{node}
-				</App>
+				<SelectionContext.Provider value={{manager: this.selectionManager}}>
+					<App
+						stdin={this.options.stdin}
+						stdout={this.options.stdout}
+						stderr={this.options.stderr}
+						exitOnCtrlC={this.options.exitOnCtrlC}
+						interactive={this.interactive}
+						renderThrottleMs={this.renderThrottleMs}
+						writeToStdout={this.writeToStdout}
+						writeToStderr={this.writeToStderr}
+						setCursorPosition={this.setCursorPosition}
+						onExit={this.handleAppExit}
+						onWaitUntilRenderFlush={this.waitUntilRenderFlush}
+					>
+						{node}
+					</App>
+				</SelectionContext.Provider>
 			</AccessibilityContext.Provider>
 		);
 
@@ -954,6 +972,11 @@ export default class Ink {
 	 */
 	handleMouseEvent(mouse: ParsedMouse): void {
 		if (mouse.action === 'press') {
+			// Update selection manager first (may start a new selection)
+			if (mouse.button === 'left') {
+				this.selectionManager.handleMousePress(mouse.col, mouse.row);
+			}
+
 			dispatchClick(this.rootNode, mouse.col, mouse.row, {
 				button: mouse.button === 'none' ? undefined : mouse.button,
 				shift: mouse.shift,
@@ -961,8 +984,21 @@ export default class Ink {
 				ctrl: mouse.ctrl,
 			});
 		} else if (mouse.action === 'drag') {
+			if (mouse.button === 'left') {
+				this.selectionManager.handleMouseDrag(mouse.col, mouse.row);
+			}
+
 			dispatchHover(this.rootNode, mouse.col, mouse.row);
+		} else if (mouse.action === 'release') {
+			if (mouse.button === 'left') {
+				this.selectionManager.handleMouseRelease();
+			}
 		}
+	}
+
+	/** Get the selection manager for this instance. */
+	getSelectionManager(): SelectionManager {
+		return this.selectionManager;
 	}
 
 	/**

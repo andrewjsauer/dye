@@ -71,6 +71,30 @@ export {dispatchClick, dispatchHover, resetHoverState} from './events/dispatch.j
 // Node rect cache (hit-testing foundation)
 export type {CachedLayout} from './node-cache.js';
 export {getNodeRect, hitTest} from './node-cache.js';
+// Selection
+export {default as useSelection} from './hooks/use-selection.js';
+export type {UseSelectionResult} from './hooks/use-selection.js';
+export {SelectionManager} from './selection-manager.js';
+export {applySelectionOverlay} from './selection-overlay.js';
+export {
+	normalizeSelection,
+	startSelection,
+	extendSelection,
+	selectWordAt,
+	selectLineAt,
+	getSelectedText,
+	copyToClipboard,
+	clickCountToMode,
+	recordClick,
+	createMultiClickTracker,
+	MULTI_CLICK_THRESHOLD_MS,
+} from './selection.js';
+export type {
+	SelectionState,
+	SelectionMode,
+	Point,
+	MultiClickTracker,
+} from './selection.js';
 export {diffScreens} from './diff.js';
 export type {DiffOptions} from './diff.js';
 export {optimize, diffToString} from './optimizer.js';
