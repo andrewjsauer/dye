@@ -36,7 +36,9 @@ function AlternateScreen({
 	const {stdout} = useContext(StdoutContext);
 
 	useEffect(() => {
-		if (!mouseTracking) return;
+		if (!mouseTracking) {
+			return;
+		}
 
 		stdout.write(MOUSE_ENABLE);
 		return () => {
