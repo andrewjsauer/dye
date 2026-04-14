@@ -134,3 +134,68 @@ test('onFrame errors do not break render', t => {
 		});
 	});
 });
+
+test('onFrame fires on rerender', t => {
+	const stdout = createStdout(80, false);
+	const events: FrameEvent[] = [];
+
+	const instance = render(<Text>One</Text>, {
+		stdout,
+		debug: true,
+		onFrame(event) {
+			events.push(event);
+		},
+	});
+
+	const initialCount = events.length;
+	instance.rerender(<Text>Two</Text>);
+
+	t.true(events.length > initialCount, 'rerender should produce additional FrameEvent');
+});
+
+test('onFrame survives a throwing callback and fires again on rerender', t => {
+	const stdout = createStdout(80, false);
+	let callCount = 0;
+	let sawSecond = false;
+
+	const instance = render(<Text>One</Text>, {
+		stdout,
+		debug: true,
+		onFrame() {
+			callCount++;
+			if (callCount === 1) throw new Error('first-frame boom');
+			sawSecond = true;
+		},
+	});
+
+	// The first onFrame throw should be swallowed. A rerender must still
+	// invoke onFrame (callCount goes above 1 and sawSecond flips).
+	instance.rerender(<Text>Two</Text>);
+	t.true(sawSecond, 'onFrame must fire on second render after first threw');
+});
+
+test('onFrame reentrant rerender does not throw or hang', t => {
+	// React may batch/dedupe a rerender triggered from inside onFrame,
+	// so we don't assert that it fires a second event — only that the
+	// outer frame completes cleanly and the render loop survives.
+	const stdout = createStdout(80, false);
+	const events: FrameEvent[] = [];
+	let rerendered = false;
+
+	t.notThrows(() => {
+		const instance = render(<Text>One</Text>, {
+			stdout,
+			debug: true,
+			onFrame(event) {
+				events.push(event);
+				if (!rerendered) {
+					rerendered = true;
+					instance.rerender(<Text>Two</Text>);
+				}
+			},
+		});
+		instance.unmount();
+	});
+
+	t.true(events.length >= 1);
+});

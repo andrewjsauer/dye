@@ -326,11 +326,6 @@ export default class Ink {
 	 */
 	private readonly selectionManager: SelectionManager = new SelectionManager();
 
-	/**
-	 * FrameTimer for the current render cycle. Set at the start of onRender
-	 * when onFrame is configured; finalized and emitted after the write phase.
-	 */
-	private pendingFrameTimer: FrameTimer | undefined;
 	private readonly container: FiberRoot;
 	private readonly rootNode: dom.DOMElement;
 	// This variable is used only in debug mode to store full static output
@@ -549,14 +544,24 @@ export default class Ink {
 	};
 
 	onRender: () => void = () => {
+		const frameTimer = this.options.onFrame ? new FrameTimer() : undefined;
 		try {
-			this.doRender();
+			this.doRender(frameTimer);
 		} finally {
-			this.finalizeFrameEvent();
+			// Capture timer in local so reentrant renders (onFrame triggering
+			// rerender) cannot discard the outer frame's event.
+			if (frameTimer) {
+				frameTimer.mark('write');
+				try {
+					this.options.onFrame?.(frameTimer.finish());
+				} catch {
+					// Never let an onFrame error break the render loop
+				}
+			}
 		}
 	};
 
-	private doRender(): void {
+	private doRender(frameTimer: FrameTimer | undefined): void {
 		this.hasPendingThrottledRender = false;
 
 		if (this.isUnmounted) {
@@ -568,7 +573,6 @@ export default class Ink {
 			this.nextRenderCommit = undefined;
 		}
 
-		const frameTimer = this.options.onFrame ? new FrameTimer() : undefined;
 		const startTime = performance.now();
 		const {output, outputHeight, staticOutput, screen} = render(
 			this.rootNode,
@@ -591,7 +595,6 @@ export default class Ink {
 			}
 		}
 
-		this.pendingFrameTimer = frameTimer;
 		this.options.onRender?.({renderTime: performance.now() - startTime});
 
 		// If <Static> output isn't empty, it means new children have been added to it
@@ -684,23 +687,6 @@ export default class Ink {
 			outputHeight,
 			hasStaticOutput ? staticOutput : '',
 		);
-	}
-
-	/**
-	 * Finalize the pending FrameTimer and emit the FrameEvent via onFrame.
-	 * Called at the end of each onRender invocation. No-op when onFrame is
-	 * not configured.
-	 */
-	private finalizeFrameEvent(): void {
-		const timer = this.pendingFrameTimer;
-		if (!timer) return;
-		this.pendingFrameTimer = undefined;
-		timer.mark('write');
-		try {
-			this.options.onFrame?.(timer.finish());
-		} catch {
-			// Never let an onFrame error break the render loop
-		}
 	}
 
 	render(node: ReactNode): void {

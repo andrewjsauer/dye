@@ -188,7 +188,7 @@ Dye re-exports all of Ink v7's public API. See the [Ink documentation](https://g
 For advanced use cases:
 
 - `parseMouse(sequence)`, `MOUSE_ENABLE`, `MOUSE_DISABLE` — SGR mouse protocol
-- `dispatchClick`, `dispatchHover` — manual event dispatch
+- `dispatchClick`, `dispatchHover`, `resetHoverState` — manual event dispatch
 - `hitTest(root, col, row)` — coordinate-to-node lookup
 - `createScreen`, `setCellAt`, `getCell` — screen buffer primitives
 - `CharPool`, `StylePool`, `HyperlinkPool` — interning pools
