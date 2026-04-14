@@ -11,7 +11,6 @@
 
 import {
 	type Screen,
-	CellWidth,
 	getCellWord1,
 	unpackStyleId,
 	unpackHyperlinkId,
@@ -38,15 +37,16 @@ export function applySelectionOverlay(
 	selection: SelectionState,
 ): boolean {
 	const [start, end] = normalizeSelection(selection);
-	if (start.row > end.row
-		|| (start.row === end.row && start.col > end.col)) {
+	if (start.row > end.row || (start.row === end.row && start.col > end.col)) {
 		return false;
 	}
 
 	let mutated = false;
 
-	for (let row = start.row; row <= end.row; row++) {
-		if (row < 0 || row >= screen.height) continue;
+	for (let {row} = start; row <= end.row; row++) {
+		if (row < 0 || row >= screen.height) {
+			continue;
+		}
 
 		const [startCol, endCol] = selectionColRange(
 			selection.mode,
@@ -57,7 +57,9 @@ export function applySelectionOverlay(
 		);
 
 		for (let col = startCol; col <= endCol && col < screen.width; col++) {
-			if (col < 0) continue;
+			if (col < 0) {
+				continue;
+			}
 
 			const charId = getCellCharId(screen, col, row);
 			const word1 = getCellWord1(screen, col, row);
@@ -68,7 +70,9 @@ export function applySelectionOverlay(
 			// Get the original style codes and append SGR 7 (inverse)
 			const currentCodes = screen.stylePool.resolve(currentStyleId);
 			// Avoid adding duplicate inverse codes
-			if (currentCodes.includes(7)) continue;
+			if (currentCodes.includes(7)) {
+				continue;
+			}
 
 			const selectedCodes = [...currentCodes, 7];
 			const selectedStyleId = screen.stylePool.intern(selectedCodes);
@@ -80,7 +84,7 @@ export function applySelectionOverlay(
 				charId,
 				selectedStyleId,
 				currentHyperlinkId,
-				width as CellWidth,
+				width,
 			);
 			mutated = true;
 		}
