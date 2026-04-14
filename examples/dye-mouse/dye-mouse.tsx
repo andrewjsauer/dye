@@ -4,6 +4,8 @@ import {
 	Box,
 	Text,
 	AlternateScreen,
+	useApp,
+	useInput,
 	type ClickEvent,
 } from '../../src/index.js';
 
@@ -31,6 +33,15 @@ function Button({
 function App() {
 	const [count, setCount] = useState(0);
 	const [hovered, setHovered] = useState<string | undefined>();
+	const {exit} = useApp();
+
+	// useInput puts stdin in raw mode so the SGR mouse sequences reach Dye,
+	// and keeps the process alive (otherwise Node exits once render returns).
+	useInput((input, key) => {
+		if (key.escape || input === 'q' || (input === 'c' && key.ctrl)) {
+			exit();
+		}
+	});
 
 	return (
 		<AlternateScreen mouseTracking>
@@ -88,7 +99,7 @@ function App() {
 					</Box>
 				</Box>
 				<Text dimColor color='gray'>
-					Press Ctrl+C to exit
+					Press q or Esc to exit
 				</Text>
 			</Box>
 		</AlternateScreen>
