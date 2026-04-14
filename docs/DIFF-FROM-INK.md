@@ -2,8 +2,6 @@
 
 Dye is a fork of [Ink](https://github.com/vadimdemedes/ink) v7.0.0. The public API is a superset: existing Ink apps work by swapping the import. This document enumerates what Dye adds, changes, or replaces, with pointers into the source.
 
-Lineage: the features below were prototyped inside Anthropic's internal Ink fork (shipped as part of Claude Code), then re-implemented clean-room in Dye so they could be released under Ink's MIT license without vendor coupling.
-
 ## Summary table
 
 | Area                          | Ink v7                                | Dye                                                   |

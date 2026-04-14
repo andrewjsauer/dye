@@ -182,7 +182,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Credits
 
-Dye is a fork of [Ink](https://github.com/vadimdemedes/ink) by Vadim Demedes. The renderer, mouse, selection, and scroll extensions were developed and refined inside Anthropic's internal Ink fork used by Claude Code, then re-implemented clean-room here for release under Ink's MIT license.
+Dye is a fork of [Ink](https://github.com/vadimdemedes/ink) by Vadim Demedes, extended with a double-buffered renderer, mouse support, text selection, hardware scroll, and per-frame performance instrumentation — all released under Ink's MIT license.
 
 ## License
 
