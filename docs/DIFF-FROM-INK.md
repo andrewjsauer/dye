@@ -81,7 +81,7 @@ Claude Code's internal Ink has components tightly coupled to its product surface
 - `events/focus-event.ts`, `input-event.ts`, `keyboard-event.ts`, `terminal-event.ts` — the full event hierarchy was simplified to `event.ts` + `click-event.ts` for the v0.1 surface
 - `ClockContext`, `TerminalFocusContext` — not generally useful without the product's scheduling model
 
-These may return as separate opt-in packages; they are deliberately out of `@sauerapple/dye` core.
+These may return as separate opt-in packages; they are deliberately out of `@andrewjsauer/dye` core.
 
 ## Version mapping
 

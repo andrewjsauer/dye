@@ -5,7 +5,7 @@ Thanks for your interest in Dye! This document covers the development setup and 
 ## Development setup
 
 ```
-git clone https://github.com/sauerapple/dye.git
+git clone https://github.com/andrewjsauer/dye.git
 cd dye
 npm install
 ```

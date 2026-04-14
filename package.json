@@ -1,12 +1,12 @@
 {
-	"name": "@sauerapple/dye",
+	"name": "@andrewjsauer/dye",
 	"version": "0.1.0-alpha.0",
 	"description": "React terminal UI framework with mouse support, text selection, and double-buffered rendering. Fork of Ink.",
 	"license": "MIT",
-	"repository": "sauerapple/dye",
+	"repository": "andrewjsauer/dye",
 	"author": {
 		"name": "Andrew Sauer",
-		"url": "https://github.com/sauerapple"
+		"url": "https://github.com/andrewjsauer"
 	},
 	"type": "module",
 	"exports": {

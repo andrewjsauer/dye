@@ -12,7 +12,7 @@ jobs:
     # and register NPM_TOKEN as an environment secret.
     environment:
       name: npm
-      url: https://www.npmjs.com/package/@sauerapple/dye
+      url: https://www.npmjs.com/package/@andrewjsauer/dye
     permissions:
       contents: read
       id-token: write
