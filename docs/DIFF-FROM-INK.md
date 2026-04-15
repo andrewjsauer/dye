@@ -81,7 +81,7 @@ Some surface area was considered and intentionally left out of the core package 
 - A full event class hierarchy (focus/input/keyboard/terminal events) — simplified to `event.ts` + `click-event.ts` for the v0.1 surface
 - Scheduling/clock and terminal-focus contexts — not generally useful without an opinionated scheduling model
 
-These may return as separate opt-in packages; they are deliberately out of `@andrewjsauer/dye` core.
+These may return as separate opt-in packages; they are deliberately out of `@sauerapple/dye` core.
 
 ## Version mapping
 

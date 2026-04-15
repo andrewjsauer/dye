@@ -1,5 +1,5 @@
 {
-	"name": "@andrewjsauer/dye",
+	"name": "@sauerapple/dye",
 	"version": "0.1.0-alpha.0",
 	"description": "React terminal UI framework with mouse support, text selection, and double-buffered rendering. Fork of Ink.",
 	"license": "MIT",

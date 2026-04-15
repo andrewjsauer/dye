@@ -2,12 +2,12 @@
 
 **The terminal is a canvas. Dye is the brush.**
 
-> **Status: alpha (v0.1.0-alpha.0).** Core is stable, tested, and passes every upstream Ink v7 test. Install with `npm install @andrewjsauer/dye@alpha`. The API may shift before v1; see *What's wired vs. what's foundation* below.
+> **Status: alpha (v0.1.0-alpha.0).** Core is stable, tested, and passes every upstream Ink v7 test. Install with `npm install @sauerapple/dye@alpha`. The API may shift before v1; see *What's wired vs. what's foundation* below.
 
 Dye is a React framework for building terminal UIs that feel like applications, not logs — with a mouse that works, text you can actually select, and a renderer fast enough to animate. It is a drop-in superset of [Ink](https://github.com/vadimdemedes/ink) v7: change the import, keep your app.
 
 ```jsx
-import {render, Box, Text, AlternateScreen} from '@andrewjsauer/dye';
+import {render, Box, Text, AlternateScreen} from '@sauerapple/dye';
 
 render(
   <AlternateScreen mouseTracking>
@@ -35,7 +35,7 @@ Everything Ink exports, Dye exports. Your existing `<Box>` and `<Text>` trees ke
 ## Install
 
 ```
-npm install @andrewjsauer/dye
+npm install @sauerapple/dye
 ```
 
 Requires Node 22+ and React 19. Also runs on Bun.
@@ -64,7 +64,7 @@ Clicks bubble through ancestors. Use `event.stopPropagation()` or `event.stopImm
 Once mouse tracking is on, users can select text the way they'd expect — drag, double-click, triple-click, shift-extend. You read it with a hook:
 
 ```jsx
-import {useSelection, useInput} from '@andrewjsauer/dye';
+import {useSelection, useInput} from '@sauerapple/dye';
 
 function Copier() {
   const {hasSelection, selectedText, copy, clearSelection} = useSelection();
@@ -101,7 +101,7 @@ render(<App />, {
 When a scroll by a known delta is the right mental model (lists, logs, virtualized panes), emit a DECSTBM hint and let the terminal do the work:
 
 ```ts
-import {applyScrollHint} from '@andrewjsauer/dye';
+import {applyScrollHint} from '@sauerapple/dye';
 
 stdout.write(applyScrollHint(prev, {top: 2, bottom: 20, delta: 1}, {
   altScreen: true,
